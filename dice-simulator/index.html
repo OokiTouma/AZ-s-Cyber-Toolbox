@@ -524,9 +524,15 @@
             box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
         }
 
-        .party-next-btn:hover {
+        .party-next-btn:hover:not(:disabled) {
             transform: scale(1.05);
             box-shadow: 0 0 50px rgba(0, 212, 255, 0.8);
+        }
+
+        .party-next-btn:disabled {
+            background: linear-gradient(135deg, #666 0%, #444 100%);
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
         .party-status {
@@ -686,6 +692,69 @@
             display: flex;
             gap: 1rem;
             justify-content: center;
+        }
+
+        /* 重掷骰选择对话框样式 */
+        .reroll-groups {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .reroll-group {
+            background: linear-gradient(135deg, rgba(255, 0, 110, 0.2) 0%, rgba(131, 56, 236, 0.2) 100%);
+            border: 2px solid rgba(255, 0, 110, 0.5);
+            border-radius: 15px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 150px;
+        }
+
+        .reroll-group:hover {
+            border-color: #ff006e;
+            background: linear-gradient(135deg, rgba(255, 0, 110, 0.3) 0%, rgba(131, 56, 236, 0.3) 100%);
+            transform: translateY(-3px);
+        }
+
+        .reroll-group.selected {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 140, 0, 0.3) 100%);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .reroll-group-title {
+            color: #ff006e;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .reroll-group.selected .reroll-group-title {
+            color: #ffd700;
+        }
+
+        .reroll-group-dice {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .reroll-dice {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
         }
 
         .party-skill-list {
@@ -956,6 +1025,27 @@
             .texas-dialog-buttons button {
                 width: 100%;
             }
+
+            /* 重掷骰选择对话框手机优化 */
+            .reroll-groups {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .reroll-group {
+                min-width: auto;
+                padding: 0.8rem;
+            }
+
+            .reroll-group-title {
+                font-size: 1rem;
+            }
+
+            .reroll-dice {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
         }
 
         /* 超小屏幕优化 */
@@ -1092,6 +1182,28 @@
         </div>
     </div>
 
+    <!-- 重掷骰选择对话框 -->
+    <div id="rerollSelectDialog" class="texas-dialog" style="display: none;">
+        <div class="texas-dialog-content">
+            <h3>🔄 重掷骰 - 选择一组</h3>
+            <p>点击选择你想要的一组骰子：</p>
+            <div class="reroll-groups">
+                <div class="reroll-group" id="rerollGroup1" onclick="selectRerollGroup(1)">
+                    <div class="reroll-group-title">第一组</div>
+                    <div class="reroll-group-dice" id="rerollGroup1Dice"></div>
+                </div>
+                <div class="reroll-group" id="rerollGroup2" onclick="selectRerollGroup(2)">
+                    <div class="reroll-group-title">第二组</div>
+                    <div class="reroll-group-dice" id="rerollGroup2Dice"></div>
+                </div>
+            </div>
+            <div class="texas-dialog-buttons">
+                <button class="party-roll-btn" onclick="confirmRerollSelect()" id="rerollConfirmBtn" disabled>确认选择</button>
+                <button class="party-next-btn" onclick="cancelRerollSelect()">取消</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 喝酒摇骰子模式遮罩 -->
     <div id="partyModeOverlay" class="party-overlay" style="display: none;">
         <div class="party-container">
@@ -1133,7 +1245,7 @@
     </div>
 
     <script>
-        let selectedDiceType = 8;
+        let selectedDiceType = 6;
         let selectedDiceCount = 2;
         let rollHistory = [];
         
@@ -1401,6 +1513,89 @@
             renderPartySkills();
             updatePartyStatus('取消使用德州骰');
         }
+
+        // 重掷骰选择相关变量
+        let rerollSelection = {
+            group1: [],
+            group2: [],
+            selectedGroup: null,
+            active: false
+        };
+
+        function showRerollDialog() {
+            // 生成两组5个d6骰子
+            rerollSelection.group1 = [];
+            rerollSelection.group2 = [];
+            rerollSelection.selectedGroup = null;
+            rerollSelection.active = true;
+
+            for (let i = 0; i < 5; i++) {
+                rerollSelection.group1.push(Math.floor(Math.random() * 6) + 1);
+                rerollSelection.group2.push(Math.floor(Math.random() * 6) + 1);
+            }
+
+            // 渲染两组骰子
+            const group1Container = document.getElementById('rerollGroup1Dice');
+            const group2Container = document.getElementById('rerollGroup2Dice');
+
+            group1Container.innerHTML = rerollSelection.group1.map(value =>
+                `<div class="reroll-dice">${value}</div>`
+            ).join('');
+
+            group2Container.innerHTML = rerollSelection.group2.map(value =>
+                `<div class="reroll-dice">${value}</div>`
+            ).join('');
+
+            // 重置选择状态
+            document.getElementById('rerollGroup1').classList.remove('selected');
+            document.getElementById('rerollGroup2').classList.remove('selected');
+            document.getElementById('rerollConfirmBtn').disabled = true;
+
+            document.getElementById('rerollSelectDialog').style.display = 'flex';
+        }
+
+        function selectRerollGroup(groupNum) {
+            if (!rerollSelection.active) return;
+
+            rerollSelection.selectedGroup = groupNum;
+
+            document.getElementById('rerollGroup1').classList.toggle('selected', groupNum === 1);
+            document.getElementById('rerollGroup2').classList.toggle('selected', groupNum === 2);
+
+            document.getElementById('rerollConfirmBtn').disabled = false;
+        }
+
+        function confirmRerollSelect() {
+            if (!rerollSelection.selectedGroup) return;
+
+            const selectedDice = rerollSelection.selectedGroup === 1
+                ? rerollSelection.group1
+                : rerollSelection.group2;
+
+            // 将选中的骰子应用到游戏中
+            for (let i = 0; i < 5; i++) {
+                partyMode.dice[i].value = selectedDice[i];
+                partyMode.dice[i].locked = true;
+            }
+
+            document.getElementById('rerollSelectDialog').style.display = 'none';
+            rerollSelection.active = false;
+
+            renderPartyDice();
+            renderPartySkills();
+
+            const values = partyMode.dice.map(d => d.value);
+            updatePartyStatus(`使用重掷骰！选择了第${rerollSelection.selectedGroup}组: [${values.join(', ')}]`);
+        }
+
+        function cancelRerollSelect() {
+            document.getElementById('rerollSelectDialog').style.display = 'none';
+            rerollSelection.active = false;
+            // 返还技能骰
+            partyMode.skills.reroll++;
+            renderPartySkills();
+            updatePartyStatus('取消使用德州骰');
+        }
         
         function renderPartyDice() {
             const container = document.getElementById('partyDiceContainer');
@@ -1416,7 +1611,7 @@
             const container = document.getElementById('partySkillList');
             
             const skills = [
-                { key: 'reroll', name: '🔄 重掷骰', desc: '无视锁定重掷5个d6', count: partyMode.skills.reroll },
+                { key: 'reroll', name: '🔄 重掷骰', desc: '重掷两组5个d6，选择其中一组', count: partyMode.skills.reroll },
                 { key: 'small', name: '🔹 小小骰', desc: '无视锁定重掷5个d4', count: partyMode.skills.small },
                 { key: 'big', name: '🔸 大大骰', desc: '重掷5个d6，结果只可能为4/5/6', count: partyMode.skills.big },
                 { key: 'texas', name: '🤠 德州骰', desc: '重掷7个d6，选择其中5个', count: partyMode.skills.texas }
@@ -1467,10 +1662,30 @@
                 partyMode.dice.forEach(die => die.locked = true);
                 renderPartyDice();
                 
-                // 显示下一局按钮
+                // 显示下一局按钮（带倒计时）
                 document.getElementById('partyRollBtn').style.display = 'none';
-                document.getElementById('partyNextBtn').style.display = 'block';
-                
+                const nextBtn = document.getElementById('partyNextBtn');
+                nextBtn.style.display = 'block';
+                nextBtn.disabled = true;
+
+                // 5秒倒计时
+                let countdown = 5;
+                nextBtn.textContent = `下一局 (${countdown}s)`;
+
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    if (countdown > 0) {
+                        nextBtn.textContent = `下一局 (${countdown}s)`;
+                    } else {
+                        clearInterval(countdownInterval);
+                        nextBtn.disabled = false;
+                        nextBtn.textContent = '下一局 ➜';
+                    }
+                }, 1000);
+
+                // 保存interval ID以便提前清除
+                nextBtn.dataset.countdownInterval = countdownInterval;
+
                 updatePartyStatus(`第${partyMode.round}局完成！五个骰子: [${values.join(', ')}]`);
                 
                 // 检查是否需要奖励技能骰（每3局）
@@ -1481,18 +1696,30 @@
         }
         
         function partyNextRound() {
+            const nextBtn = document.getElementById('partyNextBtn');
+
+            // 如果按钮被禁用，不执行
+            if (nextBtn.disabled) return;
+
+            // 清除倒计时interval
+            if (nextBtn.dataset.countdownInterval) {
+                clearInterval(parseInt(nextBtn.dataset.countdownInterval));
+                delete nextBtn.dataset.countdownInterval;
+            }
+
             partyMode.round++;
             partyMode.locked = false;
-            
+
             // 解锁骰子但保留值
             partyMode.dice.forEach(die => {
                 die.locked = false;
             });
-            
+
             document.getElementById('partyRound').textContent = partyMode.round;
             document.getElementById('partyRollBtn').style.display = 'block';
-            document.getElementById('partyNextBtn').style.display = 'none';
-            
+            nextBtn.style.display = 'none';
+            nextBtn.textContent = '下一局 ➜';
+
             renderPartyDice();
             updatePartyStatus(`第${partyMode.round}局开始！点击"掷骰子"`);
         }
@@ -1511,12 +1738,9 @@
             
             switch(skillKey) {
                 case 'reroll':
-                    // 重掷骰：无视锁定重掷5个d6
-                    partyMode.dice.forEach((die, index) => {
-                        die.value = Math.floor(Math.random() * 6) + 1;
-                        die.locked = true;
-                    });
-                    break;
+                    // 重掷骰：生成两组5个d6，让玩家选择
+                    showRerollDialog();
+                    return; // 不执行后续的render和update
                     
                 case 'small':
                     // 小小骰：无视锁定重掷5个d4
