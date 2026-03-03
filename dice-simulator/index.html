@@ -1418,6 +1418,9 @@
             partyMode.round = 1;
             document.getElementById('partyRound').textContent = partyMode.round;
 
+            // 重置锁定状态
+            partyMode.locked = false;
+
             // 重置骰子
             partyMode.dice.forEach(die => {
                 die.value = null;
