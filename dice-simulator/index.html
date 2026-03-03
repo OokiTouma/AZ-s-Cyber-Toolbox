@@ -757,6 +757,83 @@
             color: white;
         }
 
+        /* 自选骰子彩蛋样式 */
+        .custom-dice-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .custom-dice-row {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .custom-dice-slot {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            border: 3px solid transparent;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .custom-dice-slot:hover {
+            border-color: #ff006e;
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
+        }
+
+        .custom-dice-slot.selected {
+            border-color: #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 140, 0, 0.3) 100%);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+        }
+
+        .custom-dice-slot.filled {
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+        }
+
+        .custom-dice-numbers {
+            margin-bottom: 1.5rem;
+        }
+
+        .custom-dice-numbers p {
+            color: #aaa;
+            margin-bottom: 0.8rem;
+        }
+
+        .number-grid {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .number-btn {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            border: none;
+            border-radius: 10px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .number-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+        }
+
         .party-skill-list {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -1046,6 +1123,27 @@
                 height: 40px;
                 font-size: 1.1rem;
             }
+
+            /* 自选骰子彩蛋手机优化 */
+            .custom-dice-row {
+                gap: 0.5rem;
+            }
+
+            .custom-dice-slot {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+
+            .number-grid {
+                gap: 0.5rem;
+            }
+
+            .number-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 1.2rem;
+            }
         }
 
         /* 超小屏幕优化 */
@@ -1204,6 +1302,34 @@
         </div>
     </div>
 
+    <!-- 自选骰子彩蛋对话框 -->
+    <div id="customDiceDialog" class="texas-dialog" style="display: none;">
+        <div class="texas-dialog-content">
+            <h3>🎁 彩蛋解锁！自选5个D6</h3>
+            <p>点击数字选择你想要的骰子结果（1-6）：</p>
+            <div class="custom-dice-container">
+                <div class="custom-dice-row" id="customDiceRow">
+                    <!-- 5个自选骰子位置 -->
+                </div>
+            </div>
+            <div class="custom-dice-numbers">
+                <p>点击数字设置骰子：</p>
+                <div class="number-grid">
+                    <button class="number-btn" onclick="setCustomDiceValue(1)">1</button>
+                    <button class="number-btn" onclick="setCustomDiceValue(2)">2</button>
+                    <button class="number-btn" onclick="setCustomDiceValue(3)">3</button>
+                    <button class="number-btn" onclick="setCustomDiceValue(4)">4</button>
+                    <button class="number-btn" onclick="setCustomDiceValue(5)">5</button>
+                    <button class="number-btn" onclick="setCustomDiceValue(6)">6</button>
+                </div>
+            </div>
+            <div class="texas-dialog-buttons">
+                <button class="party-roll-btn" onclick="confirmCustomDice()" id="customDiceConfirmBtn" disabled>确认设置</button>
+                <button class="party-next-btn" onclick="cancelCustomDice()">取消</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 喝酒摇骰子模式遮罩 -->
     <div id="partyModeOverlay" class="party-overlay" style="display: none;">
         <div class="party-container">
@@ -1230,7 +1356,7 @@
 
             <div class="party-skills" id="partySkills" style="display: none;">
                 <div class="party-skills-header">
-                    <h3 class="party-skills-title">🎮 技能骰</h3>
+                    <h3 class="party-skills-title" onclick="handleSkillsTitleClick()">🎮 技能骰</h3>
                     <button class="party-close-pro" onclick="showCloseProConfirm()">关闭Pro模式</button>
                 </div>
                 <div class="party-skill-list" id="partySkillList">
@@ -1525,6 +1651,11 @@
             active: false
         };
 
+        // 技能骰标题点击计数（彩蛋）
+        let skillsTitleClickCount = 0;
+        let skillsTitleClickTimer = null;
+        let customDiceBonusUsed = false;
+
         function showRerollDialog() {
             // 生成两组5个d6骰子
             rerollSelection.group1 = [];
@@ -1597,9 +1728,150 @@
             // 返还技能骰
             partyMode.skills.reroll++;
             renderPartySkills();
-            updatePartyStatus('取消使用德州骰');
+            updatePartyStatus('取消使用重掷骰');
         }
-        
+
+        // 技能骰标题点击处理（彩蛋）
+        function handleSkillsTitleClick() {
+            if (customDiceBonusUsed) {
+                updatePartyStatus('彩蛋已经使用过了！');
+                return;
+            }
+
+            skillsTitleClickCount++;
+
+            // 清除之前的计时器
+            if (skillsTitleClickTimer) {
+                clearTimeout(skillsTitleClickTimer);
+            }
+
+            // 3秒内没有继续点击则重置计数
+            skillsTitleClickTimer = setTimeout(() => {
+                skillsTitleClickCount = 0;
+            }, 3000);
+
+            // 点击10次触发彩蛋
+            if (skillsTitleClickCount >= 10) {
+                skillsTitleClickCount = 0;
+                clearTimeout(skillsTitleClickTimer);
+                showCustomDiceDialog();
+            } else if (skillsTitleClickCount >= 5) {
+                // 提示用户快成功了
+                updatePartyStatus(`再点击 ${10 - skillsTitleClickCount} 次解锁彩蛋！`);
+            }
+        }
+
+        // 自选骰子彩蛋相关变量
+        let customDiceSelection = {
+            values: [null, null, null, null, null],
+            selectedSlot: 0,
+            active: false
+        };
+
+        function showCustomDiceDialog() {
+            customDiceSelection.values = [null, null, null, null, null];
+            customDiceSelection.selectedSlot = 0;
+            customDiceSelection.active = true;
+
+            // 渲染5个骰子槽位
+            const container = document.getElementById('customDiceRow');
+            container.innerHTML = customDiceSelection.values.map((value, index) => {
+                const displayValue = value || '?';
+                const selectedClass = index === 0 ? 'selected' : '';
+                const filledClass = value ? 'filled' : '';
+                return `<div class="custom-dice-slot ${selectedClass} ${filledClass}" id="customDiceSlot${index}" onclick="selectCustomDiceSlot(${index})">${displayValue}</div>`;
+            }).join('');
+
+            document.getElementById('customDiceConfirmBtn').disabled = true;
+            document.getElementById('customDiceDialog').style.display = 'flex';
+            updatePartyStatus('🎁 彩蛋解锁！请选择5个骰子的数值');
+        }
+
+        function selectCustomDiceSlot(index) {
+            if (!customDiceSelection.active) return;
+
+            customDiceSelection.selectedSlot = index;
+
+            // 更新选中状态
+            customDiceSelection.values.forEach((_, i) => {
+                const slot = document.getElementById(`customDiceSlot${i}`);
+                slot.classList.toggle('selected', i === index);
+            });
+        }
+
+        function setCustomDiceValue(value) {
+            if (!customDiceSelection.active) return;
+
+            const slotIndex = customDiceSelection.selectedSlot;
+            customDiceSelection.values[slotIndex] = value;
+
+            // 更新显示
+            const slot = document.getElementById(`customDiceSlot${slotIndex}`);
+            slot.textContent = value;
+            slot.classList.add('filled');
+
+            // 自动选择下一个空槽位
+            const nextEmptyIndex = customDiceSelection.values.findIndex(v => v === null);
+            if (nextEmptyIndex !== -1) {
+                selectCustomDiceSlot(nextEmptyIndex);
+            }
+
+            // 检查是否全部设置完成
+            const isComplete = customDiceSelection.values.every(v => v !== null);
+            document.getElementById('customDiceConfirmBtn').disabled = !isComplete;
+        }
+
+        function confirmCustomDice() {
+            if (!customDiceSelection.active) return;
+
+            // 检查是否全部设置
+            if (customDiceSelection.values.some(v => v === null)) return;
+
+            // 应用到游戏
+            for (let i = 0; i < 5; i++) {
+                partyMode.dice[i].value = customDiceSelection.values[i];
+                partyMode.dice[i].locked = true;
+            }
+
+            partyMode.locked = true;
+            customDiceBonusUsed = true;
+
+            document.getElementById('customDiceDialog').style.display = 'none';
+            customDiceSelection.active = false;
+
+            // 显示下一局按钮
+            document.getElementById('partyRollBtn').style.display = 'none';
+            const nextBtn = document.getElementById('partyNextBtn');
+            nextBtn.style.display = 'block';
+            nextBtn.disabled = true;
+
+            // 5秒倒计时
+            let countdown = 5;
+            nextBtn.textContent = `下一局 (${countdown}s)`;
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    nextBtn.textContent = `下一局 (${countdown}s)`;
+                } else {
+                    clearInterval(countdownInterval);
+                    nextBtn.disabled = false;
+                    nextBtn.textContent = '下一局 ➜';
+                }
+            }, 1000);
+            nextBtn.dataset.countdownInterval = countdownInterval;
+
+            renderPartyDice();
+
+            const values = partyMode.dice.map(d => d.value);
+            updatePartyStatus(`🎁 彩蛋使用成功！自选骰子: [${values.join(', ')}]`);
+        }
+
+        function cancelCustomDice() {
+            document.getElementById('customDiceDialog').style.display = 'none';
+            customDiceSelection.active = false;
+            updatePartyStatus('取消使用彩蛋');
+        }
+
         function renderPartyDice() {
             const container = document.getElementById('partyDiceContainer');
             
