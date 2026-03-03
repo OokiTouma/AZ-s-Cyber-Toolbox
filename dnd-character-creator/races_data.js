@@ -120,6 +120,50 @@ const RACES_DATA = {
                     { name: '戏法', description: '你习得一个法师戏法，施法属性为智力', grantsSpells: { cantrips: { count: 1, spellList: 'wizard', choose: true, ability: '智力' } } },
                     { name: '额外语言', description: '你能说、读、写一门额外的自选语言' }
                 ]
+            },
+            eladrin: {
+                name: '雅灵',
+                nameEn: 'Eladrin',
+                source: '魔邓肯的众敌之书',
+                abilityScores: { charisma: 1 },
+                traits: [
+                    { name: '精类血统', description: '你在为自己避免或结束魅惑状态的豁免检定中具有优势' },
+                    { name: '精类步', description: '你可以魔法地传送到一处30尺内且未被占据的可见空间。短休或长休后恢复。3级时，精类步根据你的季节获得额外效果：秋-魅惑；冬-恐慌；春-传送盟友；夏-火焰伤害。', grantsSpells: { level2: [{ name: '迷雾步', levelRequired: 1, freeCast: { count: 1, reset: '短休' }, ability: '魅力' }] } }
+                ]
+            },
+            shadarKai: {
+                name: '影灵',
+                nameEn: 'Shadar-Kai',
+                source: '魔邓肯的众敌之书',
+                abilityScores: { constitution: 1 },
+                traits: [
+                    { name: '精类血统', description: '你在为自己避免或结束魅惑状态的豁免检定中具有优势' },
+                    { name: '鸦后的祝福', description: '你可以魔法地传送到一处30尺内且未被占据的可见空间。短休或长休后恢复。3级时，传送后获得所有伤害抗性直到你的下一回合开始' },
+                    { name: '黯蚀抗性', description: '你具有黯蚀伤害的抗性' }
+                ]
+            },
+            sea: {
+                name: '海精灵',
+                nameEn: 'Sea Elf',
+                source: '魔邓肯的众敌之书',
+                abilityScores: { constitution: 1 },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照。在黑暗中，该范围内可视为等同于微光光照。你无法在黑暗中分辨颜色，只能看到有灰度的黑白画面' },
+                    { name: '海之子', description: '你获得游泳速度，等同于你的步行速度。你可以在水下呼吸空气和水' },
+                    { name: '海之友', description: '你可以与任何有游泳速度的野兽传达简单的意念。它们可以感知你的话语的意思，虽然没有特殊能力来回应' }
+                ]
+            },
+            astral: {
+                name: '星界精灵',
+                nameEn: 'Astral Elf',
+                source: '星界冒险者指南',
+                abilityScores: { intelligence: 1, wisdom: 1, charisma: 1 },
+                abilityScoreText: '选择智力、感知或魅力+1',
+                traits: [
+                    { name: '星界之火', description: '你知晓一个自选的戏法：舞光术、光亮术或圣火术。智力、感知或魅力是你释放该法术时的施法属性（选择该种族时决定）', grantsSpells: { cantrips: { count: 1, spellList: 'wizard', choose: true, ability: '智力' } } },
+                    { name: '星光步', description: '你可以魔法地传送到30尺内一处你可见且未被占据的空间。你能使用本特性的次数等于你的熟练加值，当你完成一次长休，你恢复所有已使用的次数。', grantsSpells: { level2: [{ name: '迷雾步', levelRequired: 1, freeCast: { count: '熟练加值', reset: '长休' }, ability: '魅力' }] } },
+                    { name: '星界出神', description: '你不需要睡眠，并且不会因魔法效应而陷入睡眠。你能够在4小时里完成一次长休，只要你在期间进行出神般的冥想，整个过程你都能保持清醒。当你完成出神时，你获得一个自选技能的熟练项，与一件自选武器或自选工具的熟练项。这些熟练项你只能从玩家手册中选择。你通过抽取共享的精灵记忆及星界位面的实体经历，神秘地获得了这些熟练项，这个好处会一直持续到你完成下次长休。' }
+                ]
             }
         }
     },
@@ -173,6 +217,19 @@ const RACES_DATA = {
                 abilityScores: { constitution: 2 },
                 traits: [
                     { name: '武器训练', description: '你熟练使用战斧、手斧、轻型锤、战锤' }
+                ]
+            },
+            duergar: {
+                name: '灰矮人',
+                nameEn: 'Duergar',
+                source: '魔邓肯的众敌之书',
+                abilityScores: { strength: 1 },
+                darkvision: 120,
+                traits: [
+                    { name: '增强黑暗视觉', description: '你的黑暗视觉范围提升至120尺' },
+                    { name: '灰矮人魔法', description: '从3级开始，你可以对自己施展变巨/缩小术，且无需材料成分。从5级开始，你同样可以对自己施展隐形术，且无需材料成分。一旦你使用该特质施展了这些法术中的任何一个，直到完成一次长休，你不能再次使用该特质施展那个法术。你也能用你拥有的相应法术位来施展这些法术。当你使用此特质施展法术时，智力、感知或魅力是你的施法属性（选择该种族时决定）。', grantsSpells: { level2: [{ name: '变巨/缩小术', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '智力' }], level3: [{ name: '隐形术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '智力' }] } },
+                    { name: '矮人韧性', description: '你在为自己避免或结束中毒状态的豁免检定时具有优势。你同样具有毒素伤害的抗性。' },
+                    { name: '灵能坚韧', description: '你在为自己避免或结束魅惑和震慑状态的豁免检定时具有优势。' }
                 ]
             }
         }
@@ -275,8 +332,8 @@ const RACES_DATA = {
     dragonborn: {
         name: '龙裔',
         nameEn: 'Dragonborn',
-        source: '玩家手册',
-        description: '龙裔是龙族血统的继承者，拥有龙的力量和吐息武器。',
+        source: '玩家手册/费兹班的龙族宝藏',
+        description: '龙裔是龙族血统的继承者，拥有龙的力量和吐息武器。他们行走在多元宇宙中，是龙族血脉在凡人世界的体现。',
         abilityScores: {
             strength: 2,
             charisma: 1
@@ -301,14 +358,273 @@ const RACES_DATA = {
             { name: '红龙', damage: '火焰', breathWeapon: '15尺锥形', dc: '敏捷' },
             { name: '银龙', damage: '冷冻', breathWeapon: '15尺锥形', dc: '体质' },
             { name: '白龙', damage: '冷冻', breathWeapon: '15尺锥形', dc: '体质' }
-        ]
+        ],
+        subraces: {
+            // 彩色龙裔（邪恶龙血统）
+            black: {
+                name: '黑龙裔',
+                nameEn: 'Black Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '黑龙裔继承了黑龙的强酸之力，他们的吐息能腐蚀一切。',
+                damageType: '强酸',
+                breathWeapon: { shape: '直线', range: '5尺宽30尺长', dc: '敏捷' },
+                traits: [
+                    { name: '强酸吐息', description: '你可以呼出破坏性的强酸，5尺宽30尺长的直线区域，区域内生物必须进行敏捷豁免（DC=8+体质调整值+熟练加值），失败受到2d6强酸伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '强酸抗性', description: '你拥有强酸伤害的抗性' },
+                    { name: '两栖', description: '你可以在水下呼吸空气和水' }
+                ]
+            },
+            blue: {
+                name: '蓝龙裔',
+                nameEn: 'Blue Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '蓝龙裔继承了蓝龙的闪电之力，他们的吐息能撕裂天空。',
+                damageType: '闪电',
+                breathWeapon: { shape: '直线', range: '5尺宽30尺长', dc: '敏捷' },
+                traits: [
+                    { name: '闪电吐息', description: '你可以呼出破坏性的闪电，5尺宽30尺长的直线区域，区域内生物必须进行敏捷豁免（DC=8+体质调整值+熟练加值），失败受到2d6闪电伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '闪电抗性', description: '你拥有闪电伤害的抗性' },
+                    { name: '沙漠行者', description: '你无视困难地形的沙漠环境效果' }
+                ]
+            },
+            green: {
+                name: '绿龙裔',
+                nameEn: 'Green Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '绿龙裔继承了绿龙的毒素之力，他们的吐息能让敌人窒息。',
+                damageType: '毒素',
+                breathWeapon: { shape: '锥形', range: '15尺', dc: '体质' },
+                traits: [
+                    { name: '毒素吐息', description: '你可以呼出破坏性的毒气，15尺锥形区域，区域内生物必须进行体质豁免（DC=8+体质调整值+熟练加值），失败受到2d6毒素伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '毒素抗性', description: '你拥有毒素伤害的抗性' },
+                    { name: '林地伪装', description: '在森林或丛林地形进行隐匿检定时具有优势' }
+                ]
+            },
+            red: {
+                name: '红龙裔',
+                nameEn: 'Red Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '红龙裔继承了红龙的火焰之力，他们的吐息能焚尽一切。',
+                damageType: '火焰',
+                breathWeapon: { shape: '锥形', range: '15尺', dc: '敏捷' },
+                traits: [
+                    { name: '火焰吐息', description: '你可以呼出破坏性的火焰，15尺锥形区域，区域内生物必须进行敏捷豁免（DC=8+体质调整值+熟练加值），失败受到2d6火焰伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '火焰抗性', description: '你拥有火焰伤害的抗性' },
+                    { name: '火山适应', description: '你免疫高原反应，可以无视极端高温的环境效果' }
+                ]
+            },
+            white: {
+                name: '白龙裔',
+                nameEn: 'White Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '白龙裔继承了白龙的冷冻之力，他们的吐息能冻结灵魂。',
+                damageType: '冷冻',
+                breathWeapon: { shape: '锥形', range: '15尺', dc: '体质' },
+                traits: [
+                    { name: '冷冻吐息', description: '你可以呼出破坏性的寒气，15尺锥形区域，区域内生物必须进行体质豁免（DC=8+体质调整值+熟练加值），失败受到2d6冷冻伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '冷冻抗性', description: '你拥有冷冻伤害的抗性' },
+                    { name: '极地行者', description: '你免疫高原反应，可以无视极端寒冷的环境效果' }
+                ]
+            },
+            // 金属龙裔（善良龙血统）
+            brass: {
+                name: '黄铜龙裔',
+                nameEn: 'Brass Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '黄铜龙裔继承了黄铜龙的火焰之力，他们热爱交谈和阳光。',
+                damageType: '火焰',
+                breathWeapon: { shape: '直线', range: '5尺宽30尺长', dc: '敏捷' },
+                traits: [
+                    { name: '火焰吐息', description: '你可以呼出破坏性的火焰，5尺宽30尺长的直线区域，区域内生物必须进行敏捷豁免（DC=8+体质调整值+熟练加值），失败受到2d6火焰伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '火焰抗性', description: '你拥有火焰伤害的抗性' },
+                    { name: '沙漠适应', description: '你可以无视极端高温的环境效果' }
+                ]
+            },
+            bronze: {
+                name: '青铜龙裔',
+                nameEn: 'Bronze Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '青铜龙裔继承了青铜龙的闪电之力，他们热爱海洋和正义。',
+                damageType: '闪电',
+                breathWeapon: { shape: '直线', range: '5尺宽30尺长', dc: '敏捷' },
+                traits: [
+                    { name: '闪电吐息', description: '你可以呼出破坏性的闪电，5尺宽30尺长的直线区域，区域内生物必须进行敏捷豁免（DC=8+体质调整值+熟练加值），失败受到2d6闪电伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '闪电抗性', description: '你拥有闪电伤害的抗性' },
+                    { name: '两栖', description: '你可以在水下呼吸空气和水' }
+                ]
+            },
+            copper: {
+                name: '赤铜龙裔',
+                nameEn: 'Copper Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '赤铜龙裔继承了赤铜龙的强酸之力，他们热爱恶作剧和故事。',
+                damageType: '强酸',
+                breathWeapon: { shape: '直线', range: '5尺宽30尺长', dc: '敏捷' },
+                traits: [
+                    { name: '强酸吐息', description: '你可以呼出破坏性的强酸，5尺宽30尺长的直线区域，区域内生物必须进行敏捷豁免（DC=8+体质调整值+熟练加值），失败受到2d6强酸伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '强酸抗性', description: '你拥有强酸伤害的抗性' },
+                    { name: '岩地行者', description: '在岩石或山地地形进行隐匿检定时具有优势' }
+                ]
+            },
+            gold: {
+                name: '金龙裔',
+                nameEn: 'Gold Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '金龙裔继承了金龙的火焰之力，他们追求正义和秩序。',
+                damageType: '火焰',
+                breathWeapon: { shape: '锥形', range: '15尺', dc: '敏捷' },
+                traits: [
+                    { name: '火焰吐息', description: '你可以呼出破坏性的火焰，15尺锥形区域，区域内生物必须进行敏捷豁免（DC=8+体质调整值+熟练加值），失败受到2d6火焰伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '火焰抗性', description: '你拥有火焰伤害的抗性' },
+                    { name: '水下呼吸', description: '你可以在水下呼吸' }
+                ]
+            },
+            silver: {
+                name: '银龙裔',
+                nameEn: 'Silver Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '银龙裔继承了银龙的冷冻之力，他们热爱云端和善良。',
+                damageType: '冷冻',
+                breathWeapon: { shape: '锥形', range: '15尺', dc: '体质' },
+                traits: [
+                    { name: '冷冻吐息', description: '你可以呼出破坏性的寒气，15尺锥形区域，区域内生物必须进行体质豁免（DC=8+体质调整值+熟练加值），失败受到2d6冷冻伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '冷冻抗性', description: '你拥有冷冻伤害的抗性' },
+                    { name: '极地适应', description: '你可以无视极端寒冷的环境效果' }
+                ]
+            },
+            // 宝石龙裔（中立龙血统 - 来自费兹班的龙族宝藏）
+            amethyst: {
+                name: '紫晶龙裔',
+                nameEn: 'Amethyst Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '紫晶龙裔继承了紫晶龙的心灵之力，他们追求知识和平衡。',
+                damageType: '心灵',
+                breathWeapon: { shape: '直线', range: '5尺宽30尺长', dc: '感知' },
+                traits: [
+                    { name: '心灵吐息', description: '你可以呼出破坏性的心灵能量，5尺宽30尺长的直线区域，区域内生物必须进行感知豁免（DC=8+体质调整值+熟练加值），失败受到2d6心灵伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '心灵抗性', description: '你拥有心灵伤害的抗性' },
+                    { name: '宝石抗性', description: '你进行对抗魅惑和恐慌的豁免时具有优势' }
+                ]
+            },
+            crystal: {
+                name: '水晶龙裔',
+                nameEn: 'Crystal Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '水晶龙裔继承了水晶龙的光耀之力，他们热爱阳光和美丽。',
+                damageType: '光耀',
+                breathWeapon: { shape: '直线', range: '5尺宽30尺长', dc: '体质' },
+                traits: [
+                    { name: '光耀吐息', description: '你可以呼出破坏性的光耀能量，5尺宽30尺长的直线区域，区域内生物必须进行体质豁免（DC=8+体质调整值+熟练加值），失败受到2d6光耀伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '光耀抗性', description: '你拥有光耀伤害的抗性' },
+                    { name: '宝石抗性', description: '你进行对抗魅惑和恐慌的豁免时具有优势' }
+                ]
+            },
+            emerald: {
+                name: '翡翠龙裔',
+                nameEn: 'Emerald Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '翡翠龙裔继承了翡翠龙的心灵之力，他们是操纵思想的专家。',
+                damageType: '心灵',
+                breathWeapon: { shape: '锥形', range: '15尺', dc: '感知' },
+                traits: [
+                    { name: '心灵吐息', description: '你可以呼出破坏性的心灵能量，15尺锥形区域，区域内生物必须进行感知豁免（DC=8+体质调整值+熟练加值），失败受到2d6心灵伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '心灵抗性', description: '你拥有心灵伤害的抗性' },
+                    { name: '宝石抗性', description: '你进行对抗魅惑和恐慌的豁免时具有优势' }
+                ]
+            },
+            sapphire: {
+                name: '蓝宝石龙裔',
+                nameEn: 'Sapphire Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '蓝宝石龙裔继承了蓝宝石龙的心灵之力，他们是灵能的掌控者。',
+                damageType: '心灵',
+                breathWeapon: { shape: '直线', range: '5尺宽30尺长', dc: '感知' },
+                traits: [
+                    { name: '心灵吐息', description: '你可以呼出破坏性的心灵能量，5尺宽30尺长的直线区域，区域内生物必须进行感知豁免（DC=8+体质调整值+熟练加值），失败受到2d6心灵伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '心灵抗性', description: '你拥有心灵伤害的抗性' },
+                    { name: '宝石抗性', description: '你进行对抗魅惑和恐慌的豁免时具有优势' }
+                ]
+            },
+            topaz: {
+                name: '黄玉龙裔',
+                nameEn: 'Topaz Dragonborn',
+                source: '费兹班的龙族宝藏',
+                description: '黄玉龙裔继承了黄玉龙的黯蚀之力，他们与死亡和遗忘为伴。',
+                damageType: '黯蚀',
+                breathWeapon: { shape: '锥形', range: '15尺', dc: '体质' },
+                traits: [
+                    { name: '黯蚀吐息', description: '你可以呼出破坏性的黯蚀能量，15尺锥形区域，区域内生物必须进行体质豁免（DC=8+体质调整值+熟练加值），失败受到2d6黯蚀伤害，成功伤害减半。5级时3d6，11级时4d6，17级时5d6（短休或长休恢复）' },
+                    { name: '黯蚀抗性', description: '你拥有黯蚀伤害的抗性' },
+                    { name: '宝石抗性', description: '你进行对抗魅惑和恐慌的豁免时具有优势' }
+                ]
+            }
+        },
+        // 龙裔变体选项
+        variants: {
+            draconicGifts: {
+                name: '龙族恩赐',
+                nameEn: 'Draconic Gifts',
+                source: '费兹班的龙族宝藏',
+                description: '一些龙裔展现出额外的龙族特征和能力',
+                options: [
+                    { 
+                        name: '龙翼', 
+                        description: '你长出龙翼，获得等于步行速度的飞行速度。5级起，你可以使用飞行速度',
+                        levelRequired: 5
+                    },
+                    { 
+                        name: '龙尾', 
+                        description: '你长出龙尾，可以用它进行徒手打击，造成1d6+力量调整值的钝击伤害，命中后可用附赠动作尝试擒抱或推撞目标'
+                    },
+                    { 
+                        name: '龙爪', 
+                        description: '你的爪子变得锋利，徒手打击造成1d6+力量调整值的挥砍伤害'
+                    },
+                    { 
+                        name: '龙鳞强化', 
+                        description: '你的鳞片更加坚硬，未着装护甲时AC=13+敏捷调整值'
+                    },
+                    { 
+                        name: '龙息强化', 
+                        description: '你的龙息武器伤害骰提升一级（d6变为d8）'
+                    }
+                ]
+            },
+            chromaticLegacy: {
+                name: '彩色龙传承',
+                nameEn: 'Chromatic Legacy',
+                source: '费兹班的龙族宝藏',
+                description: '彩色龙裔可以选择此变体，获得额外的彩色龙能力',
+                traits: [
+                    { name: '彩色龙魔法', description: '你知晓戏法毒气喷溅；3级后每日一次施展脆弱诅咒；5级后每日一次施展黑暗术', grantsSpells: { cantrips: [{ name: '毒气喷溅', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '脆弱诅咒', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '黑暗术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            },
+            metallicLegacy: {
+                name: '金属龙传承',
+                nameEn: 'Metallic Legacy',
+                source: '费兹班的龙族宝藏',
+                description: '金属龙裔可以选择此变体，获得额外的金属龙能力',
+                traits: [
+                    { name: '金属龙魔法', description: '你知晓戏法光亮术；3级后每日一次施展治愈真言；5级后每日一次施展次级复原术', grantsSpells: { cantrips: [{ name: '光亮术', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '治愈真言', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '次级复原术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            },
+            gemLegacy: {
+                name: '宝石龙传承',
+                nameEn: 'Gem Legacy',
+                source: '费兹班的龙族宝藏',
+                description: '宝石龙裔可以选择此变体，获得额外的宝石龙能力',
+                traits: [
+                    { name: '宝石龙魔法', description: '你知晓戏法心灵之楔；3级后每日一次施展护盾术；5级后每日一次施展迷踪步', grantsSpells: { cantrips: [{ name: '心灵之楔', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '护盾术', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '迷踪步', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            }
+        }
     },
 
     halfElf: {
         name: '半精灵',
         nameEn: 'Half-Elf',
-        source: '玩家手册',
-        description: '半精灵是精灵和人类的混血，继承了两者的优点，但常常不被任何一方完全接纳。',
+        source: '玩家手册/剑湾冒险者指南/扩展',
+        description: '半精灵是精灵和人类的混血，继承了两者的优点，但常常不被任何一方完全接纳。他们拥有人类的适应力和精灵的优雅，是优秀的 diplomats 和冒险者。',
         abilityScores: {
             charisma: 2
         },
@@ -324,11 +640,150 @@ const RACES_DATA = {
         languages: ['通用语', '精灵语'],
         extraLanguages: 1,
         traits: [
-            { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+            { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照。在黑暗中，该范围内可视为等同于微光光照' },
             { name: '妖精血统', description: '你进行对抗魅惑的豁免时具有优势，并且不会因魔法效应陷入睡眠' },
             { name: '多才多艺', description: '你获得两项自选技能熟练' }
         ],
-        extraSkills: 2
+        extraSkills: 2,
+        // 半精灵变体 - 基于精灵血统
+        subraces: {
+            // 标准半精灵
+            standard: {
+                name: '标准半精灵',
+                nameEn: 'Standard Half-Elf',
+                source: '玩家手册',
+                description: '最常见的半精灵类型，继承了人类和高等精灵的血统。',
+                abilityScores: { charisma: 2 },
+                abilityScoreChoice: { count: 2, bonus: 1, text: '另两项不同属性各+1' },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '妖精血统', description: '你进行对抗魅惑的豁免时具有优势，并且不会因魔法效应陷入睡眠' },
+                    { name: '多才多艺', description: '你获得两项自选技能熟练' }
+                ],
+                extraSkills: 2
+            },
+            // 木精灵血统半精灵
+            wood: {
+                name: '木精灵血统半精灵',
+                nameEn: 'Wood Elf Heritage Half-Elf',
+                source: '剑湾冒险者指南',
+                description: '继承了木精灵血统的半精灵，与自然有着更深的联系。',
+                abilityScores: { charisma: 2 },
+                abilityScoreChoice: { count: 2, bonus: 1, text: '另两项不同属性各+1' },
+                speed: 35,
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '妖精血统', description: '你进行对抗魅惑的豁免时具有优势，并且不会因魔法效应陷入睡眠' },
+                    { name: '精灵武器训练', description: '你熟练使用长剑、短剑、短弓和长弓' },
+                    { name: '轻捷步伐', description: '你的基础步行速度提升至35尺' },
+                    { name: '多才多艺', description: '你获得一项自选技能熟练' }
+                ],
+                extraSkills: 1
+            },
+            // 卓尔血统半精灵
+            drow: {
+                name: '卓尔血统半精灵',
+                nameEn: 'Drow Heritage Half-Elf',
+                source: '剑湾冒险者指南',
+                description: '继承了卓尔血统的半精灵，拥有幽暗地域的力量。',
+                abilityScores: { charisma: 2 },
+                abilityScoreChoice: { count: 2, bonus: 1, text: '另两项不同属性各+1' },
+                darkvision: 120,
+                traits: [
+                    { name: '增强黑暗视觉', description: '你的黑暗视觉范围提升至120尺' },
+                    { name: '妖精血统', description: '你进行对抗魅惑的豁免时具有优势，并且不会因魔法效应陷入睡眠' },
+                    { name: '卓尔魔法', description: '你知晓舞光术戏法；3级后可施展妖火术；5级后可施展黑暗术；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '舞光术', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '妖火术', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '黑暗术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } },
+                    { name: '日光敏感', description: '阳光直射下攻击检定和依赖视觉的感知（察觉）检定具有劣势' },
+                    { name: '多才多艺', description: '你获得一项自选技能熟练' }
+                ],
+                extraSkills: 1
+            },
+            // 高等精灵血统半精灵
+            high: {
+                name: '高等精灵血统半精灵',
+                nameEn: 'High Elf Heritage Half-Elf',
+                source: '剑湾冒险者指南',
+                description: '继承了高等精灵血统的半精灵，拥有奥术天赋。',
+                abilityScores: { charisma: 2 },
+                abilityScoreChoice: { count: 2, bonus: 1, text: '另两项不同属性各+1' },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '妖精血统', description: '你进行对抗魅惑的豁免时具有优势，并且不会因魔法效应陷入睡眠' },
+                    { name: '精灵武器训练', description: '你熟练使用长剑、短剑、短弓和长弓' },
+                    { name: '戏法', description: '你习得一个法师戏法，施法属性为智力', grantsSpells: { cantrips: { count: 1, spellList: 'wizard', choose: true, ability: '智力' } } },
+                    { name: '多才多艺', description: '你获得一项自选技能熟练' }
+                ],
+                extraSkills: 1
+            },
+            // 海精灵血统半精灵
+            sea: {
+                name: '海精灵血统半精灵',
+                nameEn: 'Sea Elf Heritage Half-Elf',
+                source: '扩展/魔邓肯的众敌之书',
+                description: '继承了海精灵血统的半精灵，与水元素有着特殊的联系。',
+                abilityScores: { charisma: 2 },
+                abilityScoreChoice: { count: 2, bonus: 1, text: '另两项不同属性各+1' },
+                swimSpeed: 30,
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '妖精血统', description: '你进行对抗魅惑的豁免时具有优势，并且不会因魔法效应陷入睡眠' },
+                    { name: '海之子', description: '你获得游泳速度，等同于你的步行速度。你可以在水下呼吸空气和水' },
+                    { name: '海之友', description: '你可以与任何有游泳速度的野兽传达简单的意念' },
+                    { name: '多才多艺', description: '你获得一项自选技能熟练' }
+                ],
+                extraSkills: 1
+            },
+            // 雅灵血统半精灵
+            eladrin: {
+                name: '雅灵血统半精灵',
+                nameEn: 'Eladrin Heritage Half-Elf',
+                source: '扩展/魔邓肯的众敌之书',
+                description: '继承了雅灵血统的半精灵，与妖精荒野有着神秘的联系。',
+                abilityScores: { charisma: 2 },
+                abilityScoreChoice: { count: 2, bonus: 1, text: '另两项不同属性各+1' },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '妖精血统', description: '你进行避免或结束魅惑状态的豁免时具有优势' },
+                    { name: '精类步', description: '你可以魔法地传送到一处30尺内且未被占据的可见空间。短休或长休后恢复。', grantsSpells: { level2: [{ name: '迷雾步', levelRequired: 1, freeCast: { count: 1, reset: '短休' }, ability: '魅力' }] } },
+                    { name: '多才多艺', description: '你获得一项自选技能熟练' }
+                ],
+                extraSkills: 1
+            },
+            // 影灵血统半精灵
+            shadarKai: {
+                name: '影灵血统半精灵',
+                nameEn: 'Shadar-Kai Heritage Half-Elf',
+                source: '扩展/魔邓肯的众敌之书',
+                description: '继承了影灵血统的半精灵，与阴影位面有着神秘的联系。',
+                abilityScores: { charisma: 2 },
+                abilityScoreChoice: { count: 2, bonus: 1, text: '另两项不同属性各+1' },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '妖精血统', description: '你进行避免或结束魅惑状态的豁免时具有优势' },
+                    { name: '鸦后的祝福', description: '你可以魔法地传送到一处30尺内且未被占据的可见空间。短休或长休后恢复。3级时，传送后获得所有伤害抗性直到你的下一回合开始' },
+                    { name: '暗蚀抗性', description: '你具有黯蚀伤害的抗性' },
+                    { name: '多才多艺', description: '你获得一项自选技能熟练' }
+                ],
+                extraSkills: 1
+            },
+            // 星界精灵血统半精灵
+            astral: {
+                name: '星界精灵血统半精灵',
+                nameEn: 'Astral Elf Heritage Half-Elf',
+                source: '扩展/星界冒险者指南',
+                description: '继承了星界精灵血统的半精灵，与星光位面有着神秘的联系。',
+                abilityScores: { charisma: 2 },
+                abilityScoreChoice: { count: 2, bonus: 1, text: '另两项不同属性各+1' },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '妖精血统', description: '你进行避免或结束魅惑状态的豁免时具有优势' },
+                    { name: '星界之火', description: '你知晓一个自选的戏法：舞光术、光亮术或圣火术。智力、感知或魅力是你释放该法术时的施法属性（选择该种族时决定）', grantsSpells: { cantrips: { count: 1, spellList: 'wizard', choose: true, ability: '魅力' } } },
+                    { name: '星光步', description: '你可以魔法地传送到30尺内一处你可见且未被占据的空间。你能使用本特性的次数等于你的熟练加值，当你完成一次长休，你恢复所有已使用的次数。', grantsSpells: { level2: [{ name: '迷雾步', levelRequired: 1, freeCast: { count: '熟练加值', reset: '长休' }, ability: '魅力' }] } },
+                    { name: '多才多艺', description: '你获得一项自选技能熟练' }
+                ],
+                extraSkills: 1
+            }
+        },
     },
 
     halfOrc: {
@@ -356,8 +811,8 @@ const RACES_DATA = {
     tiefling: {
         name: '提夫林',
         nameEn: 'Tiefling',
-        source: '玩家手册',
-        description: '提夫林是恶魔或魔鬼的后裔，拥有地狱的血统和力量。',
+        source: '玩家手册/魔邓肯的众敌之书/剑湾冒险者指南',
+        description: '提夫林是恶魔或魔鬼的后裔，拥有地狱的血统和力量。他们的外表带有明显的恶魔特征，如角、尾巴和异色瞳孔，但他们并非天生邪恶，而是被多元宇宙中的偏见所困扰。',
         abilityScores: {
             intelligence: 1,
             charisma: 2
@@ -368,10 +823,197 @@ const RACES_DATA = {
         darkvision: 60,
         languages: ['通用语', '炼狱语'],
         traits: [
-            { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+            { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照。在黑暗中，该范围内可视为等同于微光光照' },
             { name: '火焰抗性', description: '你拥有火焰伤害抗性' },
             { name: '地狱遗赠', description: '你知晓奇术戏法；3级后可施展炼狱叱喝；5级后可施展黑暗术；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '奇术', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '炼狱叱喝', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '黑暗术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
-        ]
+        ],
+        // 提夫林变体 - 基于不同地狱血统
+        subraces: {
+            // 阿斯莫提夫林（标准提夫林 - 阿斯莫血统）
+            asmodeus: {
+                name: '阿斯莫提夫林',
+                nameEn: 'Asmodeus Tiefling',
+                source: '魔邓肯的众敌之书',
+                description: '继承了九层地狱之主阿斯莫血统的提夫林，是最常见的提夫林类型。',
+                abilityScores: { intelligence: 1, charisma: 2 },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '火焰抗性', description: '你拥有火焰伤害抗性' },
+                    { name: '地狱遗赠', description: '你知晓奇术戏法；3级后可施展炼狱叱喝；5级后可施展黑暗术；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '奇术', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '炼狱叱喝', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '黑暗术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            },
+            // 巴力提夫林
+            baalzebul: {
+                name: '巴力提夫林',
+                nameEn: 'Baalzebul Tiefling',
+                source: '魔邓肯的众敌之书',
+                description: '继承了苍蝇领主巴力血统的提夫林，擅长腐化和诡计。',
+                abilityScores: { intelligence: 1, charisma: 2 },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '火焰抗性', description: '你拥有火焰伤害抗性' },
+                    { name: '巴力遗赠', description: '你知晓奇术戏法；3级后可施展脆弱诅咒；5级后可施展侦测思想；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '奇术', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '脆弱诅咒', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '侦测思想', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            },
+            // 狄斯帕特提夫林
+            dispater: {
+                name: '狄斯帕特提夫林',
+                nameEn: 'Dispater Tiefling',
+                source: '魔邓肯的众敌之书',
+                description: '继承了迪斯城主狄斯帕特血统的提夫林，是间谍和阴谋的大师。',
+                abilityScores: { dexterity: 1, charisma: 2 },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '火焰抗性', description: '你拥有火焰伤害抗性' },
+                    { name: '狄斯帕特遗赠', description: '你知晓奇术戏法；3级后可施展不谐低语；5级后可施展隐形术；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '奇术', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '不谐低语', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '隐形术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            },
+            // 菲尔娜提夫林
+            fierna: {
+                name: '菲尔娜提夫林',
+                nameEn: 'Fierna Tiefling',
+                source: '魔邓肯的众敌之书',
+                description: '继承了菲尔娜血统的提夫林，拥有操控他人情感的能力。',
+                abilityScores: { wisdom: 1, charisma: 2 },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '火焰抗性', description: '你拥有火焰伤害抗性' },
+                    { name: '菲尔娜遗赠', description: '你知晓交友术戏法；3级后可施展魅惑人类；5级后可施展暗示术；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '交友术', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '魅惑人类', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '暗示术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            },
+            // 格拉斯亚提夫林
+            glasya: {
+                name: '格拉斯亚提夫林',
+                nameEn: 'Glasya Tiefling',
+                source: '魔邓肯的众敌之书',
+                description: '继承了玛尔博吉女王格拉斯亚血统的提夫林，是欺诈和盗窃的大师。',
+                abilityScores: { dexterity: 1, charisma: 2 },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '火焰抗性', description: '你拥有火焰伤害抗性' },
+                    { name: '格拉斯亚遗赠', description: '你知晓次级幻影戏法；3级后可施展易容术；5级后可施展隐形术；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '次级幻影', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '易容术', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '隐形术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            },
+            // 莱维思图斯提夫林
+            levistus: {
+                name: '莱维思图斯提夫林',
+                nameEn: 'Levistus Tiefling',
+                source: '魔邓肯的众敌之书',
+                description: '继承了被冰封的莱维思图斯血统的提夫林，拥有冰冻的力量。',
+                abilityScores: { constitution: 1, charisma: 2 },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '冷冻抗性', description: '你拥有冷冻伤害抗性' },
+                    { name: '莱维思图斯遗赠', description: '你知晓法师之手戏法（呈现为幽灵冰爪）；3级后可施展护甲之主；5级后可施展黑暗术；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '法师之手', alwaysKnown: true, ability: '魅力', special: '幽灵冰爪' }], level1: [{ name: '护甲之主', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '黑暗术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            },
+            // 玛门提夫林
+            mammon: {
+                name: '玛门提夫林',
+                nameEn: 'Mammon Tiefling',
+                source: '魔邓肯的众敌之书',
+                description: '继承了贪婪大公玛门血统的提夫林，对财富和宝藏有着天生的敏感。',
+                abilityScores: { intelligence: 1, charisma: 2 },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '火焰抗性', description: '你拥有火焰伤害抗性' },
+                    { name: '玛门遗赠', description: '你知晓法师之手戏法；3级后可施展塔莎狂笑术；5级后可施展蛛行术；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '法师之手', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '塔莎狂笑术', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '蛛行术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            },
+            // 墨菲斯托费利斯提夫林
+            mephistopheles: {
+                name: '墨菲斯托费利斯提夫林',
+                nameEn: 'Mephistopheles Tiefling',
+                source: '魔邓肯的众敌之书',
+                description: '继承了墨菲斯托费利斯血统的提夫林，是奥术知识的追求者。',
+                abilityScores: { intelligence: 1, charisma: 2 },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '火焰抗性', description: '你拥有火焰伤害抗性' },
+                    { name: '墨菲斯托费利斯遗赠', description: '你知晓火焰箭戏法；3级后可施展燃烧之手；5级后可施展火焰刀；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '火焰箭', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '燃烧之手', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '火焰刀', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            },
+            // 扎瑞尔提夫林
+            zariel: {
+                name: '扎瑞尔提夫林',
+                nameEn: 'Zariel Tiefling',
+                source: '魔邓肯的众敌之书',
+                description: '继承了堕落天使扎瑞尔血统的提夫林，是战斗和毁灭的化身。',
+                abilityScores: { strength: 1, charisma: 2 },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '火焰抗性', description: '你拥有火焰伤害抗性' },
+                    { name: '扎瑞尔遗赠', description: '你知晓奇术戏法；3级后可施展神恩；5级后可施展印记斩；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '奇术', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '神恩', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '印记斩', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            },
+            // 深渊提夫林（恶魔血统）
+            abyssal: {
+                name: '深渊提夫林',
+                nameEn: 'Abyssal Tiefling',
+                source: '剑湾冒险者指南/自定义',
+                description: '继承了深渊恶魔血统的提夫林，拥有更野蛮和混乱的力量。',
+                abilityScores: { constitution: 1, charisma: 2 },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '毒素抗性', description: '你拥有毒素伤害抗性' },
+                    { name: '深渊遗赠', description: '你知晓毒气喷溅戏法；3级后可施展妖火；5级后可施展蛛行术；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '毒气喷溅', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '妖火', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '蛛行术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            },
+            // 尤格罗斯提夫林
+            yugoloth: {
+                name: '尤格罗斯提夫林',
+                nameEn: 'Yugoloth Tiefling',
+                source: '自定义/扩展',
+                description: '继承了尤格罗斯魔血统的提夫林，是中立邪恶位面的后裔。',
+                abilityScores: { intelligence: 1, charisma: 2 },
+                traits: [
+                    { name: '黑暗视觉', description: '在微光光照下，你身边60尺内可以视为等同于明亮光照' },
+                    { name: '黯蚀抗性', description: '你拥有黯蚀伤害抗性' },
+                    { name: '尤格罗斯遗赠', description: '你知晓冷冻射线戏法；3级后可施展虚假生命；5级后可施展黑暗术；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '冷冻射线', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '虚假生命', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '黑暗术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            }
+        },
+        // 提夫林变体选项
+        variants: {
+            winged: {
+                name: '有翼提夫林',
+                nameEn: 'Winged Tiefling',
+                source: '剑湾冒险者指南',
+                description: '一些提夫林拥有蝙蝠般的翅膀，可以飞行。',
+                traits: [
+                    { name: '飞行', description: '你拥有30尺飞行速度。穿戴中甲或重甲时不能使用此飞行速度' }
+                ],
+                tradeOff: '失去地狱遗赠特性'
+            },
+            devilTongue: {
+                name: '魔鬼之舌',
+                nameEn: 'Devil\'s Tongue',
+                source: '剑湾冒险者指南',
+                description: '你的口才和魅惑能力得到了魔鬼血统的强化。',
+                traits: [
+                    { name: '魔鬼之舌', description: '你知晓恶毒嘲笑和交友术戏法；3级后可施展魅惑人类；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '恶毒嘲笑', alwaysKnown: true, ability: '魅力' }, { name: '交友术', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '魅惑人类', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ],
+                tradeOff: '替换地狱遗赠中的奇术和炼狱叱喝'
+            },
+            hellfire: {
+                name: '地狱之火',
+                nameEn: 'Hellfire',
+                source: '剑湾冒险者指南',
+                description: '你的地狱遗赠能力得到了火焰的强化。',
+                traits: [
+                    { name: '地狱之火', description: '你的炼狱叱喝额外造成火焰伤害' }
+                ]
+            },
+            infernalLegacy: {
+                name: '炼狱传承',
+                nameEn: 'Infernal Legacy',
+                source: '玩家手册',
+                description: '标准的炼狱血统提夫林。',
+                traits: [
+                    { name: '炼狱传承', description: '你知晓奇术戏法；3级后可施展炼狱叱喝；5级后可施展黑暗术；长休恢复；施法属性为魅力', grantsSpells: { cantrips: [{ name: '奇术', alwaysKnown: true, ability: '魅力' }], level1: [{ name: '炼狱叱喝', levelRequired: 3, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }], level2: [{ name: '黑暗术', levelRequired: 5, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } }
+                ]
+            }
+        }
     },
 
     aasimar: {

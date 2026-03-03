@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D 5E 法术速查</title>
+    <link rel="stylesheet" href="/AZ-s-Cyber-Toolbox/dnd-character-creator/styles.css">
+    <style>
+        /* 法术速查专用样式 */
+        .spell-search-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .search-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--card-bg) 0%, #fffef0 100%);
+            border-radius: 12px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .search-header h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .search-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .search-group label {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .search-group input,
+        .search-group select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .search-group input:focus,
+        .search-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+        }
+
+        .search-stats {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .spell-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .spell-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .spell-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(139, 69, 19, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .spell-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .spell-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .spell-title {
+            flex: 1;
+        }
+
+        .spell-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .spell-name-en {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .spell-level-badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .spell-level-badge.cantrip {
+            background: linear-gradient(135deg, #9c27b0, #e91e63);
+        }
+
+        .spell-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .spell-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .spell-meta-label {
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .spell-meta-value {
+            color: var(--text-color);
+        }
+
+        .spell-school {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .spell-school.abjuration { background: #e3f2fd; color: #1565c0; }
+        .spell-school.conjuration { background: #e8f5e9; color: #2e7d32; }
+        .spell-school.divination { background: #fff3e0; color: #ef6c00; }
+        .spell-school.enchantment { background: #fce4ec; color: #c2185b; }
+        .spell-school.evocation { background: #ffebee; color: #c62828; }
+        .spell-school.illusion { background: #f3e5f5; color: #7b1fa2; }
+        .spell-school.necromancy { background: #efebe9; color: #4e342e; }
+        .spell-school.transmutation { background: #e0f2f1; color: #00695c; }
+
+        .spell-classes {
+            margin-bottom: 15px;
+        }
+
+        .spell-classes-title {
+            font-weight: bold;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .spell-class-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .spell-class-tag {
+            background: var(--bg-color);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .spell-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-color);
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-link:hover {
+            background: var(--secondary-color);
+            transform: translateX(-5px);
+        }
+
+        /* 夜间模式适配 */
+        [data-theme="dark"] .spell-school.abjuration { background: #1565c0; color: #e3f2fd; }
+        [data-theme="dark"] .spell-school.conjuration { background: #2e7d32; color: #e8f5e9; }
+        [data-theme="dark"] .spell-school.divination { background: #ef6c00; color: #fff3e0; }
+        [data-theme="dark"] .spell-school.enchantment { background: #c2185b; color: #fce4ec; }
+        [data-theme="dark"] .spell-school.evocation { background: #c62828; color: #ffebee; }
+        [data-theme="dark"] .spell-school.illusion { background: #7b1fa2; color: #f3e5f5; }
+        [data-theme="dark"] .spell-school.necromancy { background: #4e342e; color: #efebe9; }
+        [data-theme="dark"] .spell-school.transmutation { background: #00695c; color: #e0f2f1; }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .spell-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .spell-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary-color);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="spell-search-container">
+        <a href="dnd-character-creator/index.html" class="back-link">← 返回角色创建器</a>
+
+        <div class="search-header">
+            <h1>🪄 D&D 5E 法术速查</h1>
+            <p>快速查找和浏览所有法术，支持按名称、环阶、学派、职业筛选</p>
+        </div>
+
+        <div class="search-controls">
+            <div class="search-group">
+                <label for="searchName">法术名称</label>
+                <input type="text" id="searchName" placeholder="输入法术名称搜索...">
+            </div>
+            <div class="search-group">
+                <label for="searchLevel">法术环阶</label>
+                <select id="searchLevel">
+                    <option value="">全部环阶</option>
+                    <option value="0">戏法 (0环)</option>
+                    <option value="1">1环</option>
+                    <option value="2">2环</option>
+                    <option value="3">3环</option>
+                    <option value="4">4环</option>
+                    <option value="5">5环</option>
+                    <option value="6">6环</option>
+                    <option value="7">7环</option>
+                    <option value="8">8环</option>
+                    <option value="9">9环</option>
+                </select>
+            </div>
+            <div class="search-group">
+                <label for="searchSchool">法术学派</label>
+                <select id="searchSchool">
+                    <option value="">全部学派</option>
+                    <option value="防护">防护</option>
+                    <option value="咒法">咒法</option>
+                    <option value="预言">预言</option>
+                    <option value="惑控">惑控</option>
+                    <option value="塑能">塑能</option>
+                    <option value="幻术">幻术</option>
+                    <option value="死灵">死灵</option>
+                    <option value="变化">变化</option>
+                </select>
+            </div>
+            <div class="search-group">
+                <label for="searchClass">职业</label>
+                <select id="searchClass">
+                    <option value="">全部职业</option>
+                    <option value="bard">吟游诗人</option>
+                    <option value="cleric">牧师</option>
+                    <option value="druid">德鲁伊</option>
+                    <option value="paladin">圣武士</option>
+                    <option value="ranger">游侠</option>
+                    <option value="sorcerer">术士</option>
+                    <option value="warlock">邪术师</option>
+                    <option value="wizard">法师</option>
+                    <option value="artificer">奇械师</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="search-stats" id="searchStats">
+            共找到 <span id="spellCount">0</span> 个法术
+        </div>
+
+        <div class="spell-grid" id="spellGrid">
+            <div class="loading">正在加载法术数据...</div>
+        </div>
+    </div>
+
+    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/spells_data.js"></script>
+    <script>
+        // 法术速查应用
+        class SpellSearchApp {
+            constructor() {
+                this.allSpells = [];
+                this.filteredSpells = [];
+                this.init();
+            }
+
+            init() {
+                this.loadSpells();
+                this.setupEventListeners();
+                this.renderSpells();
+            }
+
+            loadSpells() {
+                // 从 SPELLS 对象加载所有法术
+                if (typeof SPELLS !== 'undefined') {
+                    // 加载戏法
+                    if (SPELLS.cantrips) {
+                        this.allSpells.push(...SPELLS.cantrips.map(s => ({...s, level: 0})));
+                    }
+                    // 加载1-9环法术
+                    for (let i = 1; i <= 9; i++) {
+                        const key = `level${i}`;
+                        if (SPELLS[key]) {
+                            this.allSpells.push(...SPELLS[key]);
+                        }
+                    }
+                }
+                this.filteredSpells = [...this.allSpells];
+                this.updateStats();
+            }
+
+            setupEventListeners() {
+                document.getElementById('searchName').addEventListener('input', () => this.filterSpells());
+                document.getElementById('searchLevel').addEventListener('change', () => this.filterSpells());
+                document.getElementById('searchSchool').addEventListener('change', () => this.filterSpells());
+                document.getElementById('searchClass').addEventListener('change', () => this.filterSpells());
+            }
+
+            filterSpells() {
+                const nameFilter = document.getElementById('searchName').value.toLowerCase();
+                const levelFilter = document.getElementById('searchLevel').value;
+                const schoolFilter = document.getElementById('searchSchool').value;
+                const classFilter = document.getElementById('searchClass').value;
+
+                this.filteredSpells = this.allSpells.filter(spell => {
+                    // 名称筛选
+                    if (nameFilter && !spell.name.toLowerCase().includes(nameFilter) && 
+                        !spell.nameEn.toLowerCase().includes(nameFilter)) {
+                        return false;
+                    }
+
+                    // 环阶筛选
+                    if (levelFilter !== '' && spell.level !== parseInt(levelFilter)) {
+                        return false;
+                    }
+
+                    // 学派筛选
+                    if (schoolFilter && spell.school !== schoolFilter) {
+                        return false;
+                    }
+
+                    // 职业筛选
+                    if (classFilter && (!spell.class || !spell.class.includes(classFilter))) {
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                this.updateStats();
+                this.renderSpells();
+            }
+
+            updateStats() {
+                document.getElementById('spellCount').textContent = this.filteredSpells.length;
+            }
+
+            getSchoolClass(school) {
+                const schoolMap = {
+                    '防护': 'abjuration',
+                    '咒法': 'conjuration',
+                    '预言': 'divination',
+                    '惑控': 'enchantment',
+                    '塑能': 'evocation',
+                    '幻术': 'illusion',
+                    '死灵': 'necromancy',
+                    '变化': 'transmutation'
+                };
+                return schoolMap[school] || '';
+            }
+
+            getLevelText(level) {
+                if (level === 0) return '戏法';
+                return `${level}环`;
+            }
+
+            getClassName(classKey) {
+                const classMap = {
+                    'bard': '吟游诗人',
+                    'cleric': '牧师',
+                    'druid': '德鲁伊',
+                    'paladin': '圣武士',
+                    'ranger': '游侠',
+                    'sorcerer': '术士',
+                    'warlock': '邪术师',
+                    'wizard': '法师',
+                    'artificer': '奇械师'
+                };
+                return classMap[classKey] || classKey;
+            }
+
+            renderSpells() {
+                const grid = document.getElementById('spellGrid');
+
+                if (this.filteredSpells.length === 0) {
+                    grid.innerHTML = `
+                        <div class="no-results" style="grid-column: 1 / -1;">
+                            <div class="no-results-icon">🔍</div>
+                            <h3>未找到匹配的法术</h3>
+                            <p>请尝试调整搜索条件</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = this.filteredSpells.map(spell => {
+                    const schoolClass = this.getSchoolClass(spell.school);
+                    const levelText = this.getLevelText(spell.level);
+                    const levelBadgeClass = spell.level === 0 ? 'cantrip' : '';
+                    
+                    const classTags = spell.class ? spell.class.map(c => 
+                        `<span class="spell-class-tag">${this.getClassName(c)}</span>`
+                    ).join('') : '';
+
+                    return `
+                        <div class="spell-card">
+                            <div class="spell-header">
+                                <div class="spell-title">
+                                    <div class="spell-name">${spell.name}</div>
+                                    <div class="spell-name-en">${spell.nameEn}</div>
+                                </div>
+                                <div class="spell-level-badge ${levelBadgeClass}">${levelText}</div>
+                            </div>
+                            
+                            <div class="spell-meta">
+                                <div class="spell-meta-item">
+                                    <span class="spell-meta-label">学派：</span>
+                                    <span class="spell-school ${schoolClass}">${spell.school}</span>
+                                </div>
+                                <div class="spell-meta-item">
+                                    <span class="spell-meta-label">施法时间：</span>
+                                    <span class="spell-meta-value">${spell.castingTime}</span>
+                                </div>
+                                <div class="spell-meta-item">
+                                    <span class="spell-meta-label">射程：</span>
+                                    <span class="spell-meta-value">${spell.range}</span>
+                                </div>
+                                <div class="spell-meta-item">
+                                    <span class="spell-meta-label">成分：</span>
+                                    <span class="spell-meta-value">${spell.components}</span>
+                                </div>
+                                <div class="spell-meta-item">
+                                    <span class="spell-meta-label">持续：</span>
+                                    <span class="spell-meta-value">${spell.duration}</span>
+                                </div>
+                            </div>
+
+                            <div class="spell-classes">
+                                <div class="spell-classes-title">可用职业：</div>
+                                <div class="spell-class-tags">${classTags}</div>
+                            </div>
+
+                            <div class="spell-description">
+                                ${spell.description}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', () => {
+            new SpellSearchApp();
+        });
+    </script>
+</body>
+</html>

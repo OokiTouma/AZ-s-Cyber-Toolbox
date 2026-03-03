@@ -435,13 +435,23 @@ class CharacterApp {
             if (this.character.class) {
                 this.renderClassFeatures(this.character.class);
             }
-            
+
+            // 重新渲染契约恩赐和魔能祈唤（邪术师）
+            this.renderPactBoon();
+            this.renderEldritchInvocations();
+
             this.checkSubclassAvailability();
             this.updateCharacterSheet();
         });
 
         document.getElementById('charXP').addEventListener('input', (e) => {
             this.character.xp = parseInt(e.target.value) || 0;
+            this.updateCharacterSheet();
+        });
+
+        // 阵营选择
+        document.getElementById('charAlignment').addEventListener('change', (e) => {
+            this.character.alignment = e.target.value;
             this.updateCharacterSheet();
         });
 
@@ -497,8 +507,8 @@ class CharacterApp {
         });
 
         // 财富输入
-        const wealthInputs = ['wealthPP', 'wealthGP', 'wealthEP', 'wealthSP', 'wealthCP'];
-        const wealthKeys = ['pp', 'gp', 'ep', 'sp', 'cp'];
+        const wealthInputs = ['wealthPP', 'wealthGP', 'wealthSP', 'wealthCP'];
+        const wealthKeys = ['pp', 'gp', 'sp', 'cp'];
         wealthInputs.forEach((id, index) => {
             const input = document.getElementById(id);
             if (input) {
@@ -984,6 +994,10 @@ class CharacterApp {
             if (cls.spellcasting) {
                 this.updateSpellSelect(document.getElementById('spellLevel').value);
             }
+
+            // 渲染契约恩赐和魔能祈唤（邪术师）
+            this.renderPactBoon();
+            this.renderEldritchInvocations();
         } else {
             document.getElementById('classDescription').textContent = '';
             document.getElementById('classFeatures').innerHTML = '';
@@ -1148,31 +1162,72 @@ class CharacterApp {
         const container = document.getElementById('skillsList');
         container.innerHTML = '';
 
+        // 按属性分类技能
+        const abilityGroups = {
+            strength: { name: '力量', skills: [] },
+            dexterity: { name: '敏捷', skills: [] },
+            intelligence: { name: '智力', skills: [] },
+            wisdom: { name: '感知', skills: [] },
+            charisma: { name: '魅力', skills: [] }
+        };
+
+        // 将技能分组
         for (const [key, skill] of Object.entries(SKILLS)) {
-            const item = document.createElement('div');
-            item.className = 'skill-item';
+            if (abilityGroups[skill.ability]) {
+                abilityGroups[skill.ability].skills.push({ key, ...skill });
+            }
+        }
 
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = `skill-${key}`;
-            checkbox.checked = this.character.proficiencies.skills.includes(key);
-            checkbox.addEventListener('change', () => {
-                this.toggleSkillProficiency(key);
-            });
+        // 按属性顺序渲染
+        const abilityOrder = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma'];
+        
+        for (const ability of abilityOrder) {
+            const group = abilityGroups[ability];
+            if (group.skills.length === 0) continue;
 
-            const label = document.createElement('label');
-            label.htmlFor = `skill-${key}`;
-            label.textContent = skill.name;
+            // 创建属性分组
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'skill-group';
+            
+            // 属性标题
+            const groupHeader = document.createElement('div');
+            groupHeader.className = 'skill-group-header';
+            groupHeader.textContent = group.name;
+            groupDiv.appendChild(groupHeader);
 
-            const modifier = document.createElement('span');
-            modifier.className = 'skill-modifier';
-            modifier.id = `skill-mod-${key}`;
-            modifier.textContent = this.getSkillModifierText(key);
+            // 技能列表
+            const skillsContainer = document.createElement('div');
+            skillsContainer.className = 'skills-container';
 
-            item.appendChild(checkbox);
-            item.appendChild(label);
-            item.appendChild(modifier);
-            container.appendChild(item);
+            for (const skill of group.skills) {
+                const item = document.createElement('div');
+                item.className = 'skill-item';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `skill-${skill.key}`;
+                checkbox.checked = this.character.proficiencies.skills.includes(skill.key);
+                checkbox.addEventListener('change', () => {
+                    this.toggleSkillProficiency(skill.key);
+                });
+
+                const label = document.createElement('label');
+                label.htmlFor = `skill-${skill.key}`;
+                label.textContent = skill.name;
+
+                const modifier = document.createElement('span');
+                modifier.className = 'skill-modifier';
+                modifier.id = `skill-mod-${skill.key}`;
+                modifier.textContent = this.getSkillModifierText(skill.key);
+
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                item.appendChild(modifier);
+                skillsContainer.appendChild(item);
+            }
+
+            groupDiv.appendChild(skillsContainer);
+            container.appendChild(groupDiv);
         }
     }
 
@@ -1200,6 +1255,237 @@ class CharacterApp {
             this.character.proficiencies.skills.push(skillKey);
         }
         this.renderSkills();
+        this.updateCharacterSheet();
+    }
+
+    // 获取魔能祈唤数量
+    getInvocationSlots() {
+        const level = this.character.level || 1;
+        if (level >= 18) return 8;
+        if (level >= 15) return 7;
+        if (level >= 12) return 6;
+        if (level >= 9) return 5;
+        if (level >= 7) return 4;
+        if (level >= 5) return 3;
+        if (level >= 2) return 2;
+        return 0;
+    }
+
+    // 渲染契约恩赐
+    renderPactBoon() {
+        const section = document.getElementById('pactBoonSection');
+        const list = document.getElementById('pactBoonList');
+
+        // 只有邪术师显示契约恩赐
+        if (this.character.class !== 'warlock') {
+            section.style.display = 'none';
+            return;
+        }
+
+        // 只有3级及以上才显示
+        const level = this.character.level || 1;
+        if (level < 3) {
+            section.style.display = 'none';
+            return;
+        }
+
+        section.style.display = 'block';
+
+        // 初始化已选恩赐
+        if (!this.character.pactBoon) {
+            this.character.pactBoon = null;
+        }
+
+        const warlock = CLASSES.warlock;
+        if (!warlock || !warlock.pactBoons) {
+            list.innerHTML = '<p>暂无可用契约恩赐</p>';
+            return;
+        }
+
+        list.innerHTML = '';
+
+        for (const boon of warlock.pactBoons) {
+            const item = document.createElement('div');
+            item.className = 'pact-boon-item';
+
+            const isSelected = this.character.pactBoon === boon.key;
+
+            if (isSelected) {
+                item.classList.add('selected');
+            }
+
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'pactBoon';
+            radio.value = boon.key;
+            radio.checked = isSelected;
+            radio.addEventListener('change', () => {
+                this.selectPactBoon(boon.key);
+            });
+
+            const info = document.createElement('div');
+            info.className = 'pact-boon-info';
+
+            const name = document.createElement('div');
+            name.className = 'pact-boon-name';
+            name.textContent = boon.name;
+
+            const desc = document.createElement('div');
+            desc.className = 'pact-boon-description';
+            desc.textContent = boon.description;
+
+            info.appendChild(name);
+            info.appendChild(desc);
+            item.appendChild(radio);
+            item.appendChild(info);
+
+            // 点击整行选择
+            item.addEventListener('click', (e) => {
+                if (e.target !== radio) {
+                    radio.checked = true;
+                    this.selectPactBoon(boon.key);
+                }
+            });
+
+            list.appendChild(item);
+        }
+    }
+
+    // 选择契约恩赐
+    selectPactBoon(boonKey) {
+        this.character.pactBoon = boonKey;
+        this.renderPactBoon();
+
+        const warlock = CLASSES.warlock;
+        const boon = warlock.pactBoons.find(b => b.key === boonKey);
+        this.showNotification(`已选择契约恩赐: ${boon?.name || boonKey}`, 'success');
+        this.updateCharacterSheet();
+    }
+
+    // 渲染魔能祈唤
+    renderEldritchInvocations() {
+        const section = document.getElementById('eldritchInvocationsSection');
+        const list = document.getElementById('eldritchInvocationsList');
+        const slotsDisplay = document.getElementById('invocationSlots');
+
+        // 只有邪术师显示魔能祈唤
+        if (this.character.class !== 'warlock') {
+            section.style.display = 'none';
+            return;
+        }
+
+        section.style.display = 'block';
+        const maxSlots = this.getInvocationSlots();
+        const currentSlots = (this.character.eldritchInvocations || []).length;
+        slotsDisplay.textContent = `${currentSlots}/${maxSlots}`;
+
+        // 初始化已选祈唤
+        if (!this.character.eldritchInvocations) {
+            this.character.eldritchInvocations = [];
+        }
+
+        const warlock = CLASSES.warlock;
+        if (!warlock || !warlock.eldritchInvocations) {
+            list.innerHTML = '<p>暂无可用魔能祈唤</p>';
+            return;
+        }
+
+        list.innerHTML = '';
+
+        // 按等级排序
+        const invocations = [...warlock.eldritchInvocations].sort((a, b) => a.level - b.level);
+
+        for (const invocation of invocations) {
+            const item = document.createElement('div');
+            item.className = 'invocation-item';
+
+            const isSelected = this.character.eldritchInvocations.includes(invocation.name);
+            const canSelect = isSelected || currentSlots < maxSlots;
+            const meetsLevel = (this.character.level || 1) >= invocation.level;
+
+            if (isSelected) {
+                item.classList.add('selected');
+            }
+            if (!canSelect || !meetsLevel) {
+                item.classList.add('disabled');
+            }
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = isSelected;
+            checkbox.disabled = !canSelect || !meetsLevel;
+            checkbox.addEventListener('change', () => {
+                this.toggleInvocation(invocation.name);
+            });
+
+            const info = document.createElement('div');
+            info.className = 'invocation-info';
+
+            const name = document.createElement('div');
+            name.className = 'invocation-name';
+            name.textContent = invocation.name;
+
+            const prerequisite = document.createElement('div');
+            prerequisite.className = 'invocation-prerequisite';
+            let prereqText = `${invocation.level}级可学`;
+            if (invocation.prerequisite) {
+                prereqText += ` | 先决条件: ${invocation.prerequisite}`;
+            }
+            prerequisite.textContent = prereqText;
+
+            info.appendChild(name);
+            info.appendChild(prerequisite);
+            item.appendChild(checkbox);
+            item.appendChild(info);
+
+            // 添加魔能祈唤描述tooltip事件
+            if (invocation.description) {
+                name.addEventListener('mouseenter', (e) => {
+                    this.showTooltip(e, invocation.description);
+                });
+                name.addEventListener('mouseleave', () => {
+                    this.hideTooltip();
+                });
+                name.addEventListener('mousemove', (e) => {
+                    this.moveTooltip(e);
+                });
+            }
+
+            // 点击整行切换
+            item.addEventListener('click', (e) => {
+                if (e.target !== checkbox) {
+                    if (!checkbox.disabled) {
+                        checkbox.checked = !checkbox.checked;
+                        this.toggleInvocation(invocation.name);
+                    }
+                }
+            });
+
+            list.appendChild(item);
+        }
+    }
+
+    // 切换魔能祈唤
+    toggleInvocation(invocationName) {
+        if (!this.character.eldritchInvocations) {
+            this.character.eldritchInvocations = [];
+        }
+
+        const index = this.character.eldritchInvocations.indexOf(invocationName);
+        if (index > -1) {
+            this.character.eldritchInvocations.splice(index, 1);
+            this.showNotification(`已移除魔能祈唤: ${invocationName}`, 'info');
+        } else {
+            const maxSlots = this.getInvocationSlots();
+            if (this.character.eldritchInvocations.length >= maxSlots) {
+                this.showNotification('魔能祈唤数量已达上限', 'error');
+                return;
+            }
+            this.character.eldritchInvocations.push(invocationName);
+            this.showNotification(`已添加魔能祈唤: ${invocationName}`, 'success');
+        }
+
+        this.renderEldritchInvocations();
         this.updateCharacterSheet();
     }
 
@@ -1325,6 +1611,14 @@ class CharacterApp {
         document.getElementById('sheetPlayer').textContent = this.character.playerName || '-';
         document.getElementById('sheetXP').textContent = this.character.xp;
 
+        // 阵营显示
+        const alignmentMap = {
+            'lg': '守序善良', 'ng': '中立善良', 'cg': '混乱善良',
+            'ln': '守序中立', 'tn': '绝对中立', 'cn': '混乱中立',
+            'le': '守序邪恶', 'ne': '中立邪恶', 'ce': '混乱邪恶'
+        };
+        document.getElementById('sheetAlignment').textContent = alignmentMap[this.character.alignment] || '-';
+
         // 种族/职业/等级
         let raceName = this.character.race ? RACES[this.character.race]?.name : '种族';
         
@@ -1403,11 +1697,19 @@ class CharacterApp {
         const calculatedMaxHP = hitDice + conMod + (this.character.level - 1) * (Math.floor(hitDice / 2) + 1 + conMod);
         
         // 更新最大生命值（如果职业或等级改变）
-        if (this.character.maxHP !== calculatedMaxHP) {
+        const oldMaxHP = this.character.maxHP || 0;
+        if (oldMaxHP !== calculatedMaxHP) {
             this.character.maxHP = calculatedMaxHP;
-            // 如果是新角色或当前生命值大于最大生命值，重置当前生命值
-            if (this.character.currentHP === 0 || this.character.currentHP > this.character.maxHP) {
+            // 如果是新角色，当前生命值设为最大生命值
+            if (this.character.currentHP === 0) {
                 this.character.currentHP = this.character.maxHP;
+            } else if (this.character.currentHP > this.character.maxHP) {
+                // 如果当前生命值超过最大生命值，限制为最大生命值
+                this.character.currentHP = this.character.maxHP;
+            } else if (calculatedMaxHP > oldMaxHP && oldMaxHP > 0) {
+                // 升级时，当前生命值也增加相同的数值
+                const hpIncrease = calculatedMaxHP - oldMaxHP;
+                this.character.currentHP += hpIncrease;
             }
         }
         
@@ -1475,30 +1777,27 @@ class CharacterApp {
 
     // 渲染角色卡预览 - 财富
     renderSheetWealth() {
-        const wealth = this.character.wealth || { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 };
-        
+        const wealth = this.character.wealth || { pp: 0, gp: 0, sp: 0, cp: 0 };
+
         // 更新各币种显示
         const ppEl = document.getElementById('sheetPP');
         const gpEl = document.getElementById('sheetGP');
-        const epEl = document.getElementById('sheetEP');
         const spEl = document.getElementById('sheetSP');
         const cpEl = document.getElementById('sheetCP');
         const totalEl = document.getElementById('sheetWealthTotal');
-        
+
         if (ppEl) ppEl.textContent = wealth.pp || 0;
         if (gpEl) gpEl.textContent = wealth.gp || 0;
-        if (epEl) epEl.textContent = wealth.ep || 0;
         if (spEl) spEl.textContent = wealth.sp || 0;
         if (cpEl) cpEl.textContent = wealth.cp || 0;
-        
+
         // 计算总价值（转换为GP）
-        // PP = 10 GP, EP = 0.5 GP, SP = 0.1 GP, CP = 0.01 GP
-        const totalGP = (wealth.pp || 0) * 10 + 
-                       (wealth.gp || 0) + 
-                       (wealth.ep || 0) * 0.5 + 
-                       (wealth.sp || 0) * 0.1 + 
+        // PP = 10 GP, SP = 0.1 GP, CP = 0.01 GP
+        const totalGP = (wealth.pp || 0) * 10 +
+                       (wealth.gp || 0) +
+                       (wealth.sp || 0) * 0.1 +
                        (wealth.cp || 0) * 0.01;
-        
+
         if (totalEl) totalEl.textContent = `${totalGP.toFixed(2)} GP`;
     }
 
@@ -1617,6 +1916,13 @@ class CharacterApp {
         }
     }
 
+    // 获取法术描述
+    getSpellDescription(spellName, spellLevel) {
+        const spellKey = spellLevel === 0 ? 'cantrips' : `level${spellLevel}`;
+        const spellData = SPELLS[spellKey]?.find(s => s.name === spellName);
+        return spellData?.description || '';
+    }
+
     // 渲染法术列表
     renderSpells() {
         const container = document.getElementById('spellsList');
@@ -1664,10 +1970,14 @@ class CharacterApp {
             
             const removeButton = spell.fromFeature ? '' : `<button onclick="characterApp.removeSpell('${spell.name}')" class="btn-remove">移除</button>`;
             
+            // 获取法术描述用于tooltip
+            const description = this.getSpellDescription(spell.name, spell.level);
+            const tooltipAttr = description ? `data-tooltip="${description}"` : '';
+            
             return `
-                <div class="spell-item ${spell.fromFeature ? 'feature-spell' : ''}">
+                <div class="spell-item ${spell.fromFeature ? 'feature-spell' : ''}" ${tooltipAttr}>
                     <div class="spell-main-info">
-                        <span class="spell-name">${spell.name}</span>
+                        <span class="spell-name" title="${description}">${spell.name}</span>
                         <span class="spell-level">${spell.level === 0 ? '戏法' : spell.level + '环'}</span>
                         <span class="spell-school">${spell.school}</span>
                         ${removeButton}
@@ -1676,6 +1986,65 @@ class CharacterApp {
                 </div>
             `;
         }).join('');
+        
+        // 添加tooltip事件监听
+        this.setupSpellTooltips(container);
+    }
+
+    // 设置法术tooltip事件
+    setupSpellTooltips(container) {
+        const spellItems = container.querySelectorAll('.spell-item[data-tooltip]');
+        spellItems.forEach(item => {
+            const spellName = item.querySelector('.spell-name');
+            if (spellName) {
+                spellName.addEventListener('mouseenter', (e) => {
+                    this.showTooltip(e, item.dataset.tooltip);
+                });
+                spellName.addEventListener('mouseleave', () => {
+                    this.hideTooltip();
+                });
+                spellName.addEventListener('mousemove', (e) => {
+                    this.moveTooltip(e);
+                });
+            }
+        });
+    }
+
+    // 显示tooltip
+    showTooltip(e, text) {
+        let tooltip = document.getElementById('spell-tooltip');
+        if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.id = 'spell-tooltip';
+            tooltip.className = 'spell-tooltip';
+            document.body.appendChild(tooltip);
+        }
+        tooltip.textContent = text;
+        tooltip.style.display = 'block';
+        this.moveTooltip(e);
+    }
+
+    // 隐藏tooltip
+    hideTooltip() {
+        const tooltip = document.getElementById('spell-tooltip');
+        if (tooltip) {
+            tooltip.style.display = 'none';
+        }
+    }
+
+    // 移动tooltip
+    moveTooltip(e) {
+        const tooltip = document.getElementById('spell-tooltip');
+        if (tooltip) {
+            const x = e.clientX + 15;
+            const y = e.clientY + 15;
+            // 防止tooltip超出屏幕
+            const rect = tooltip.getBoundingClientRect();
+            const maxX = window.innerWidth - rect.width - 10;
+            const maxY = window.innerHeight - rect.height - 10;
+            tooltip.style.left = Math.min(x, maxX) + 'px';
+            tooltip.style.top = Math.min(y, maxY) + 'px';
+        }
     }
 
     // 添加法术
@@ -2001,18 +2370,32 @@ class CharacterApp {
     renderSheetWeapons() {
         const container = document.getElementById('sheetWeapons');
         if (!container) return;
-        
+
+        // 获取空手伤害（武僧和拳斗士）
+        const unarmedStrike = this.getUnarmedStrikeDamage();
+
         const allWeapons = [...this.character.weapons.melee, ...this.character.weapons.ranged];
-        
+
+        // 如果有空手伤害，添加到武器列表开头
+        if (unarmedStrike) {
+            allWeapons.unshift({
+                name: unarmedStrike.name,
+                damage: unarmedStrike.damage,
+                damageType: unarmedStrike.damageType,
+                isUnarmed: true
+            });
+        }
+
         if (allWeapons.length === 0) {
             container.innerHTML = '<p class="empty-text">暂无武器</p>';
             return;
         }
-        
+
         container.innerHTML = allWeapons.map(weapon => {
             const attackBonus = this.calculateWeaponAttackBonus(weapon);
+            const unarmedClass = weapon.isUnarmed ? 'unarmed-weapon' : '';
             return `
-                <div class="sheet-weapon-item">
+                <div class="sheet-weapon-item ${unarmedClass}">
                     <span class="sheet-weapon-name">${weapon.name}</span>
                     <span class="sheet-weapon-bonus">攻击${attackBonus >= 0 ? '+' : ''}${attackBonus}</span>
                     <span class="sheet-weapon-damage">${weapon.damage} ${weapon.damageType}</span>
@@ -2025,7 +2408,16 @@ class CharacterApp {
     // 计算武器攻击加值
     calculateWeaponAttackBonus(weapon) {
         let bonus = this.getProficiencyBonus();
-        
+
+        // 空手攻击使用敏捷（武僧和拳斗士）
+        if (weapon.isUnarmed) {
+            const dexMod = this.calculateModifier(
+                this.character.abilities.dexterity.base + this.character.abilities.dexterity.racial
+            );
+            bonus += dexMod;
+            return bonus;
+        }
+
         // 根据武器类型使用力量或敏捷
         if (weapon.properties && weapon.properties.includes('灵巧')) {
             const dexMod = this.calculateModifier(
@@ -2043,7 +2435,7 @@ class CharacterApp {
             );
             bonus += strMod;
         }
-        
+
         return bonus;
     }
 

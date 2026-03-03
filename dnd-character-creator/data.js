@@ -394,10 +394,10 @@ const SUBCLASSES = {
             description: '盗贼精通潜行、开锁和偷窃，是城市街道的大师。',
             features: [
                 { name: '快手 (Fast Hands)', level: 3, description: '狡猾行动可进行巧手检定、使用盗贼工具或使用物品。' },
-                { name: 'Second-Story Work', level: 3, description: '攀爬不消耗额外移动力，跳跃不消耗额外移动力。' },
-                { name: 'Supreme Sneak', level: 9, description: '速度降至一半时隐匿检定优势。' },
-                { name: 'Use Magic Device', level: 13, description: '忽略职业、种族、等级限制使用魔法物品。' },
-                { name: 'Reflexes', level: 17, description: '获得第二个反应，每回合只能使用一次。' }
+                { name: '飞檐走壁 (Second-Story Work)', level: 3, description: '攀爬不消耗额外移动力，跳跃不消耗额外移动力。' },
+                { name: '潜行大师 (Supreme Sneak)', level: 9, description: '速度降至一半时隐匿检定优势。' },
+                { name: '使用魔法装置 (Use Magic Device)', level: 13, description: '忽略职业、种族、等级限制使用魔法物品。' },
+                { name: '反射闪避 (Reflexes)', level: 17, description: '获得第二个反应，每回合只能使用一次。' }
             ]
         },
         assassin: {
@@ -406,10 +406,10 @@ const SUBCLASSES = {
             description: '刺客精通致命一击和伪装，是致命的杀手。',
             features: [
                 { name: '精通毒素 (Bonus Proficiencies)', level: 3, description: '获得伪装工具、毒药工具熟练。' },
-                { name: '暗杀 (Assassinate)', level: 3, description: '先攻检定优势，surprised生物对你的攻击自动暴击且暴击骰翻倍。' },
-                { name: 'Infiltration Expertise', level: 9, description: '可伪造身份。' },
-                { name: 'Impostor', level: 13, description: '模仿生物声音和笔迹，欺瞒检定优势。' },
-                { name: 'Death Strike', level: 17, description: '偷袭攻击surprised生物时，其进行体质豁免，失败则伤害翻倍。' }
+                { name: '暗杀 (Assassinate)', level: 3, description: '先攻检定优势，受惊生物对你的攻击自动暴击且暴击骰翻倍。' },
+                { name: '渗透专精 (Infiltration Expertise)', level: 9, description: '可伪造身份。' },
+                { name: '冒名顶替 (Impostor)', level: 13, description: '模仿生物声音和笔迹，欺瞒检定优势。' },
+                { name: '死亡一击 (Death Strike)', level: 17, description: '偷袭攻击受惊生物时，其进行体质豁免，失败则伤害翻倍。' }
             ]
         }
     },
@@ -419,10 +419,10 @@ const SUBCLASSES = {
             level: 3,
             description: '散打宗武僧精通徒手格斗技巧，能够用气的力量来操控敌人的身体。他们是武术的大师。',
             features: [
-                { name: '徒手打击 (Open Hand Technique)', level: 3, description: '疾风连击命中时可选择效果：击倒、推开、无法反应。' },
+                { name: '开掌技法 (Open Hand Technique)', level: 3, description: '疾风连击命中时可选择效果：击倒、推开、无法反应。' },
                 { name: '震颤掌 (Quivering Palm)', level: 6, description: '攻击命中生物时可使其进行体质豁免，失败则震慑。' },
-                { name: '毒息 (Toxic Breath)', level: 11, description: '可喷出毒素，生物进行体质豁免，失败则中毒。' },
-                { name: '奇穴 (Quivering Palm)', level: 17, description: '可让生物直接降至0HP。' }
+                { name: '毒息术 (Toxic Breath)', level: 11, description: '可喷出毒素，生物进行体质豁免，失败则中毒。' },
+                { name: '奇穴震颤 (Quivering Palm)', level: 17, description: '可让生物直接降至0HP。' }
             ]
         },
         kensei: {
@@ -430,12 +430,12 @@ const SUBCLASSES = {
             level: 3,
             description: '剑圣宗武僧将武器视为身体的延伸，精通各种武器的使用。他们是武器大师。',
             features: [
-                { name: '剑圣 (Path of the Kensei)', level: 3, description: '选择2种武器作为剑圣武器，获得熟练。' },
-                { name: 'Agile Parry', level: 3, description: '剑圣武器攻击后徒手攻击可+2AC。' },
-                { name: 'Kensei\'s Shot', level: 3, description: 'bonus action让远程剑圣武器伤害+1d4。' },
-                { name: 'One with the Blade', level: 6, description: '剑圣武器视为魔法武器。' },
-                { name: 'Sharpen the Blade', level: 11, description: '花费1-3气让武器攻击和伤害+1至+3。' },
-                { name: 'Unerring Accuracy', level: 17, description: '未命中时可重骰。' }
+                { name: '剑圣之路 (Path of the Kensei)', level: 3, description: '选择2种武器作为剑圣武器，获得熟练。' },
+                { name: '灵动招架 (Agile Parry)', level: 3, description: '剑圣武器攻击后徒手攻击可+2AC。' },
+                { name: '剑圣射击 (Kensei\'s Shot)', level: 3, description: '附赠动作让远程剑圣武器伤害+1d4。' },
+                { name: '人剑合一 (One with the Blade)', level: 6, description: '剑圣武器视为魔法武器。' },
+                { name: '磨砺锋刃 (Sharpen the Blade)', level: 11, description: '花费1-3气让武器攻击和伤害+1至+3。' },
+                { name: '精准无误 (Unerring Accuracy)', level: 17, description: '未命中时可重骰。' }
             ]
         },
         shadow: {
@@ -443,10 +443,10 @@ const SUBCLASSES = {
             level: 3,
             description: '暗影宗武僧掌握暗影魔法，能够在阴影中移动和攻击。他们是阴影中的致命刺客。',
             features: [
-                { name: '暗影步 (Shadow Arts)', level: 3, description: '花费2气施展黑暗术、黑暗视觉、pass without trace或沉默术。' },
-                { name: 'Bonus Action Teleport', level: 3, description: '附赠动作在微光或黑暗间传送60尺。' },
-                { name: '暗影步 (Shadow Step)', level: 6, description: 'bonus action传送到微光或黑暗中，下一回合首次攻击具有优势。' },
-                { name: '幻影打击 (Shadow Strike)', level: 11, description: '暗影步后攻击命中可让目标进行感知豁免，失败则震慑。' },
+                { name: '暗影技艺 (Shadow Arts)', level: 3, description: '花费2气施展黑暗术、黑暗视觉、行踪无迹或沉默术。' },
+                { name: '暗影传送 (Shadow Step)', level: 3, description: '附赠动作在微光或黑暗间传送60尺。' },
+                { name: '暗影突袭 (Shadow Strike)', level: 6, description: '附赠动作传送到微光或黑暗中，下一回合首次攻击具有优势。' },
+                { name: '幻影打击 (Phantom Strike)', level: 11, description: '暗影步后攻击命中可让目标进行感知豁免，失败则震慑。' },
                 { name: '精通暗影 (Improved Shadow)', level: 17, description: '黑暗视觉无视魔法黑暗，微光中隐匿检定优势。' }
             ]
         },
@@ -463,27 +463,27 @@ const SUBCLASSES = {
             ]
         },
         drunken_master: {
-            name: '醉拳宗',
+            name: '醉拳宗 (Way of the Drunken Master)',
             level: 3,
             description: '醉拳宗武僧模仿醉酒者的动作，以不可预测的方式战斗。他们的动作看似混乱但实则精妙。',
             features: [
-                { name: '醉汉步法', level: 3, description: '你在使用 Flurry of Blows 时可以移动而不引发借机攻击' },
-                { name: '醉汉运气', level: 3, description: '你可以使用反应动作来减少受到的伤害' },
-                { name: '醉汉反击', level: 6, description: '你可以在被攻击时进行反击' },
-                { name: '醉汉闪避', level: 11, description: '你可以使用反应动作来完全躲避攻击' },
-                { name: '醉汉大师', level: 17, description: '你可以同时使用多个醉汉技巧' }
+                { name: '醉汉步法 (Drunken Technique)', level: 3, description: '你在使用疾风连击时可以移动而不引发借机攻击' },
+                { name: '醉汉运气 (Tipsy Sway)', level: 3, description: '你可以使用反应动作来减少受到的伤害' },
+                { name: '醉汉反击 (Drunkard\'s Luck)', level: 6, description: '你可以在被攻击时进行反击' },
+                { name: '醉汉闪避 (Intoxicated Frenzy)', level: 11, description: '你可以使用反应动作来完全躲避攻击' },
+                { name: '醉汉大师 (Master of Drunken Style)', level: 17, description: '你可以同时使用多个醉汉技巧' }
             ]
         },
         sun_soul: {
-            name: '日魂宗',
+            name: '日魂宗 (Way of the Sun Soul)',
             level: 3,
             description: '日魂宗武僧掌握太阳之力，能够发射光束和火焰。他们是光明的战士。',
             features: [
-                { name: '辐射日', level: 3, description: '你可以发射光束进行远程攻击' },
-                { name: '燃烧之手', level: 3, description: '你可以使用动作发射火焰' },
-                { name: '灼热之光', level: 6, description: '你的攻击可以造成额外火焰伤害' },
-                { name: '太阳之魂', level: 11, description: '你可以化身为太阳形态' },
-                { name: '太阳大师', level: 17, description: '你可以发射强大的太阳射线' }
+                { name: '辐射日 (Radiant Sun Bolt)', level: 3, description: '你可以发射光束进行远程攻击' },
+                { name: '燃烧之手 (Searing Arc Strike)', level: 3, description: '你可以使用动作发射火焰' },
+                { name: '灼热之光 (Searing Sunburst)', level: 6, description: '你的攻击可以造成额外火焰伤害' },
+                { name: '太阳之魂 (Sun Soul)', level: 11, description: '你可以化身为太阳形态' },
+                { name: '太阳大师 (Sun Shield)', level: 17, description: '你可以发射强大的太阳射线' }
             ]
         }
     },
@@ -555,9 +555,9 @@ const SUBCLASSES = {
             features: [
                 { name: '狂野魔法浪涌 (Wild Magic Surge)', level: 1, description: 'DM可让你在施法后掷d20，1则触发狂野魔法浪涌表。' },
                 { name: '魔法潮汐 (Tides of Chaos)', level: 1, description: '长休后恢复，可进行一次攻击、检定或豁免的优势，触发浪涌后恢复。' },
-                { name: 'bend luck', level: 6, description: '花费2术法点让生物的掷骰+1d4或-1d4。' },
-                { name: 'Controlled Chaos', level: 14, description: '浪涌表掷两次，选择结果。' },
-                { name: 'Spell Bombardment', level: 18, description: '伤害骰掷出最高数值时可额外掷一个伤害骰。' }
+                { name: '扭曲命运 (Bend Luck)', level: 6, description: '花费2术法点让生物的掷骰+1d4或-1d4。' },
+                { name: '掌控混沌 (Controlled Chaos)', level: 14, description: '浪涌表掷两次，选择结果。' },
+                { name: '法术轰炸 (Spell Bombardment)', level: 18, description: '伤害骰掷出最高数值时可额外掷一个伤害骰。' }
             ]
         },
         divine_soul: {
@@ -848,16 +848,15 @@ const SUBCLASSES = {
     },
     pugilist: {
         squared_circle: {
-            name: '拳击手 (Squared Circle)',
+            name: '方圆擂尊 (Squared Circle)',
             level: 3,
-            description: '拳击手精通传统拳击技巧，以快速的组合拳和灵活的步法著称。他们在擂台上磨练技艺，将拳击艺术发挥到极致。',
+            description: '击倒，然后绞锁敌人。在擂台上搏斗的拳斗士都深谙一个道理——通往胜利的最快路径是让对手认输。这些摔跤手专注于使用锁喉和关节技压制那些最强大的敌人，迫使敌人按照自己的节奏战斗。',
             features: [
-                { name: '组合拳 (One-Two Punch)', level: 3, description: '从3级开始，当你使用攻击动作进行徒手攻击时，可以使用附赠动作再进行一次徒手攻击。' },
-                { name: '闪避步法 (Footwork)', level: 3, description: '从3级开始，当你未着甲且未持盾时，你可以使用附赠动作进行撤离或疾跑动作。' },
-                { name: '铁拳 (Iron Fists)', level: 6, description: '从6级开始，你的徒手攻击视为魔法武器，可以克服非魔法抗性和免疫。' },
-                { name: '重拳出击 (Devastating Critical)', level: 10, description: '从10级开始，当你使用徒手攻击造成致命一击时，可以额外造成1d8伤害。' },
-                { name: '不屈意志 (Unbreakable)', level: 14, description: '从14级开始，你免疫恐慌状态。' },
-                { name: '拳击大师 (Champion of the Ring)', level: 18, description: '从18级开始，你的徒手攻击在18-20时造成致命一击。此外，当你造成致命一击时，目标必须进行体质豁免（DC=8+熟练加值+力量或敏捷调整值），失败则昏迷直到你的下一回合开始。' }
+                { name: '稳扎稳打 (Groundwork)', level: 3, description: '你获得以下增益：高压锁绞（当你令一名或更多生物陷入受擒下开始你的回合时，你能对你擒抱的每名生物造成钝击伤害，无需动作，伤害值等于掷一次你的拳斗士骰加你的力量调整值）；无处可逃（当一名生物对抗你的擒抱或推撞DC进行豁免或属性检定时，你能消耗1点锐气令其检定具有劣势）；止步而倒（当你以徒手打击命中一名生物，并且没有在攻击中使用精通词条时，你能同时使用擒抱和推撞选项）。' },
+                { name: '大肌霸 (Muscle Mass)', level: 3, description: '选择运动或特技技能。若你没有选择技能的熟练，你获得其熟练，若你已获得熟练则获得其专精。' },
+                { name: '肉盾 (Meat Shield)', level: 6, description: '在你令一名生物陷入受擒期间，你对抗没有被你擒抱的生物的攻击时获得半身掩护。当一名没被你擒抱的生物对你进行的攻击检定失手时，你能以反应消耗1点锐气迫使该生物对你擒抱的生物以新的攻击检定发动一次相同的攻击。' },
+                { name: '重磅拳手 (Heavyweight)', level: 11, description: '当你使用徒手打击的推撞或擒抱选项时，你的体型视为大一级。此外，你带动受擒者移动时，若受擒生物体型不超过你，你无需额外消耗移动力。' },
+                { name: '利落收尾 (Clean Finish)', level: 17, description: '当一名因你受擒的生物结束其回合时，你能反应迫使其进行一次对抗你擒抱逃脱DC的体质豁免，否则陷入失能状态直至其下个回合结束。若该生物处于浴血且已因该特性陷入失能，其改为将生命值降至0。一旦你以该特性将一名生物的生命值降至0，直至完成长休你都无法再次使用该特性。' }
             ]
         },
         street_fighter: {
@@ -913,6 +912,30 @@ const SUBCLASSES = {
                 { name: '铁拳 (Iron Fists)', level: 10, description: '从10级开始，你的徒手攻击视为魔法武器，可以克服非魔法抗性和免疫。' },
                 { name: '完美时机 (Perfect Timing)', level: 14, description: '从14级开始，当你进行先攻检定时，可以消耗2点锐气获得优势。此外，在战斗的第一轮中，你对尚未行动的生物攻击具有优势。' },
                 { name: '拳法大师 (Grandmaster)', level: 18, description: '从18级开始，你的徒手打击在18-20时造成致命一击。此外，当你造成致命一击时，目标必须进行体质豁免（DC=8+熟练加值+力量或敏捷调整值），失败则昏迷1分钟或直到其受到伤害。' }
+            ]
+        },
+        piss_and_vinegar: {
+            name: '怒雷恶氓 (Piss and Vinegar)',
+            level: 3,
+            description: '嘴上带刺，拳上见血。有的拳斗士以反派形象为荣，乐于夸大其词来博取恶名。他们因污言秽语和卑鄙伎俩遭人憎恨，但这些拳斗士以他们的挑衅技术和不惜一切赢的战斗的决心为傲。',
+            features: [
+                { name: '恶劣态度 (Bad Attitude)', level: 3, description: '若你还未获得威吓技能的熟练，你获得之。此外，你使用威吓技能的属性检定获得等于你力量调整值的加值（至少+1）。' },
+                { name: '咸涩礼敬 (Salty Salute)', level: 3, description: '你对侮辱他人有着艺术般的技巧。你能以附赠动作挑衅一名60尺内的能看见或听见你的生物。该生物必须成功通过一次感知豁免检定（DC=8+体质调整值+熟练加值），否则受到等于掷一次你的拳斗骰加你的体质调整值的心灵伤害，且其对除你以外的生物进行的任意攻击检定具有劣势，持续至你的下个回合开始。' },
+                { name: '腌臜诡技 (Dirty Tricks)', level: 6, description: '你有些诡技能让你即使身处逆境也能挽回局势。你能使用以下一种腌臜诡技。你每回合仅能使用一次腌臜诡技，且一旦你使用了某个腌臜诡技，直至完成短休或长休你都无法再次使用该诡技。踩脚（当你以徒手打击或拳斗武器对一名生物造成伤害时，该生物必须成功通过一次敏捷豁免，否则其速度降至0，持续1分钟，受影响的生物可以在其每个回合结束时重复豁免）；偷桃（当你以徒手打击或拳斗武器对一名生物造成伤害时，你能猛击该生物的下体，该生物必须成功通过一次力量豁免，否则对该生物发动的攻击具有优势，持续至你的下个回合结束）；抛沙（你能以附赠动作对10尺内的一名生物的眼睛抛出尘土，该生物必须成功通过一次体质豁免，否则其陷入目盲状态，持续至其下个回合结束）。' },
+                { name: '老而为贼 (Mean Old Cuss)', level: 11, description: '你只需要用一个手势和几句讥讽就能让整座屋子的生物被你激怒。你能以附赠动作选择一定数量的位于你30尺内能看见或听见你的目标，数量至多等于你的拳斗士等级。你选择的每名生物必须成功通过一次感知豁免，否则受到等于掷一次你的拳斗骰加你的体质调整值的心灵伤害，且其对除你以外的生物进行的任意攻击检定具有劣势。此特性一经使用，直至完成长休你都无法再次使用。你也可以消耗3点锐气（无需动作）来重置该特性的使用权。' },
+                { name: '龌龊诡技 (Dirtier Tricks)', level: 17, description: '你获得下列额外的腌臜诡技。你每回合仅能使用一次腌臜诡技，且一旦你使用了某个腌臜诡技，直至完成短休或长休你都无法再次使用该诡技。后脑兔击（当你以徒手打击或拳斗武器命中一名生物时，你猛击其头部，该生物失去其心灵伤害抗性且其豁免检定具有劣势，持续至你的下个回合结束）；混球暗袭（当你以徒手打击或拳斗武器命中一名生物时，你能将命中改为重击命中，对此重击命中，你改为投掷三次该攻击的伤害骰并将其累加，而非平常的两次）。' }
+            ]
+        },
+        street_saint: {
+            name: '街角圣徒 (Street Saint)',
+            level: 3,
+            description: '献上祈祷与重拳。拳斗士总能战胜逆境。那些被称作街角圣徒的人凭借着对诸神的信仰最终幸存。这些拳斗士饱受考验最终战胜了逆境，他们侍奉神明的正义决心无可动摇，也受到了他们的神明认可。',
+            features: [
+                { name: '引导神力 (Channel Divinity)', level: 3, description: '你能直接从外层位面引导神圣力量用以释放魔法效应。你起始时具有两种效应选项：信实之拳和诸神恩典。每当你使用本子职的引导神力时，你选择要创造哪种效应。一旦使用了本职业的引导神力，直至完成短休或长休你才能再次使用该引导神力。信实之拳（你能以附赠动作将正义的怒火注入双拳，在接下来的1分钟内，你的徒手打击额外造成1d4光耀伤害，若目标为邪魔或亡灵，则为2d4）；诸神恩典（你能以附赠动作祈求神明的恩典，在接下来的1分钟内，你获得对暗蚀伤害的抗性，且当你进行豁免检定时，掷1d4并将骰值加入检定）。' },
+                { name: '圣疗 (Lay On Hands)', level: 3, description: '你的触碰带有祝福，可以医治伤口。你获得一个治疗能量池，其内的治疗能量在每次完成长休时补满。治疗能量池储备的可恢复生命值总值等于你的拳斗士等级的三倍。你能够以附赠动作触碰一名生物（可以是你自己），并抽取治疗能量池中的能量恢复该生物的生命值，其恢复量最多等于你治疗能量池中剩余的治疗量。此外，你也可以使用5点治疗量来移除目标身上的中毒状态，这些点数不会同时恢复生物的生命值。' },
+                { name: '磨难成圣 (Ravaged But Resolute)', level: 6, description: '当你使用浴血奋战时，你能补满你的圣疗能量池。此特性一经使用，直至完成长休你都无法再次使用。' },
+                { name: '抗性灵光 (Aura of Resilience)', level: 11, description: '当你使用反求诸己时，你能在源自你的10尺光环区域内散发出一道不可见的庇护灵光，持续10分钟。灵光在你陷入失能期间失效。灵光内你的盟友获得对钝击、穿刺和挥砍伤害的抗性。此特性一经使用，直至完成长休你都无法再次使用。' },
+                { name: '神圣之手 (Hallowed Hands)', level: 17, description: '每个你的回合一次，当你以徒手打击或拳斗武器命中一名生物时，你能消耗一定点数的治疗能量来对目标造成额外的光耀伤害，至多消耗等于你拳斗士等级的治疗能量。额外伤害值等于你消耗的治疗能量点数，若目标为邪魔或亡灵，则为你消耗点数的两倍。' }
             ]
         }
     }
@@ -1435,10 +1458,12 @@ const CLASSES = {
             { name: '休憩曲 (Song of Rest, d6)', level: 2, description: '短休时演奏音乐，恢复生命值的生物额外恢复1d6生命值。' },
             { name: '吟游诗人学院 (Bard College)', level: 3, description: '选择一所吟游诗人学院（子职业），获得相应能力。' },
             { name: '专精 (Expertise)', level: 3, description: '选择2项已熟练的技能或工具，熟练加值翻倍。10级时可再选择2项。' },
-            { name: '激励之源 (Font of Inspiration)', level: 5, description: '短休或长休后恢复所有吟游激励次数。' },
-            { name: '反迷惑 (Countercharm)', level: 6, description: '动作开始演奏，10尺内友军对抗魅惑/恐慌豁免优势。' },
-            { name: '魔法奥秘 (Magical Secrets, 4个)', level: 10, description: '从任意职业法术列表中选择4个法术加入已知法术。14级和18级时再各选2个。' },
-            { name: '卓越灵感 (Superior Inspiration)', level: 20, description: '先攻检定开始时若无可用的激励次数，获得1个。' }
+            { name: '激励之源 (Font of Inspiration)', level: 5, description: '现在，当你完成一次短休或长休时，你重获所有已消耗的诗人激励使用次数。此外，你可以消耗一个法术位（无需动作）来重获一次已消耗的诗人激励使用次数。' },
+            { name: '反迷惑 (Countercharm)', level: 7, description: '你可以用带有力量的音符或话语来干扰影响心灵的效应。若你或位于你30尺内的一名生物在对抗施加魅惑或恐慌状态的效应的豁免检定中失败，你能够以反应令其重骰这次豁免，这次重骰具有优势。' },
+            { name: '魔法奥秘 (Magical Secrets)', level: 10, description: '你自各种魔法传说中习得了他们的奥秘。每当你到达一个吟游诗人特性表中准备法术数量有所增加的吟游诗人等级时（包括此等级），你可以从吟游诗人、牧师、德鲁伊和法师的法术列表中选择法术准备（这些职业的法术列表见其职业章节），这些法术对你而言都视作吟游诗人法术。此外，每当你替换本职业的准备法术时，你也可以从这些法术列表中选择替换。' },
+            { name: '先发激励 (Superior Inspiration)', level: 18, description: '当你投掷先攻时，若你的诗人激励使用次数不足两次，你重获已消耗的诗人激励使用次数到两次为止。' },
+            { name: '传奇恩惠 (Epic Boon)', level: 19, description: '你获得一项传奇恩惠专长（见第五章）或其他一项你选择的适用的专长。推荐选择法术溯回之恩惠。' },
+            { name: '创生圣言 (Words of Creation)', level: 20, description: '你掌握了创生圣言的其中两字："生"与"死"。因此，你始终准备着法术律令医疗和律令死亡。当你施展这两道法术时，你可以选择第二个生物作为目标，那名生物必须位于第一个目标10尺内。', grantsSpells: { level9: [{ name: '律令医疗', levelRequired: 20, alwaysPrepared: true, ability: '魅力' }, { name: '律令死亡', levelRequired: 20, alwaysPrepared: true, ability: '魅力' }] } }
         ],
         spellcasting: true,
         spellAbility: '魅力',
@@ -1462,7 +1487,10 @@ const CLASSES = {
             { name: '神圣领域 (Divine Domain)', level: 1, description: '选择一个神圣领域（子职业），获得领域法术和特性。' },
             { name: '引导神力 (Channel Divinity, 1次/短休)', level: 2, description: '短休后恢复，获得领域特定的引导神力选项。6级时2次，18级时3次。' },
             { name: '摧毁不死生物 (Destroy Undead, CR 1/2)', level: 5, description: '引导神力驱散不死生物时，CR 1/2或更低的不死生物直接被摧毁。8级CR 1，11级CR 2，14级CR 3，17级CR 4。' },
+            { name: '受祝击 (Blessed Strikes)', level: 7, description: '神圣的力量在战斗中注入你。你从以下特性中选择其一获得：神圣打击（每个你的回合一次，当你使用武器的攻击命中了一名生物时，你可以使该生物额外受到1d8点暗蚀伤害或光耀伤害）；强力施法（你将你的感知调整值加到你用任何牧师戏法造成的伤害上）。' },
             { name: '神圣干预 (Divine Intervention)', level: 10, description: '可请求神祇直接干预，成功率等于牧师等级百分比，成功后7天内无法再次使用。' },
+            { name: '精通受祝击 (Improved Blessed Strike)', level: 14, description: '你所选择的受祝击变得更加强大。神圣打击：神圣打击的额外伤害提升至2d8。强力施法：当你施展一道牧师戏法并用它对一个生物造成伤害时，你可以为你自己或你60尺内的另一个生物注入活力，使其获得等同于你感知调整值两倍的临时生命值。' },
+            { name: '传奇恩惠 (Epic Boon)', level: 19, description: '你获得一项传奇恩惠专长（见第五章）或其他一项你选择的适用的专长。推荐选择扭曲命运之恩惠。' },
             { name: '神圣干预提升 (Improved Divine Intervention)', level: 20, description: '神圣干预自动成功。' }
         ],
         spellcasting: true,
@@ -1487,12 +1515,18 @@ const CLASSES = {
             { name: '施法 (Spellcasting)', level: 1, description: '使用感知施放神圣魔法。法术位为完整施法者进度，可准备法术。' },
             { name: '德鲁伊语 (Druidic)', level: 1, description: '学会德鲁伊秘密语言，可留下隐藏信息。' },
             { name: '荒野形态 (Wild Shape)', level: 2, description: '变形为CR 1/4或更低（无飞行/游泳）的野兽，持续小时数等于一半德鲁伊等级（向下取整）。' },
-            { name: '德鲁伊结社 (Druid Circle)', level: 2, description: '加入一个德鲁伊结社（子职业），获得相应能力。' },
+            { name: '荒野伙伴 (Wild Companion)', level: 2, description: '你可以召唤出一个动物外形的自然精魂来帮助自己。以一个魔法动作，你可以消耗一个法术位或一次荒野变形次数来施展寻获魔宠法术，无需任何材料成分。当你以这种方式施展这一法术时，获得的魔宠为妖精，并且它会在你完成一次长休时消失。', grantsSpells: { level1: [{ name: '寻获魔宠', levelRequired: 2, freeCast: { count: '法术位或荒野变形次数', reset: '长休' }, ability: '感知' }] } },
+            { name: '德鲁伊子职 (Druid Subclass)', level: 3, description: '你选择获得一项德鲁伊子职：大地结社、月亮结社、海洋结社或星辰结社。子职是一种特化，在特定的德鲁伊等级给予你对应的独特能力。德鲁伊们会形成松散的联系，他们称之为"结社"。' },
+            { name: '属性值提升 (Ability Score Improvement)', level: 4, description: '你获得属性值提升专长或其他你满足条件的专长。你还会在第8、第12、第16级时再次获得本特性。' },
             { name: '荒野形态提升 (CR 1/2)', level: 4, description: '可变形为CR 1/2或更低，可游泳。' },
+            { name: '荒野复苏 (Wild Resurgence)', level: 5, description: '每个你的回合内一次，如果你没有荒野变形使用次数，你可以消耗一个法术位（无需动作）让自己获得一次荒野变形次数。此外，你可以消耗一次荒野变形使用次数（无需动作）来令自己获得一个一环法术位，然后直至完成长休你都无法再如此做。' },
             { name: '荒野形态提升 (CR 1)', level: 8, description: '可变形为CR 1或更低，可飞行。' },
+            { name: '元素之怒 (Elemental Fury)', level: 7, description: '元素之力在你的身体里流淌。你获得以下一个你选择的特性：强力施法（你以任何德鲁伊戏法造成的伤害上都可以加上你的感知调整值）；原力蛮击（每个你的回合内一次，当你以一次武器攻击或荒野变形中野兽形态的攻击命中一名生物时，你可以对目标额外造成1d8寒冷、火焰、闪电或雷鸣伤害）。' },
+            { name: '元素狂怒 (Improved Elemental Fury)', level: 15, description: '你选择的元素之怒特性变得愈发强大。强力施法：当你施展一道施法距离为10尺或更高的德鲁伊戏法时，法术施法距离提升300尺。原力蛮击：原力蛮击的额外伤害提升至2d8。' },
             { name: '不朽身 (Timeless Body)', level: 18, description: '不因衰老而减少属性值，无法被魔法衰老。' },
-            { name: '荒野形态(野兽施法) (Beast Spells)', level: 18, description: '荒野形态下可施展德鲁伊戏法。' },
-            { name: '大德鲁伊 (Archdruid)', level: 20, description: '荒野形态无次数限制，可无视材料成分施展德鲁伊法术。' }
+            { name: '兽形施法 (Beast Spells)', level: 18, description: '你可以在任何荒野变形下施法。当一个法术需要标有价值的材料成分或需要消耗材料成分时，你无法在荒野变形下施展。' },
+            { name: '传奇恩惠 (Epic Boon)', level: 19, description: '你获得一项传奇恩惠专长（见第五章）或其他一项你选择的适用的专长。推荐选择次元旅行之恩惠。' },
+            { name: '大德鲁伊 (Archdruid)', level: 20, description: '自然的活力在你的身上永不凋零，令你获得以下增益：不凋化形（当你投掷先攻时，若你没有荒野变形的使用次数，你获得一次荒野变形使用次数）；自然术使（你可以将荒野变形使用次数转化为法术位，每个使用次数可以转为2个法术环阶，此增益一经使用，直至完成长休你都无法再次使用）；青春永驻（你行使的原力魔法让你的衰老速度减缓，每经过10年的岁月，你的身体就仿佛只过了1年）。' }
         ],
         spellcasting: true,
         spellAbility: '感知',
@@ -1517,7 +1551,13 @@ const CLASSES = {
             { name: '动作如潮 (Action Surge, 1次)', level: 2, description: '在自己回合内多进行一次动作和附赠动作，短休或长休后恢复。17级时可使用两次。' },
             { name: '武术范型 (Martial Archetype)', level: 3, description: '选择一个战士子职业，获得特定能力。' },
             { name: '额外攻击 (Extra Attack, 1次)', level: 5, description: '攻击动作时可进行两次攻击。11级时3次，20级时4次。' },
-            { name: '不屈 (Indomitable, 1次)', level: 9, description: '豁免失败时可重骰，长休后恢复。13级时2次，17级时3次。' }
+            { name: '战术转进 (Tactical Shift)', level: 5, description: '每当你使用附赠动作进行回气时，你可以移动至多相当于你速度一半的距离，且不会引发借机攻击。' },
+            { name: '不屈 (Indomitable, 1次)', level: 9, description: '豁免失败时可重骰，长休后恢复。13级时2次，17级时3次。' },
+            { name: '战术主宰 (Tactical Master)', level: 9, description: '每当你用武器发动攻击，且你可以使用此武器的精通词条时，你可以将此次攻击的精通词条改为推离、削弱或缓速中的一种。' },
+            { name: '额外攻击（二）(Two Extra Attacks)', level: 11, description: '你在自己回合内执行攻击动作时，可以发动三次攻击而非一次。' },
+            { name: '究明攻击 (Studied Attacks)', level: 13, description: '你已深晓对手的一举一动，并且从每次攻击中吸取经验教训。如果你对一个生物进行攻击检定但失手，那么直到你的下个回合结束前，你对其的下次攻击检定具有优势。' },
+            { name: '传奇恩惠 (Epic Boon)', level: 19, description: '你获得一项传奇恩惠专长（见第五章）或其他一项你选择的适用的专长。推荐选择英勇战斗之恩惠。' },
+            { name: '额外攻击（三）(Three Extra Attacks)', level: 20, description: '你在自己回合内执行攻击动作时，可以发动四次攻击而非一次。' }
         ],
         spellcasting: false,
         resourcePool: {
@@ -1538,32 +1578,32 @@ const CLASSES = {
         skillCount: 2,
         features: [
             { name: '无甲防御 (Unarmored Defense)', level: 1, description: '未着甲且未持盾时，AC = 10 + 敏捷调整值 + 感知调整值。' },
-            { name: 'Martial Arts (d4)', level: 1, description: '徒手攻击和武僧武器伤害骰为d4，可用敏捷代替力量进行攻击和伤害检定，bonus action可进行徒手攻击。' },
+            { name: '武艺 (Martial Arts, d4)', level: 1, description: '徒手攻击和武僧武器伤害骰为d4，可用敏捷代替力量进行攻击和伤害检定，附赠动作可进行徒手攻击。' },
             { name: '气 (Ki)', level: 2, description: '获得气点数，用于施展气能力，短休或长休后恢复。气点数等于武僧等级。' },
             { name: '无甲移动 (Unarmored Movement, +10尺)', level: 2, description: '未着甲且未持盾时，速度+10尺。6级时+15，10级时+20，14级时+25，18级时+30。' },
             { name: '疾风连击 (Flurry of Blows)', level: 2, description: '攻击动作后可消耗1气，用附赠动作进行两次徒手攻击。' },
-            { name: 'Patient Defense', level: 2, description: '消耗1气，闪避动作。' },
-            { name: 'Step of the Wind', level: 2, description: '消耗1气，疾走或撤离动作，垂直跳跃不消耗额外移动力。' },
+            { name: '步若疾风 (Step of the Wind)', level: 2, description: '消耗1气，执行疾走或撤离动作，垂直跳跃不消耗额外移动力。' },
             { name: '武僧宗派 (Monastic Tradition)', level: 3, description: '选择一个武僧宗派（子职业），获得特定能力。' },
+            { name: '拨挡攻击 (Deflect Attacks)', level: 3, description: '当你被一次伤害中包含钝击、穿刺或挥砍伤害的攻击检定命中时，你可以执行反应减少此次攻击对你造成伤害的总值，减值等于1d10+你的敏捷调整值+你的武僧等级。若被拨挡攻击的伤害减少至0，则你可以消耗1点气将此次攻击的部分伤害重新定向。如果是近战攻击，选择你周围5尺内的一个你可见的生物；如果是远程攻击，选择60尺内一个不位于全身掩护后的你可见的生物。该生物必须成功通过一次敏捷豁免，否则受到相当于你2个武艺骰+你的敏捷调整值的伤害。其伤害类型与原先攻击的伤害类型相同。' },
             { name: '偏转飞弹 (Deflect Missiles)', level: 3, description: '反应减少远程武器伤害，若降至0可花费1气反射，伤害为1d4+敏捷调整值+武僧等级。' },
             { name: '专用武器 (Dedicated Weapon)', level: 2, description: '完成短休或长休时，可碰触一件简易武器或军用武器（非重型或特殊），将其视为武僧武器，直到再次使用此能力。' },
             { name: '轻身坠 (Slow Fall)', level: 4, description: '反应减少坠落伤害，每武僧等级5点。' },
             { name: '额外攻击 (Extra Attack)', level: 5, description: '攻击动作时可进行两次攻击。' },
-            { name: '震惧掌 (Stunning Strike)', level: 5, description: '命中生物时可花费1气让其进行体质豁免，失败则震慑至你的下一回合结束。' },
-            { name: 'Martial Arts (d6)', level: 5, description: '伤害骰提升至d6。' },
+            { name: '震慑拳 (Stunning Strike)', level: 5, description: '命中生物时可花费1气让其进行体质豁免，失败则震慑至你的下一回合结束。' },
+            { name: '武艺 (Martial Arts, d6)', level: 5, description: '伤害骰提升至d6。' },
             { name: '御气以击 (Ki-Fueled Attack)', level: 3, description: '在你的回合中执行动作时花费了1点或更多的气，则你可以在回合结束前用一个附赠动作以徒手打击或武僧武器进行一次攻击。' },
-            { name: '气击 (Ki-Empowered Strikes)', level: 6, description: '徒手攻击和武僧武器视为魔法武器。' },
+            { name: '气御击 (Ki-Empowered Strikes)', level: 6, description: '徒手攻击和武僧武器视为魔法武器。' },
             { name: '加速愈合 (Quickened Healing)', level: 4, description: '以一个动作，你能消耗2点气并且投掷一粒武艺骰，你恢复等同于掷骰结果加上你的熟练加值的生命值。' },
             { name: '反射闪避 (Evasion)', level: 7, description: '敏捷豁免成功不受伤害，失败只受一半伤害。' },
             { name: '心如止水 (Stillness of Mind)', level: 7, description: '动作结束魅惑或恐慌效果。' },
             { name: '凝神聚气 (Focused Aim)', level: 5, description: '当你攻击检定未命中时，你可以花费1到3点气来使该次攻击检定获得加值，每点气的消耗能获得+2加值，这可能会使原本的未命中改为命中。' },
             { name: '无甲移动(墙上行)', level: 10, description: '未着甲且未持盾时，可垂直移动和在水面上移动。' },
-            { name: '纯净身 (Purity of Body)', level: 10, description: '免疫疾病和毒素。' },
-            { name: 'Martial Arts (d8)', level: 11, description: '伤害骰提升至d8。' },
+            { name: '百病不侵 (Purity of Body)', level: 10, description: '免疫疾病和毒素。' },
+            { name: '武艺 (Martial Arts, d8)', level: 11, description: '伤害骰提升至d8。' },
             { name: '金刚魂 (Diamond Soul)', level: 14, description: '所有豁免熟练，花费1气可重骰失败的豁免。' },
             { name: '不朽身 (Timeless Body)', level: 15, description: '不因衰老减少属性，无法被魔法衰老，不需要食物和水。' },
-            { name: 'Martial Arts (d10)', level: 17, description: '伤害骰提升至d10。' },
-            { name: '空灵体 (Empty Body)', level: 18, description: '花费4气施展隐形术和次元门。' },
+            { name: '武艺 (Martial Arts, d10)', level: 17, description: '伤害骰提升至d10。' },
+            { name: '空体 (Empty Body)', level: 18, description: '花费4气施展隐形术和次元门。' },
             { name: '超凡入圣 (Perfect Self)', level: 20, description: '先攻检定时若无气点数，获得4气。' }
         ],
         spellcasting: false,
@@ -1592,11 +1632,14 @@ const CLASSES = {
             { name: '引导神力 (Channel Divinity)', level: 3, description: '短休或长休后恢复，获得誓言特定的引导神力选项。' },
             { name: '神力掌控 (Harness Divine Power)', level: 3, description: '以一个附赠动作，触碰圣徽进行祈祷，恢复一枚环阶不超过你熟练加值的一半（向上取整）的法术位。3级1次，7级2次，15级3次，长休后恢复。' },
             { name: '额外攻击 (Extra Attack)', level: 5, description: '攻击动作时可进行两次攻击。' },
+            { name: '信实坐骑 (Faithful Steed)', level: 5, description: '你能唤来异界坐骑的协助。你始终准备着法术寻获坐骑。此外，你可以不消耗法术位地施展该法术一次，而后你必须完成一次长休才能再次这么做。', grantsSpells: { level2: [{ name: '寻获坐骑', levelRequired: 5, alwaysPrepared: true, freeCast: { count: 1, reset: '长休' }, ability: '魅力' }] } },
             { name: '守护灵光 (Aura of Protection)', level: 6, description: '你和10尺内友军豁免可加上你的魅力调整值。' },
             { name: '勇气灵光 (Aura of Courage)', level: 10, description: '你和10尺内友军免疫恐慌。' },
             { name: '精通神圣打击 (Improved Divine Smite)', level: 11, description: '所有近战武器攻击额外造成1d8光耀伤害。' },
             { name: '净化之触 (Cleansing Touch)', level: 14, description: '可结束一个法术效果，次数等于魅力调整值（最少1次），长休后恢复。' },
-            { name: '灵光提升(30尺)', level: 18, description: '灵光范围扩大至30尺。' }
+            { name: '复原之触 (Restoring Touch)', level: 14, description: '当你对一个生物使用圣疗时，你可以终止该生物身上以下一种或更多种类的状态：目盲、魅惑、耳聋、恐慌、麻痹或震慑。你每终止一个状态，都需要花费圣疗的5点治疗能量；这些治疗能量不会恢复该生物的生命值。' },
+            { name: '灵光提升(30尺)', level: 18, description: '灵光范围扩大至30尺。' },
+            { name: '传奇恩惠 (Epic Boon)', level: 19, description: '你获得一项传奇恩惠专长（见第五章）或其他一项你选择的适用的专长。推荐选择真实视觉之恩惠。' }
         ],
         spellcasting: true,
         spellAbility: '魅力',
@@ -1616,16 +1659,23 @@ const CLASSES = {
         skills: ['驯兽', '运动', '洞悉', '调查', '自然', '察觉', '隐匿', '生存'],
         skillCount: 3,
         features: [
-            { name: '宿敌 (Favored Enemy)', level: 1, description: '选择一种敌人类型，获得相关技能熟练和语言。' },
-            { name: '自然探索者 (Natural Explorer)', level: 1, description: '选择一种地形，在该地形获得优势：侦查和追踪不留下踪迹、单独时潜行可正常移动、觅食双倍食物、追踪其他生物时信息更详细。' },
-            { name: '施法 (Spellcasting)', level: 2, description: '半施法者进度，使用感知施法，准备法术。' },
-            { name: '战斗风格 (Fighting Style)', level: 2, description: '选择一种战斗风格（游侠特有：箭术、防御、对决、双武器战斗）。' },
-            { name: '游侠范型 (Ranger Archetype)', level: 3, description: '选择游侠范型，获得特定能力。' },
-            { name: '额外攻击 (Extra Attack)', level: 5, description: '攻击动作时可进行两次攻击。' },
-            { name: '大地行者 (Land\'s Stride)', level: 8, description: '非魔法困难地形不影响移动，对魔法植物豁免优势。' },
-            { name: '匿踪步 (Hide in Plain Sight)', level: 10, description: '花费1分钟伪装，隐匿检定+10。' },
-            { name: '无踪步 (Vanish)', level: 14, description: 'bonus action隐匿，无法被非魔法追踪。' },
-            { name: '屠魔者 (Foe Slayer)', level: 20, description: '对宿敌攻击或伤害可加上感知调整值（或两者分开加）。' }
+            { name: '施法 (Spellcasting)', level: 1, description: '你学会运用自然世界的魔法本源进行施法。法术位：游侠特性表显示了你可用于施展一环及以上法术的法术位数量，完成长休时恢复。一环及以上的准备法术：你准备可供你施展的一环及更高环阶的法术列表。最初选择两道游侠法术，推荐选择捕获打击和疗伤术。已准备法术数量会随你游侠等级的提升而增加。如果游侠的其他特性给了你始终准备着的法术，这些法术不计入你准备的法术数量。改变你的准备法术：每当你完成一次长休时，你可以将你准备列表上的一道法术替换为其他游侠法术。施法属性：感知。施法法器：可以使用德鲁伊法器。' },
+            { name: '宿敌 (Favored Enemy)', level: 1, description: '你始终准备着法术猎人印记。你可以无需法术位地施展此法术共计两次，并在完成一次长休后恢复此能力的所有使用次数。你能无需法术位施展该法术的次数会在你获得特定游侠等级时提升。', grantsSpells: { level1: [{ name: '猎人印记', levelRequired: 1, alwaysPrepared: true, freeCast: { count: 2, reset: '长休' }, ability: '感知' }] } },
+            { name: '武器精通 (Weapon Mastery)', level: 1, description: '你对武器的训练使你能够自选并使用2种已熟练武器的精通词条。当你完成一次长休时，你可以改变你所选择的武器类型。' },
+            { name: '熟练探险家 (Deft Explorer)', level: 2, description: '得益于你的旅途，你获得以下增益：专精（选择一项你熟练但不具备专精的技能，你在那个技能上获得专精）；语言（你习得两门语言）。' },
+            { name: '战斗风格 (Fighting Style)', level: 2, description: '你获得一项战斗风格专长，你也可以选择以下选项：德鲁伊教战士（你习得两道你选择的德鲁伊戏法，推荐选取神导术和点点星芒，它们对你视作游侠法术，施法属性是感知。每当你获得一个游侠等级时，你都能从这些戏法中选择其一替换为另一道德鲁伊戏法）。' },
+            { name: '游侠子职 (Ranger Subclass)', level: 3, description: '你选择获得一项游侠子职：驯兽师、妖精漫游者、幽域追猎者或猎人。子职是一种特化，在特定的游侠等级给予你对应的独特能力。此后你将获得你所选的子职所有能力——只要其所需等级不超过你的游侠等级。' },
+            { name: '属性值提升 (Ability Score Improvement)', level: 4, description: '你获得属性值提升专长或其他你满足条件的专长。你还会在你的游侠等级达到第8、第12和第16级时再次获得本特性。' },
+            { name: '额外攻击 (Extra Attack)', level: 5, description: '你在自己回合内执行攻击动作时，可以发动两次攻击而非一次。' },
+            { name: '越野 (Roving)', level: 6, description: '只要你未着装重甲，你的速度提升10尺。你也获得等于你速度的攀爬速度和游泳速度。' },
+            { name: '专精 (Expertise)', level: 9, description: '选择两项你熟练但不具备专精的技能，你获得这些技能的专精。' },
+            { name: '不知疲倦 (Tireless)', level: 10, description: '原初的力量现在会帮你重整旗鼓，重新踏上旅途。临时生命值（以一个魔法动作，你能够给予自己1d8+你的感知调整值的临时生命值，使用次数等于感知调整值，完成长休时恢复）；减少力竭（当你完成一次短休时，你的力竭等级减少1级）。' },
+            { name: '永恒追猎 (Relentless Hunter)', level: 13, description: '受到伤害不会打断你对猎人印记的专注。' },
+            { name: '自然面纱 (Nature\'s Veil)', level: 14, description: '你祈唤自然精魂，魔法性地将身形遮蔽隐蔽。以一个附赠动作，你可以让自己进入隐形状态，持续到你的下一回合结束。使用次数等于感知调整值，完成长休时恢复。' },
+            { name: '致命猎杀 (Precise Hunter)', level: 17, description: '你在对你的猎人印记当前指定的目标的攻击检定中具有优势。' },
+            { name: '野性感官 (Feral Senses)', level: 18, description: '你与自然的链接给予了你30尺盲视。' },
+            { name: '传奇恩惠 (Epic Boon)', level: 19, description: '你获得一项传奇恩惠专长（见第五章）或其他一项你选择的适用的专长。推荐选择次元旅行之恩惠。' },
+            { name: '屠灭众敌 (Foe Slayer)', level: 20, description: '你的猎人印记的额外伤害骰从d6变为d10。' }
         ],
         spellcasting: true,
         spellAbility: '感知'
@@ -1649,10 +1699,12 @@ const CLASSES = {
             { name: '游荡者范型 (Roguish Archetype)', level: 3, description: '选择游荡者范型，获得特定能力。' },
             { name: '反射闪避 (Uncanny Dodge)', level: 5, description: '反应让攻击伤害减半。' },
             { name: '可靠才能 (Reliable Talent)', level: 7, description: '熟练的技能检定掷出9或更低视为10。' },
-            { name: '盲感 (Blindsense)', level: 14, description: '10尺内可感知隐形生物位置。' },
-            { name: '滑溜心灵 (Slippery Mind)', level: 15, description: '感知豁免熟练。' },
-            { name: '飘忽无踪 (Elusive)', level: 18, description: '无攻击对你具有优势。' },
-            { name: '幸运一击 (Stroke of Luck)', level: 20, description: '攻击未命中时改为命中，或检定失败时改为成功，长休后恢复。' }
+            { name: '进阶诡诈打击 (Improved Cunning Strike)', level: 11, description: '你在造成偷袭伤害时可以一次性选用两种诡诈打击效果，每种效果都需要独立扣除对应的偷袭伤害骰。' },
+            { name: '凶狡打击 (Devious Strike)', level: 14, description: '你习得了新的偷袭方法，使你的偷袭变得更为凶狠卑劣。下列效果现在加入你的诡诈打击选项：恍惚（花费2d6，目标必须成功通过一次体质豁免，否则该目标的下一回合只能选择移动、执行一个动作或执行一个附赠动作中的一项）；击昏（花费6d6，目标必须成功通过一次体质豁免，否则将陷入昏迷状态，持续一分钟或受到任何伤害，昏迷的目标每在自己的回合结束时都可以重新进行豁免）；眩目（花费3d6，目标必须成功通过一次敏捷豁免，否则将陷入目盲状态，直到其下个回合结束）。' },
+            { name: '圆滑心智 (Slippery Mind)', level: 15, description: '你狡猾的头脑很难被人控制。你获得感知豁免与魅力豁免的熟练。' },
+            { name: '飘忽不定 (Elusive)', level: 18, description: '你飘忽不定的身形让敌人攻击时无从下手。只要你并未失能，以你为目标的攻击检定无法具有优势。' },
+            { name: '传奇恩惠 (Epic Boon)', level: 19, description: '你获得一项传奇恩惠专长（见第五章）或其他一项你选择的适用的专长。推荐选择暗夜精魂之恩惠。' },
+            { name: '幸运一击 (Stroke of Luck)', level: 20, description: '你留了一手非凡技巧，让你可以随时把握自己的成功之际。当你在一次D20检定中失败时，你可以将骰值改为20。此特性一经使用，直至完成短休或长休你都无法再次使用。' }
         ],
         spellcasting: false
     },
@@ -1672,6 +1724,8 @@ const CLASSES = {
             { name: '术法点 (Sorcery Points, 2点)', level: 2, description: '用于创造法术位或施展元魔法，短休或长休后恢复。' },
             { name: '灵活施法 (Flexible Casting)', level: 2, description: '可将术法点转化为法术位，或将法术位转化为术法点。' },
             { name: '元魔法 (Metamagic, 2个)', level: 3, description: '选择2种元魔法：Careful Spell、Distant Spell、Empowered Spell、Extended Spell、Heightened Spell、Quickened Spell、Subtle Spell、Twinned Spell。10级和17级时再各选1个。' },
+            { name: '术法复苏 (Sorcerous Restoration)', level: 5, description: '当你完成一次短休时，你可以恢复不大于你术士等级一半（向下取整）的已消耗术法点。此特性一经使用，直到你完成一次长休为止不能再次使用。' },
+            { name: '术法化身 (Sorcery Incarnate)', level: 7, description: '如果你的先天术法特性的使用次数耗尽，则你仍可以消耗2点术法点来用附赠动作继续激活该特性。此外，在你的先天术法特性处于激活状态期间，你可以在你施展的每道法术上应用最多两次超魔法选项。' },
             { name: '术法复原 (Sorcerous Restoration)', level: 20, description: '短休时恢复4术法点。' }
         ],
         spellcasting: true,
@@ -1695,10 +1749,15 @@ const CLASSES = {
             { name: '异界宗主 (Otherworldly Patron)', level: 1, description: '选择异界宗主（邪魔、旧日支配者、至高妖精、咒剑、天界等），获得特定能力和扩展法术列表。' },
             { name: '契约魔法 (Pact Magic)', level: 1, description: '使用魅力施法，法术位为契约魔法进度。1-2级：1个1环；3-4级：2个2环；5-6级：2个3环；7-8级：2个4环；9-20级：2个5环。短休或长休后恢复，所有法术位为最高环阶。' },
             { name: '魔能祈唤 (Eldritch Invocations, 2个)', level: 2, description: '学习2个魔能祈唤获得特殊能力，5级时3个，7级时4个，9级时5个，12级时6个，15级时7个，18级时8个。每次升级可更换一个祈唤。' },
-            { name: '契约恩赐 (Pact Boon)', level: 3, description: '选择契约恩赐：链之魔契（获得魔宠，可攻击和传送）、刃之魔契（契约武器，魅力调整值加伤害，可召唤）、书之魔契（获得影之书和三本仪式法术书）。' },
+            { name: '契约恩赐 (Pact Boon)', level: 3, description: '选择契约恩赐：链之魔契（获得魔宠，可攻击和传送）、刃之魔契（契约武器，魅力调整值加伤害，可召唤）、书之魔契（获得影之书和三本仪式法术书）。', requiresChoice: true, choiceType: 'pact_boon' },
             { name: '属性值提升 (Ability Score Improvement)', level: 4, description: '4、8、12、16、19级时提升一项属性2点或两项属性各1点（上限20）。' },
             { name: '秘法奥秘 (Mystic Arcanum, 6环)', level: 11, description: '从任意职业法术列表中选择一个6环法术，每日可使用1次。13级获得7环，15级获得8环，17级获得9环。' },
             { name: '艾尔德瑞克大师 (Eldritch Master)', level: 20, description: '花费1分钟恢复所有契约法术位，长休前无法再次使用。' }
+        ],
+        pactBoons: [
+            { key: 'chain', name: '链之魔契 (Pact of the Chain)', description: '你习得寻找魔宠法术，并能以一个仪式施展之。当你以此法施展该法术时，你能选择的魔宠种类包括普通选项以及伪龙、夸塞魔、小恶魔和妖精龙。此外，当你进行攻击动作时，你能放弃一次攻击来让你的魔宠以其反应进行攻击。' },
+            { key: 'blade', name: '刃之魔契 (Pact of the Blade)', description: '你能以一个动作在空的手中创造契约武器。你熟练于该武器，且该武器视为魔法武器，在克服对非魔法攻击和伤害的抗性和免疫时视为魔法武器。你的契约武器在离开你的手后1分钟或你再次使用该特性、你死亡、或你进行长休后消失。' },
+            { key: 'tome', name: '书之魔契 (Pact of the Tome)', description: '你获得一本影之书，你可以从任意职业的法术列表中选择三个戏法记录在影之书中。只要影之书在你手中，你就可以随意施展这些戏法。它们不计入你的已知戏法数量，且视为邪术师戏法。' }
         ],
         eldritchInvocations: [
             { name: '苦痛魔爆 (Agonizing Blast)', level: 1, prerequisite: '魔能爆戏法', description: '施展魔能爆时加上魅力调整值伤害。' },
@@ -1742,7 +1801,11 @@ const CLASSES = {
         features: [
             { name: '施法 (Spellcasting)', level: 1, description: '使用智力施法，法术位为完整施法者进度，通过法术书准备法术。' },
             { name: '法术书 (Spellbook)', level: 1, description: '记录已知法术，每级可抄写新法术，准备法术数量等于智力调整值+法师等级（最少1个）。' },
+            { name: '仪式学家 (Ritual Adept)', level: 1, description: '你能以仪式施展你法术书中任何带有仪式标签的法术。你不需要准备这些法术，但你以此法施展法术时必须阅读这本书。' },
+            { name: '奥术回想 (Arcane Recovery)', level: 1, description: '你学会了通过研读法术书来恢复魔法能量的办法。你完成一次短休后，可以选择恢复已消耗的法术位。所恢复的法术位环阶总和不得大于你法师等级的一半（向上取整），且任何一个法术位的环阶都必须小于六环。此特性一经使用，直至完成长休你都无法再次使用。' },
+            { name: '学者 (Scholar)', level: 2, description: '在学习法术之余，你还对一门学术领域有过专门的研究。从下列技能中选择一项你具有熟练的技能：奥秘、历史、调查、医药、自然或宗教。你获得所选技能的专精。' },
             { name: '奥术传承 (Arcane Tradition)', level: 2, description: '选择法师学派，获得特定能力。' },
+            { name: '记忆法术 (Memorize Spell)', level: 5, description: '每当你完成一次短休时，你可以研究你的法术书并且将其中一道你以施法特性准备的一环及以上的法术替换为你法术书中的另一道一环及以上的法术。' },
             { name: '法术精通 (Spell Mastery)', level: 18, description: '选择1个1环和1个2环法术，可随意施展最低环阶版本。' },
             { name: '招牌法术 (Signature Spell)', level: 20, description: '选择2个3环法术，可随意施展3环版本。' }
         ],
@@ -1769,14 +1832,17 @@ const CLASSES = {
             { name: '魔法工艺 (Magical Tinkering)', level: 1, description: '你可以使用修补工具作为法器施放法术，且可以触摸非魔法物品赋予它魔法特性（发光、发声、气味、图像或文字）。' },
             { name: '称手工具 (Tool Expertise)', level: 1, description: '你获得盗贼工具和修补工具的熟练，且使用这些工具时熟练加值翻倍。' },
             { name: '注法 (Infuse Item)', level: 2, description: '长休后你可以将魔法注入物品中，创造临时魔法物品。2级时2个注法，6级时3个，10级时4个，14级时5个，18级时6个。' },
-            { name: '奇械师专业 (Artificer Specialist)', level: 3, description: '选择一个奇械师专业（子职业）：炼金师、装甲师、爆破专家、战地匠师，获得相应能力。' },
-            { name: '属性值提升 (Ability Score Improvement)', level: 4, description: '获得属性值提升专长或其他专长。第8、12、16、19级再次获得。' },
+            { name: '奇械师子职 (Artificer Subclass)', level: 3, description: '你选择获得一项奇械师子职。炼金师、装甲师、魔炮师、战地匠师和制图师，子职业会在此职业之后详细描述。子职是一种特化，在特定的奇械师等级给予你对应的独特能力。此后你将获得每一个你所选的子职的能力，只要其所需等级等于或低于你的奇械师等级。' },
+            { name: '属性值提升 (Ability Score Improvement)', level: 4, description: '你获得属性值提升专长（见第五章）或其他你满足条件的专长。如奇械师特性表所示，你还会在第8、第12、第16级时再次获得本特性。' },
             { name: '工具专精 (Tool Expertise)', level: 6, description: '选择一种工具，你使用它时熟练加值翻倍。' },
-            { name: '闪避 (Flash of Genius)', level: 7, description: '当30尺内生物进行检定或豁免时，你可以使用反应动作给它加上你的智力调整值（最少+1）。次数等于智力调整值（最少1次），长休后恢复。' },
-            { name: '魔法物品工匠 (Magic Item Adept)', level: 10, description: '你可以同时维持4个注法，且制作普通和珍稀魔法物品的时间和金钱成本减半。' },
-            { name: '法术存储物品 (Spell-Storing Item)', level: 11, description: '你可以将1个1环或2环法术存入物品中，任何人都可以使用该物品施展该法术。' },
-            { name: '魔法物品大师 (Magic Item Savant)', level: 14, description: '你可以同时维持5个注法，且可以无视职业、种族、法术和等级要求使用魔法物品。' },
-            { name: '灵魂物品 (Soul of Artifice)', level: 20, description: '你可以同时维持6个注法，且每个你同调的魔法物品给你+1豁免加值（最多+6）。' }
+            { name: '魔法物品工艺师 (Magic Item Tinker)', level: 6, description: '你的仿制魔法物品特性获得以下提升：充能魔法物品（以一个附赠动作，你可以触碰5尺内的一件你用仿制魔法物品创造的魔法物品，并使用充能。你充能这件物品并花费一个不低于一环的法术位。该物品获得的充能数量等于所花费的法术位环阶）；汲取魔法物品（以一个附赠动作，你可以触碰5尺内的一件你用仿制魔法物品创造的魔法物品，并让这件物品消失，将其魔法能量转变为一个法术位。如果这件物品为普通，则法术位为一环，或如果这件物品为非普通或珍稀，则法术位为二环。一旦你使用了此特性，直到完成一次长休前，你无法再这么做。任何以此特性创造的法术位会在你完成长休时消失）；转变魔法物品（以一个魔法动作，你可以触碰5尺内的一件你用仿制魔法物品创造的魔法物品，并将其转变为一件不同的魔法物品。最终的物品必须基于你所知晓的魔法物品方案。此特性一经使用，直至完成长休你都无法再次使用）。' },
+            { name: '灵光一闪 (Flash of Genius)', level: 7, description: '当你或你30尺内能看见的一个生物在一次属性检定或豁免检定中失败时，你可以执行反应，在检定结果中加入加值，这可能将失败变为成功。加值等于你的智力调整值。你可以执行该反应的次数等于你的智力调整值（最小为1次）。你在完成长休时重获所有消耗的使用次数。' },
+            { name: '魔法物品巧匠 (Magic Item Adept)', level: 10, description: '现在你可以同时与至多四件魔法物品同调。' },
+            { name: '储法物品 (Spell-Storing Item)', level: 11, description: '每当你完成一次长休时，你可以触碰一件简易或军用武器，或一件你能将其作为施法法器的物品，并往里存储一道法术，选择一道一环、二环或三环的，施法时间为动作的奇械师法术储存到里面（你不必准备该法术）。在持握物品期间，一个生物可以使用一个动作以从中造成这个法术的效应，使用你的施法属性调整值。如果这个法术需要专注，则该生物必须为之维持专注。一旦一名生物已经使用该物品造成此法术的效应，则直到该生物的下个回合开始，此物品无法再以此法使用。该法术将留存在物品中，直到使用次数用完（最大使用次数等于你智力调整值的两倍（至少两次））或直到你再次使用该特性储存一道法术到一件物品中。' },
+            { name: '进阶奇械术 (Advanced Artifice)', level: 14, description: '你获得以下增益：魔法物品专家（现在你可以同时与至多五件魔法物品同调）；重获灵感（当你完成短休时，你的灵光一闪重获一次已消耗的使用次数）。' },
+            { name: '魔法物品大师 (Magic Item Master)', level: 18, description: '现在你可以与至多六件魔法物品同调。' },
+            { name: '传奇恩惠 (Epic Boon)', level: 19, description: '你获得一项传奇恩惠专长（见第五章）或其他一项你选择的适用的专长。推荐选择能量抗性之恩惠。' },
+            { name: '奇械之魂 (Soul of Artifice)', level: 20, description: '你与你的魔法物品建立了一种神秘的联系，你可以利用它来产生协助效果。你获得以下增益：幸免于难（当你的生命值降至0，但没有立即被杀死时，你可以解消任意件你仿制魔法物品特性创造的，稀有度为非普通或珍稀的魔法物品，并将你的生命值改为魔法物品解离数量的20倍）；魔法指引（当你完成短休时，如果你同调着至少一件魔法物品，你的灵光一闪重获所有已消耗的使用次数）。' }
         ],
         spellcasting: true,
         spellAbility: '智力',
@@ -1803,15 +1869,22 @@ const CLASSES = {
             { name: '浴血奋战 (Bloodied But Unbowed)', level: 2, description: '当你受到伤害时，以反应重获所有锐气。若处于浴血状态（半血以下），额外获得等级×4临时生命值。短休或长休后恢复。' },
             { name: '傲然致胜 (Swagger Streak)', level: 2, description: '当你力量、敏捷、体质或魅力检定失败时，消耗1点锐气投掷拳斗骰加入检定。若成功则消耗，失败则重获。短休或长休后恢复。' },
             { name: '重磅巨拳 (Heavy Hitter)', level: 3, description: '当你以徒手打击命中生物时，可同时应用擒抱或推撞选项中的一项。' },
-            { name: '拳斗士子职 (Pugilist Subclass)', level: 3, description: '选择一项拳斗士子职：拳击手、街头霸王、犬师拳狩、惧恶之手或甜蜜科学，获得对应子职能力。' },
+            { name: '拳斗士子职 (Pugilist Subclass)', level: 3, description: '选择一项拳斗士子职：方圆擂尊、街头霸王、犬师拳狩、惧恶之手、甜蜜科学、怒雷恶氓或街角圣徒，获得对应子职能力。' },
             { name: '属性值提升 (Ability Score Improvement)', level: 4, description: '获得属性值提升专长或其他专长。第8、12、16级再次获得。' },
             { name: '反求诸己 (Dig Deep)', level: 4, description: '以附赠动作激活，持续10分钟：对钝击、穿刺、挥砍伤害抗性，免疫6级以下力竭。长休后恢复，或承受1级力竭重置。' },
             { name: '额外攻击 (Extra Attack)', level: 5, description: '你进行攻击动作时可以攻击两次。' },
             { name: '万钧痛击 (Haymaker)', level: 5, description: '当你以徒手打击或拳斗武器攻击时，可消耗1点锐气进行全力攻击。若命中则重获锐气且造成最大伤害。' },
             { name: '锐不可当 (Moxie-Fueled Fists)', level: 6, description: '当你以徒手打击或临时武器造成伤害时，可选择造成力场伤害或原本伤害类型。' },
             { name: '一线胜机 (Down But Not Out)', level: 7, description: '在浴血期间使用浴血奋战时，获得1分钟伤害加值=体质调整值+力竭等级，适用于徒手打击和拳斗武器。长休后恢复。' },
-            { name: '精通徒手打击 (Improved Critical)', level: 11, description: '你的徒手攻击在19-20时造成致命一击。' },
-            { name: '传奇斗士 (Legendary Fighter)', level: 18, description: '你可以使用附赠动作进行疾跑、撤离或躲藏。' }
+            { name: '披荆斩棘 (School of Hard Knocks)', level: 9, description: '每回合一次，当你以徒手打击或以拳斗武器发动的攻击命中时，你能额外造成1d12伤害。伤害类型与该武器或徒手打击造成的伤害类型相同。你能放弃此额外伤害转而应用以下效应之一：害恶-该生物下次被攻击命中时，那次攻击造成伤害骰能造成的最大伤害而不进行掷骰；挑衅-该生物对你以外的生物进行的攻击检定具有劣势，持续至你的下个回合结束。' },
+            { name: '海格力斯 (Herculean)', level: 10, description: '你获得以下增益。承重者-计算载重时，你的力量翻倍；破柱者-当你以徒手打击命中一个物件时，此次命中变为重击命中；绝伦健将-你的跳跃距离翻倍。' },
+            { name: '甩脱重担 (Shake It Out)', level: 10, description: '在你的每个回合开始时（无需动作），你能够移除你身上的1级力竭或结束你身上的以下一种状态：目盲，魅惑，耳聋，恐慌，麻痹，中毒，束缚或震慑。此特性一经使用，直至完成长休你都无法再次使用，除非你获得1级力竭（无需动作）来重置该特性的使用权。' },
+            { name: '求己入圣 (Dig Deeper)', level: 13, description: '你能以附赠动作求己入圣。你获得反求诸己的所有增益并能够每回合使用你的披荆斩棘两次而非一次。此特性一经使用，直至完成长休你都无法再次使用。20级起，你在长休前能使用该特性两次。' },
+            { name: '坚不可摧 (Unbreakable)', level: 14, description: '你的力量、敏捷和体质豁免具有优势。此外，每当你进行豁免检定失败时，你能消耗1点锐气重骰之，你必须使用新的结果。' },
+            { name: '好勇斗狠 (Pugnacious)', level: 15, description: '当你投掷先攻时，你能移除你身上的1级力竭并重置你一线胜机、反求诸己和甩脱重担的使用权。' },
+            { name: '斗战之魂 (Fighting Spirit)', level: 18, description: '当你的生命值降至0但没有被立即杀死时，你能改为降至1生命值。若你如此做，你获得等于你生命值上限一半的临时生命值，重获所有已消耗的锐气。且你具有除力场伤害外所有伤害的抗性，持续1分钟。此特性一经使用，直至完成长休你都无法再次使用。' },
+            { name: '传奇恩惠 (Epic Boon)', level: 19, description: '你获得一项传奇恩惠专长或其他一项你选择的适用的专长。推荐选择英勇战斗之恩惠。' },
+            { name: '巅峰状态 (Peak Physical Condition)', level: 20, description: '你的力量和韧性堪称传奇。你获得以下增益。老当益壮-你的力量和体质值提升2，至多提升至23；一觉解千愁-当你完成长休时，若你已陷入力竭状态，你失去所有力竭等级；活力四溢-当你完成短休时，你恢复等于你拳斗士等级两倍的生命值。' }
         ],
         spellcasting: false,
         resourcePool: {

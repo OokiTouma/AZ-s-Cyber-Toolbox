@@ -44,6 +44,7 @@
                     <div class="dropdown-content" id="headerDropdown">
                         <a href="../index.html" class="dropdown-item">🏠 返回首页</a>
                         <a href="../dice-simulator/index.html" class="dropdown-item">🎲 骰子模拟器</a>
+                        <a href="../spell-search/index.html" class="dropdown-item">🪄 法术速查</a>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item" onclick="characterApp.clearCharacter(); closeDropdown()">🆕 新建角色</button>
                         <button class="dropdown-item" onclick="characterApp.saveCharacter(); closeDropdown()">💾 保存角色</button>
@@ -84,6 +85,21 @@
                         <div class="form-group">
                             <label for="charXP">经验值</label>
                             <input type="number" id="charXP" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="charAlignment">阵营</label>
+                            <select id="charAlignment">
+                                <option value="">-- 选择阵营 --</option>
+                                <option value="lg">守序善良 (LG)</option>
+                                <option value="ng">中立善良 (NG)</option>
+                                <option value="cg">混乱善良 (CG)</option>
+                                <option value="ln">守序中立 (LN)</option>
+                                <option value="tn">绝对中立 (TN)</option>
+                                <option value="cn">混乱中立 (CN)</option>
+                                <option value="le">守序邪恶 (LE)</option>
+                                <option value="ne">中立邪恶 (NE)</option>
+                                <option value="ce">混乱邪恶 (CE)</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -130,6 +146,15 @@
                     </div>
                     <div id="classDescription" class="description-box"></div>
                     <div id="classFeatures" class="traits-list"></div>
+                    <div id="pactBoonSection" class="form-group" style="display: none;">
+                        <label>契约恩赐 (Pact Boon)</label>
+                        <div id="pactBoonList" class="pact-boon-list"></div>
+                    </div>
+                    <div id="eldritchInvocationsSection" class="form-group" style="display: none;">
+                        <label>魔能祈唤 (Eldritch Invocations)</label>
+                        <div id="eldritchInvocationsList" class="invocations-list"></div>
+                        <div class="invocation-slots">可选: <span id="invocationSlots">0</span> 个</div>
+                    </div>
                     <div class="form-group">
                         <label for="hitDice">生命骰</label>
                         <input type="text" id="hitDice" readonly>
@@ -321,10 +346,6 @@
                             <input type="number" id="wealthGP" min="0" value="0">
                         </div>
                         <div class="form-group wealth-input">
-                            <label for="wealthEP">银金币 (EP)</label>
-                            <input type="number" id="wealthEP" min="0" value="0">
-                        </div>
-                        <div class="form-group wealth-input">
                             <label for="wealthSP">银币 (SP)</label>
                             <input type="number" id="wealthSP" min="0" value="0">
                         </div>
@@ -468,6 +489,10 @@
                                 <span class="meta-label">经验值</span>
                                 <span id="sheetXP">0</span>
                             </div>
+                            <div class="meta-item">
+                                <span class="meta-label">阵营</span>
+                                <span id="sheetAlignment">-</span>
+                            </div>
                         </div>
                     </div>
 
@@ -554,10 +579,6 @@
                             <div class="coin-box">
                                 <span class="coin-label">GP</span>
                                 <span class="coin-value" id="sheetGP">0</span>
-                            </div>
-                            <div class="coin-box">
-                                <span class="coin-label">EP</span>
-                                <span class="coin-value" id="sheetEP">0</span>
                             </div>
                             <div class="coin-box">
                                 <span class="coin-label">SP</span>
@@ -649,10 +670,10 @@
         </div>
     </div>
 
-    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/races_data.js"></script>
-    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/spells_data.js"></script>
-    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/data.js"></script>
-    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/weapons.js"></script>
-    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/app.js"></script>
+    <script src="/AZ-s-Cy ber-Toolbox/dnd-character-creator/races_data.js"></script>
+    <script src="/AZ-s-Cy ber-Toolbox/dnd-character-creator/spells_data.js"></script>
+    <script src="/AZ-s-Cy ber-Toolbox/dnd-character-creator/data.js"></script>
+    <script src="/AZ-s-Cy ber-Toolbox/dnd-character-creator/weapons.js"></script>
+    <script src="/AZ-s-Cy ber-Toolbox/dnd-character-creator/app.js"></script>
 </body>
 </html>
