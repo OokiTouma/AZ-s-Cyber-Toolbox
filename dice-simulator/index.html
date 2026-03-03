@@ -292,19 +292,694 @@
             margin-top: auto;
         }
 
+        /* 喝酒摇骰子按钮 */
+        .btn-party {
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            color: white;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 0, 110, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(255, 0, 110, 0); }
+        }
+
+        .btn-party:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
+        }
+
+        /* 喝酒摇骰子模式 - 赛博夜店风 */
+        .party-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%);
+            z-index: 1000;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+
+        .party-container {
+            width: 90%;
+            max-width: 900px;
+            min-height: min-content;
+            margin: 2rem auto;
+            background: linear-gradient(135deg, rgba(20, 20, 40, 0.95) 0%, rgba(30, 10, 50, 0.95) 100%);
+            border-radius: 20px;
+            border: 2px solid #ff006e;
+            box-shadow: 
+                0 0 30px rgba(255, 0, 110, 0.3),
+                0 0 60px rgba(131, 56, 236, 0.2),
+                inset 0 0 30px rgba(255, 0, 110, 0.1);
+            padding: 2rem;
+            position: relative;
+            box-sizing: border-box;
+            animation: partyGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes partyGlow {
+            0% { box-shadow: 0 0 30px rgba(255, 0, 110, 0.3), 0 0 60px rgba(131, 56, 236, 0.2); }
+            100% { box-shadow: 0 0 50px rgba(255, 0, 110, 0.5), 0 0 100px rgba(131, 56, 236, 0.3); }
+        }
+
+        .party-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(255, 0, 110, 0.5);
+        }
+
+        .party-title {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #ff006e 0%, #00d4ff 50%, #8338ec 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 0, 110, 0.5);
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.3); }
+        }
+
+        .party-round {
+            font-size: 1.5rem;
+            color: #00d4ff;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+        }
+
+        .party-close {
+            background: rgba(255, 0, 110, 0.2);
+            border: 2px solid #ff006e;
+            color: #ff006e;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .party-close:hover {
+            background: #ff006e;
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.8);
+        }
+
+        .party-dice-area {
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .party-dice-container {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .party-dice {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 
+                0 0 20px rgba(255, 0, 110, 0.5),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .party-dice::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 70%
+            );
+            animation: diceShine 3s infinite;
+        }
+
+        @keyframes diceShine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .party-dice:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 
+                0 0 40px rgba(255, 0, 110, 0.8),
+                0 0 60px rgba(131, 56, 236, 0.4);
+        }
+
+        .party-dice.locked {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            box-shadow: 
+                0 0 30px rgba(0, 212, 255, 0.8),
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
+        }
+
+        .party-dice.locked::after {
+            content: '🔒';
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 1rem;
+        }
+
+        .party-dice.rolling {
+            animation: diceRoll 0.5s ease-in-out;
+        }
+
+        @keyframes diceRoll {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.2); }
+            50% { transform: rotate(180deg) scale(0.8); }
+            75% { transform: rotate(270deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .party-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .party-roll-btn, .party-next-btn {
+            padding: 1rem 3rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .party-roll-btn {
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            color: white;
+            box-shadow: 0 0 30px rgba(255, 0, 110, 0.5);
+        }
+
+        .party-roll-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(255, 0, 110, 0.8);
+        }
+
+        .party-next-btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: white;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .party-next-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.8);
+        }
+
+        .party-status {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #00d4ff;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            min-height: 30px;
+        }
+
+        .party-pro-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            border: none;
+            border-radius: 10px;
+            color: #1a0a2e;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .party-pro-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+        }
+
+        .party-pro-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 技能骰样式 */
+        .party-skills {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 0, 110, 0.3);
+        }
+
+        .party-skills-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .party-skills-title {
+            color: #ffd700;
+            font-size: 1.3rem;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .party-close-pro {
+            background: rgba(255, 0, 110, 0.3);
+            border: 1px solid #ff006e;
+            color: #ff006e;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .party-close-pro:hover {
+            background: #ff006e;
+            color: white;
+        }
+
+        /* 德州骰选择对话框 */
+        .texas-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .texas-dialog-content {
+            background: linear-gradient(135deg, rgba(20, 20, 40, 0.98) 0%, rgba(30, 10, 50, 0.98) 100%);
+            border-radius: 20px;
+            border: 2px solid #ffd700;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+        }
+
+        .texas-dialog-content h3 {
+            color: #ffd700;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .texas-dialog-content p {
+            color: #aaa;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .texas-dice-options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .texas-dice-option {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .texas-dice-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .texas-dice-option.selected {
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            border-color: #fff;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        }
+
+        .texas-selected {
+            text-align: center;
+            color: #00d4ff;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .texas-dialog-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .party-skill-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .party-skill-item {
+            background: linear-gradient(135deg, rgba(255, 0, 110, 0.2) 0%, rgba(131, 56, 236, 0.2) 100%);
+            border: 2px solid rgba(255, 0, 110, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .party-skill-item:hover:not(.disabled) {
+            background: linear-gradient(135deg, rgba(255, 0, 110, 0.4) 0%, rgba(131, 56, 236, 0.4) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(255, 0, 110, 0.4);
+        }
+
+        .party-skill-item.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .party-skill-item.used {
+            opacity: 0.5;
+            border-color: #666;
+        }
+
+        .party-skill-name {
+            color: #ff006e;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .party-skill-count {
+            color: #00d4ff;
+            font-size: 0.9rem;
+        }
+
+        .party-skill-desc {
+            color: #aaa;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
-                gap: 1rem;
+                gap: 0.5rem;
                 text-align: center;
+                padding: 0.8rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .header-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.4rem;
+            }
+
+            .btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
             }
 
             .dice-types {
                 grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+
+            .dice-type-btn {
+                padding: 0.8rem 0.3rem;
+                font-size: 0.85rem;
             }
 
             .main-content {
+                padding: 0.8rem;
+            }
+
+            .dice-container {
                 padding: 1rem;
+            }
+
+            .dice-title {
+                font-size: 1.2rem;
+                margin-bottom: 1rem;
+            }
+
+            .dice-display {
+                min-height: 120px;
+                padding: 1rem;
+            }
+
+            .dice-result {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+
+            .roll-btn {
+                padding: 0.8rem 2rem;
+                font-size: 1.1rem;
+            }
+            
+            /* 喝酒摇骰子手机优化 */
+            .party-overlay {
+                align-items: flex-start;
+                padding: 0.5rem 0;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .party-container {
+                width: 98%;
+                max-width: 100%;
+                padding: 0.8rem;
+                margin: 0.5rem auto;
+                border-radius: 15px;
+            }
+            
+            .party-header {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+                padding-bottom: 0.5rem;
+            }
+            
+            .party-title {
+                font-size: 1.2rem;
+                flex: 1;
+            }
+            
+            .party-round {
+                font-size: 1rem;
+            }
+            
+            .party-close {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+            
+            .party-dice-area {
+                min-height: auto;
+                margin-bottom: 1rem;
+            }
+            
+            .party-dice-container {
+                gap: 0.6rem;
+            }
+            
+            .party-dice {
+                width: 55px;
+                height: 55px;
+                font-size: 1.4rem;
+                border-radius: 12px;
+            }
+            
+            .party-controls {
+                flex-direction: column;
+                gap: 0.6rem;
+                margin-bottom: 1rem;
+            }
+            
+            .party-roll-btn, .party-next-btn {
+                padding: 0.8rem 2rem;
+                font-size: 1.1rem;
+                width: 100%;
+            }
+            
+            .party-status {
+                font-size: 0.95rem;
+                margin-bottom: 1rem;
+            }
+            
+            .party-skills {
+                padding: 0.8rem;
+                margin-top: 1rem;
+            }
+            
+            .party-skills-header {
+                flex-direction: row;
+                align-items: center;
+                gap: 0.5rem;
+            }
+            
+            .party-skills-title {
+                font-size: 1rem;
+            }
+            
+            .party-close-pro {
+                padding: 0.2rem 0.5rem;
+                font-size: 0.7rem;
+            }
+            
+            .party-skill-list {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .party-skill-item {
+                padding: 0.5rem;
+                min-height: auto;
+            }
+
+            .party-skill-name {
+                font-size: 0.8rem;
+                margin-bottom: 0.2rem;
+            }
+
+            .party-skill-count {
+                font-size: 0.7rem;
+            }
+
+            .party-skill-desc {
+                font-size: 0.65rem;
+                margin-top: 0.3rem;
+                line-height: 1.2;
+            }
+            
+            .party-pro-btn {
+                padding: 0.8rem;
+                font-size: 1rem;
+                margin-top: 1rem;
+            }
+
+            /* 德州骰选择对话框手机优化 */
+            .texas-dialog-content {
+                width: 95%;
+                padding: 1rem;
+                margin: 1rem;
+            }
+
+            .texas-dialog-content h3 {
+                font-size: 1.2rem;
+            }
+
+            .texas-dice-options {
+                gap: 0.5rem;
+            }
+
+            .texas-dice-option {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+                border-radius: 8px;
+            }
+
+            .texas-selected {
+                font-size: 1rem;
+            }
+
+            .texas-dialog-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .texas-dialog-buttons button {
+                width: 100%;
+            }
+        }
+
+        /* 超小屏幕优化 */
+        @media (max-width: 380px) {
+            .header h1 {
+                font-size: 1.2rem;
+            }
+
+            .party-title {
+                font-size: 1rem;
+            }
+
+            .party-dice {
+                width: 48px;
+                height: 48px;
+                font-size: 1.2rem;
+            }
+
+            .party-dice-container {
+                gap: 0.4rem;
+            }
+
+            .dice-types {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -313,6 +988,7 @@
     <header class="header">
         <h1>🎲 骰子模拟器</h1>
         <div class="header-actions">
+            <button class="btn btn-party" onclick="enterPartyMode()">🍻 喝酒摇骰子</button>
             <a href="../index.html" class="btn btn-secondary">🏠 返回首页</a>
             <a href="../dnd-character-creator/index.html" class="btn btn-secondary">🧙‍♂️ 角色卡生成器</a>
         </div>
@@ -390,10 +1066,92 @@
         <p>🐉 阿正的赛博工具箱 - 让跑团更便捷</p>
     </footer>
 
+    <!-- 德州骰选择对话框 -->
+    <div id="texasSelectDialog" class="texas-dialog" style="display: none;">
+        <div class="texas-dialog-content">
+            <h3>🤠 德州骰 - 选择5个骰子</h3>
+            <p>点击选择5个骰子：</p>
+            <div id="texasDiceOptions" class="texas-dice-options"></div>
+            <div class="texas-selected">已选择: <span id="texasSelectedCount">0</span>/5</div>
+            <div class="texas-dialog-buttons">
+                <button class="party-roll-btn" onclick="confirmTexasSelect()" id="texasConfirmBtn" disabled>确认选择</button>
+                <button class="party-next-btn" onclick="cancelTexasSelect()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 关闭Pro模式确认对话框 -->
+    <div id="closeProConfirmDialog" class="texas-dialog" style="display: none;">
+        <div class="texas-dialog-content">
+            <h3>⚠️ 确认关闭Pro模式</h3>
+            <p>关闭Pro模式将重置当前局数和所有技能骰，是否继续？</p>
+            <div class="texas-dialog-buttons">
+                <button class="party-roll-btn" onclick="confirmCloseProMode()">确认关闭</button>
+                <button class="party-next-btn" onclick="cancelCloseProMode()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 喝酒摇骰子模式遮罩 -->
+    <div id="partyModeOverlay" class="party-overlay" style="display: none;">
+        <div class="party-container">
+            <div class="party-header">
+                <h2 class="party-title">🍻 喝酒摇骰子 🎲</h2>
+                <div class="party-round">第 <span id="partyRound">1</span> 局</div>
+                <button class="party-close" onclick="exitPartyMode()">✕</button>
+            </div>
+            
+            <div class="party-dice-area">
+                <div id="partyDiceContainer" class="party-dice-container">
+                    <!-- 骰子将在这里生成 -->
+                </div>
+            </div>
+
+            <div class="party-controls">
+                <button id="partyRollBtn" class="party-roll-btn" onclick="partyRoll()">🎲 掷骰子</button>
+                <button id="partyNextBtn" class="party-next-btn" onclick="partyNextRound()" style="display: none;">下一局 ➜</button>
+            </div>
+
+            <div class="party-status" id="partyStatus">
+                点击"掷骰子"开始游戏！
+            </div>
+
+            <div class="party-skills" id="partySkills" style="display: none;">
+                <div class="party-skills-header">
+                    <h3 class="party-skills-title">🎮 技能骰</h3>
+                    <button class="party-close-pro" onclick="showCloseProConfirm()">关闭Pro模式</button>
+                </div>
+                <div class="party-skill-list" id="partySkillList">
+                    <!-- 技能骰将在这里显示 -->
+                </div>
+            </div>
+
+            <button class="party-pro-btn" id="partyProBtn" onclick="enterPartyProMode()">
+                ⚡ 开启Pro模式
+            </button>
+        </div>
+    </div>
+
     <script>
         let selectedDiceType = 8;
         let selectedDiceCount = 2;
         let rollHistory = [];
+        
+        // 喝酒摇骰子模式变量
+        let partyMode = {
+            active: false,
+            proMode: false,
+            round: 1,
+            dice: [],
+            locked: false,
+            skills: {
+                reroll: 0,
+                small: 0,
+                big: 0,
+                texas: 0
+            },
+            skillHistory: []
+        };
 
         function selectDiceType(type) {
             selectedDiceType = type;
@@ -468,6 +1226,346 @@
                     <strong>[${roll.time}]</strong> ${roll.dice}: [${roll.results.join(', ')}] = <strong>${roll.total}</strong>
                 </div>`
             ).join('');
+        }
+
+        // ==================== 喝酒摇骰子模式 ====================
+        
+        function enterPartyMode() {
+            partyMode.active = true;
+            partyMode.proMode = false;
+            partyMode.round = 1;
+            partyMode.locked = false;
+            partyMode.dice = [];
+            partyMode.skillHistory = [];
+            
+            // 初始化5个d6骰子
+            for (let i = 0; i < 5; i++) {
+                partyMode.dice.push({
+                    value: null,
+                    locked: false
+                });
+            }
+            
+            document.getElementById('partyModeOverlay').style.display = 'flex';
+            document.getElementById('partyRound').textContent = partyMode.round;
+            document.getElementById('partyProBtn').style.display = 'block';
+            document.getElementById('partyProBtn').disabled = false;
+            document.getElementById('partySkills').style.display = 'none';
+            
+            renderPartyDice();
+            updatePartyStatus('点击"掷骰子"开始游戏！');
+            
+            document.getElementById('partyRollBtn').style.display = 'block';
+            document.getElementById('partyNextBtn').style.display = 'none';
+        }
+        
+        function exitPartyMode() {
+            partyMode.active = false;
+            document.getElementById('partyModeOverlay').style.display = 'none';
+        }
+        
+        function enterPartyProMode() {
+            partyMode.proMode = true;
+            partyMode.skills = {
+                reroll: 1,
+                small: 1,
+                big: 1,
+                texas: 1
+            };
+
+            document.getElementById('partyProBtn').style.display = 'none';
+            document.getElementById('partySkills').style.display = 'block';
+
+            renderPartySkills();
+            updatePartyStatus('Pro模式已开启！每3局获得一个随机技能骰');
+        }
+
+        function showCloseProConfirm() {
+            document.getElementById('closeProConfirmDialog').style.display = 'flex';
+        }
+
+        function confirmCloseProMode() {
+            document.getElementById('closeProConfirmDialog').style.display = 'none';
+            exitPartyProMode();
+        }
+
+        function cancelCloseProMode() {
+            document.getElementById('closeProConfirmDialog').style.display = 'none';
+        }
+
+        function exitPartyProMode() {
+            partyMode.proMode = false;
+            partyMode.skills = {
+                reroll: 0,
+                small: 0,
+                big: 0,
+                texas: 0
+            };
+
+            // 重置局数
+            partyMode.round = 1;
+            document.getElementById('partyRound').textContent = partyMode.round;
+
+            // 重置骰子
+            partyMode.dice.forEach(die => {
+                die.value = null;
+                die.locked = false;
+            });
+
+            document.getElementById('partyProBtn').style.display = 'block';
+            document.getElementById('partySkills').style.display = 'none';
+
+            // 重置按钮状态
+            document.getElementById('partyRollBtn').style.display = 'block';
+            document.getElementById('partyNextBtn').style.display = 'none';
+
+            renderPartyDice();
+            updatePartyStatus('Pro模式已关闭，游戏已重置！点击"掷骰子"开始新的一局');
+        }
+
+        // 德州骰选择相关变量
+        let texasSelection = {
+            results: [],
+            selected: [],
+            active: false
+        };
+
+        function showTexasDialog() {
+            // 生成7个d6骰子
+            texasSelection.results = [];
+            texasSelection.selected = [];
+            texasSelection.active = true;
+
+            for (let i = 0; i < 7; i++) {
+                texasSelection.results.push(Math.floor(Math.random() * 6) + 1);
+            }
+
+            // 渲染选择界面
+            const container = document.getElementById('texasDiceOptions');
+            container.innerHTML = texasSelection.results.map((value, index) => `
+                <div class="texas-dice-option" id="texasDie${index}" onclick="toggleTexasDie(${index})">${value}</div>
+            `).join('');
+
+            document.getElementById('texasSelectedCount').textContent = '0';
+            document.getElementById('texasConfirmBtn').disabled = true;
+            document.getElementById('texasSelectDialog').style.display = 'flex';
+        }
+
+        function toggleTexasDie(index) {
+            if (!texasSelection.active) return;
+
+            const dieEl = document.getElementById(`texasDie${index}`);
+            const selectedIndex = texasSelection.selected.indexOf(index);
+
+            if (selectedIndex > -1) {
+                // 取消选择
+                texasSelection.selected.splice(selectedIndex, 1);
+                dieEl.classList.remove('selected');
+            } else {
+                // 选择（最多5个）
+                if (texasSelection.selected.length < 5) {
+                    texasSelection.selected.push(index);
+                    dieEl.classList.add('selected');
+                }
+            }
+
+            document.getElementById('texasSelectedCount').textContent = texasSelection.selected.length;
+            document.getElementById('texasConfirmBtn').disabled = texasSelection.selected.length !== 5;
+        }
+
+        function confirmTexasSelect() {
+            if (texasSelection.selected.length !== 5) return;
+
+            // 将选中的5个骰子应用到游戏中
+            for (let i = 0; i < 5; i++) {
+                const selectedIndex = texasSelection.selected[i];
+                partyMode.dice[i].value = texasSelection.results[selectedIndex];
+                partyMode.dice[i].locked = true;
+            }
+
+            document.getElementById('texasSelectDialog').style.display = 'none';
+            texasSelection.active = false;
+
+            renderPartyDice();
+            renderPartySkills();
+
+            const values = partyMode.dice.map(d => d.value);
+            updatePartyStatus(`使用德州骰！结果: [${values.join(', ')}]`);
+        }
+
+        function cancelTexasSelect() {
+            document.getElementById('texasSelectDialog').style.display = 'none';
+            texasSelection.active = false;
+            // 返还技能骰
+            partyMode.skills.texas++;
+            renderPartySkills();
+            updatePartyStatus('取消使用德州骰');
+        }
+        
+        function renderPartyDice() {
+            const container = document.getElementById('partyDiceContainer');
+            
+            container.innerHTML = partyMode.dice.map((die, index) => {
+                const value = die.value || '?';
+                const lockedClass = die.locked ? 'locked' : '';
+                return `<div class="party-dice ${lockedClass}" id="partyDie${index}" onclick="togglePartyDieLock(${index})">${value}</div>`;
+            }).join('');
+        }
+        
+        function renderPartySkills() {
+            const container = document.getElementById('partySkillList');
+            
+            const skills = [
+                { key: 'reroll', name: '🔄 重掷骰', desc: '无视锁定重掷5个d6', count: partyMode.skills.reroll },
+                { key: 'small', name: '🔹 小小骰', desc: '无视锁定重掷5个d4', count: partyMode.skills.small },
+                { key: 'big', name: '🔸 大大骰', desc: '重掷5个d6，结果只可能为4/5/6', count: partyMode.skills.big },
+                { key: 'texas', name: '🤠 德州骰', desc: '重掷7个d6，选择其中5个', count: partyMode.skills.texas }
+            ];
+            
+            container.innerHTML = skills.map(skill => {
+                const disabledClass = skill.count <= 0 ? 'disabled' : '';
+                return `
+                    <div class="party-skill-item ${disabledClass}" onclick="usePartySkill('${skill.key}')">
+                        <div class="party-skill-name">${skill.name}</div>
+                        <div class="party-skill-count">剩余: ${skill.count}个</div>
+                        <div class="party-skill-desc">${skill.desc}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function partyRoll() {
+            if (partyMode.locked) return;
+            
+            // 掷骰子
+            partyMode.dice.forEach((die, index) => {
+                if (!die.locked) {
+                    const dieEl = document.getElementById(`partyDie${index}`);
+                    dieEl.classList.add('rolling');
+                    
+                    setTimeout(() => {
+                        die.value = Math.floor(Math.random() * 6) + 1;
+                        dieEl.textContent = die.value;
+                        dieEl.classList.remove('rolling');
+                    }, 500);
+                }
+            });
+            
+            setTimeout(() => {
+                // 检查是否五个骰子都不一样
+                const values = partyMode.dice.map(d => d.value).filter(v => v !== null);
+                const uniqueValues = [...new Set(values)];
+                
+                if (values.length === 5 && uniqueValues.length === 5) {
+                    updatePartyStatus('五个骰子都不一样！自动重新掷骰子...');
+                    setTimeout(() => partyRoll(), 1000);
+                    return;
+                }
+                
+                // 锁定骰子
+                partyMode.locked = true;
+                partyMode.dice.forEach(die => die.locked = true);
+                renderPartyDice();
+                
+                // 显示下一局按钮
+                document.getElementById('partyRollBtn').style.display = 'none';
+                document.getElementById('partyNextBtn').style.display = 'block';
+                
+                updatePartyStatus(`第${partyMode.round}局完成！五个骰子: [${values.join(', ')}]`);
+                
+                // 检查是否需要奖励技能骰（每3局）
+                if (partyMode.proMode && partyMode.round % 3 === 0) {
+                    awardRandomSkill();
+                }
+            }, 600);
+        }
+        
+        function partyNextRound() {
+            partyMode.round++;
+            partyMode.locked = false;
+            
+            // 解锁骰子但保留值
+            partyMode.dice.forEach(die => {
+                die.locked = false;
+            });
+            
+            document.getElementById('partyRound').textContent = partyMode.round;
+            document.getElementById('partyRollBtn').style.display = 'block';
+            document.getElementById('partyNextBtn').style.display = 'none';
+            
+            renderPartyDice();
+            updatePartyStatus(`第${partyMode.round}局开始！点击"掷骰子"`);
+        }
+        
+        function togglePartyDieLock(index) {
+            if (!partyMode.locked) return; // 只有在锁定状态下才能切换
+            
+            partyMode.dice[index].locked = !partyMode.dice[index].locked;
+            renderPartyDice();
+        }
+        
+        function usePartySkill(skillKey) {
+            if (partyMode.skills[skillKey] <= 0) return;
+            
+            partyMode.skills[skillKey]--;
+            
+            switch(skillKey) {
+                case 'reroll':
+                    // 重掷骰：无视锁定重掷5个d6
+                    partyMode.dice.forEach((die, index) => {
+                        die.value = Math.floor(Math.random() * 6) + 1;
+                        die.locked = true;
+                    });
+                    break;
+                    
+                case 'small':
+                    // 小小骰：无视锁定重掷5个d4
+                    partyMode.dice.forEach((die, index) => {
+                        die.value = Math.floor(Math.random() * 4) + 1;
+                        die.locked = true;
+                    });
+                    break;
+                    
+                case 'big':
+                    // 大大骰：重掷5个d6，结果只可能为4/5/6
+                    partyMode.dice.forEach((die, index) => {
+                        die.value = Math.floor(Math.random() * 3) + 4; // 4, 5, 或 6
+                        die.locked = true;
+                    });
+                    break;
+                    
+                case 'texas':
+                    // 德州骰：显示选择对话框让玩家自选5个
+                    showTexasDialog();
+                    return; // 不执行后续的render和update
+            }
+            
+            renderPartyDice();
+            renderPartySkills();
+            
+            const values = partyMode.dice.map(d => d.value);
+            updatePartyStatus(`使用技能骰！结果: [${values.join(', ')}]`);
+        }
+        
+        function awardRandomSkill() {
+            const skillKeys = ['reroll', 'small', 'big', 'texas'];
+            const randomSkill = skillKeys[Math.floor(Math.random() * skillKeys.length)];
+            partyMode.skills[randomSkill]++;
+            
+            renderPartySkills();
+            
+            const skillNames = {
+                reroll: '重掷骰',
+                small: '小小骰',
+                big: '大大骰',
+                texas: '德州骰'
+            };
+            
+            updatePartyStatus(`🎉 第${partyMode.round}局奖励！获得1个${skillNames[randomSkill]}！`);
+        }
+        
+        function updatePartyStatus(message) {
+            document.getElementById('partyStatus').textContent = message;
         }
     </script>
 </body>
