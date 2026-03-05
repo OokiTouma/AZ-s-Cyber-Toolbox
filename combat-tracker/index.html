@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D 5E 战斗追踪器</title>
+    <link rel="stylesheet" href="/AZ-s-Cyber-Toolbox/dnd-character-creator/styles.css">
+</head>
+<body>
+    <!-- 密码保护层 -->
+    <div id="passwordOverlay" class="password-overlay">
+        <div class="password-modal">
+            <div class="password-icon">🔒</div>
+            <h2 class="password-title">战斗追踪器已锁定</h2>
+            <p class="password-hint">请输入密码以继续</p>
+            <div class="password-input-group">
+                <input type="password" id="passwordInput" class="password-input" placeholder="输入密码" maxlength="10">
+                <button class="btn btn-primary password-btn" onclick="app.checkPassword()">解锁</button>
+            </div>
+            <p id="passwordError" class="password-error"></p>
+        </div>
+    </div>
+
+    <div id="app">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-content">
+                <a href="../index.html" class="back-link">← 返回</a>
+                <h1>⚔️ D&D 5E 战斗追踪器</h1>
+                <button class="theme-toggle" onclick="app.toggleTheme()">🌙</button>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 控制面板 -->
+            <div class="control-panel">
+                <div class="round-info">
+                    <span class="round-label">第</span>
+                    <span class="round-number" id="roundNumber">1</span>
+                    <span class="round-label">轮</span>
+                </div>
+                <div class="combat-controls">
+                    <button class="btn btn-primary" onclick="app.prevTurn()">← 上一回合</button>
+                    <button class="btn btn-success" onclick="app.nextTurn()">下一回合 →</button>
+                    <button class="btn btn-warning" onclick="app.resetCombat()">🔄 重置战斗</button>
+                </div>
+            </div>
+
+            <!-- 快捷操作栏 -->
+            <div class="quick-actions">
+                <button class="btn btn-primary" onclick="app.openMonsterDatabase()">📚 怪物数据库</button>
+                <button class="btn btn-success" onclick="app.openPresetEncounters()">⚔️ 预设战斗</button>
+            </div>
+
+            <!-- 添加单位表单 -->
+            <div class="add-combatant-section">
+                <h2 class="section-title">添加战斗单位</h2>
+                <form class="add-form" onsubmit="app.addCombatant(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="unitName">名称</label>
+                            <input type="text" id="unitName" placeholder="输入名称" required>
+                        </div>
+                        <div class="form-group small">
+                            <label for="unitType">类型</label>
+                            <select id="unitType">
+                                <option value="player">玩家</option>
+                                <option value="enemy">敌人</option>
+                                <option value="npc">NPC</option>
+                            </select>
+                        </div>
+                        <div class="form-group small">
+                            <label for="unitInitiative">先攻</label>
+                            <input type="number" id="unitInitiative" placeholder="0" required>
+                        </div>
+                        <div class="form-group small">
+                            <label for="unitHP">生命值</label>
+                            <input type="number" id="unitHP" placeholder="0">
+                        </div>
+                        <div class="form-group small">
+                            <label for="unitMaxHP">最大HP</label>
+                            <input type="number" id="unitMaxHP" placeholder="0">
+                        </div>
+                        <div class="form-group small">
+                            <label for="unitAC">AC</label>
+                            <input type="number" id="unitAC" placeholder="10">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full">
+                            <label for="unitNotes">备注</label>
+                            <input type="text" id="unitNotes" placeholder="可选：添加备注信息">
+                        </div>
+                        <button type="submit" class="btn btn-primary add-btn">➕ 添加</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 先攻列表 -->
+            <div class="initiative-list-section">
+                <div class="section-header">
+                    <h2 class="section-title">战斗顺序</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-secondary" onclick="app.sortInitiative()">📊 按先攻排序</button>
+                        <button class="btn btn-danger" onclick="app.clearAll()">🗑️ 清空全部</button>
+                    </div>
+                </div>
+                
+                <div class="initiative-list" id="initiativeList">
+                    <!-- 战斗单位将在这里动态生成 -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 状态效果模态框 -->
+    <div id="conditionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加状态效果</h3>
+                <button class="close-btn" onclick="app.closeConditionModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="app.addCondition(event)">
+                    <input type="hidden" id="conditionTargetId">
+                    <div class="form-group">
+                        <label for="conditionType">状态类型</label>
+                        <select id="conditionType" required>
+                            <option value="">选择状态</option>
+                            <optgroup label="控制状态">
+                                <option value="blinded">目盲</option>
+                                <option value="charmed">魅惑</option>
+                                <option value="deafened">耳聋</option>
+                                <option value="frightened">恐慌</option>
+                                <option value="grappled">被擒抱</option>
+                                <option value="incapacitated">失能</option>
+                                <option value="invisible">隐形</option>
+                                <option value="paralyzed">麻痹</option>
+                                <option value="petrified">石化</option>
+                                <option value="poisoned">中毒</option>
+                                <option value="prone">倒地</option>
+                                <option value="restrained">被束缚</option>
+                                <option value="stunned">震慑</option>
+                                <option value="unconscious">昏迷</option>
+                            </optgroup>
+                            <optgroup label="增益状态">
+                                <option value="blessed">祝福</option>
+                                <option value="hasted">加速</option>
+                                <option value="shield">护盾术</option>
+                                <option value="inspired">受激励</option>
+                                <option value="concentration">专注中</option>
+                            </optgroup>
+                            <optgroup label="其他">
+                                <option value="hidden">隐藏</option>
+                                <option value="dodging">闪避</option>
+                                <option value="dashing">疾跑</option>
+                                <option value="readied">准备动作</option>
+                                <option value="custom">自定义</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="form-group" id="customConditionGroup" style="display: none;">
+                        <label for="customConditionName">自定义状态名称</label>
+                        <input type="text" id="customConditionName" placeholder="输入状态名称">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="conditionDuration">持续轮数</label>
+                            <input type="number" id="conditionDuration" value="1" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="conditionSource">来源</label>
+                            <input type="text" id="conditionSource" placeholder="例如：法术、特性">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="conditionSave">
+                            需要豁免检定
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">添加状态</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 伤害/治疗模态框 -->
+    <div id="hpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="hpModalTitle">调整生命值</h3>
+                <button class="close-btn" onclick="app.closeHpModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="app.applyHPChange(event)">
+                    <input type="hidden" id="hpTargetId">
+                    <input type="hidden" id="hpAction">
+                    <div class="form-group">
+                        <label for="hpAmount">数值</label>
+                        <input type="number" id="hpAmount" placeholder="输入数值" min="0" required autofocus>
+                    </div>
+                    <div class="hp-actions">
+                        <button type="button" class="btn btn-danger" onclick="app.setHPAction('damage')">⚔️ 伤害</button>
+                        <button type="button" class="btn btn-success" onclick="app.setHPAction('heal')">💚 治疗</button>
+                        <button type="button" class="btn btn-primary" onclick="app.setHPAction('set')">📝 设为</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 怪物数据库模态框 -->
+    <div id="monsterDatabaseModal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3>📚 怪物数据库</h3>
+                <button class="close-btn" onclick="app.closeMonsterDatabase()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="monster-database-tabs">
+                    <button class="tab-btn active" onclick="app.switchMonsterTab('basics')">基础规则</button>
+                    <button class="tab-btn" onclick="app.switchMonsterTab('phandelver')">凡达林的地精矿坑</button>
+                    <button class="tab-btn" onclick="app.switchMonsterTab('expanded')">扩展规则</button>
+                </div>
+                <div class="monster-search">
+                    <input type="text" id="monsterSearchInput" placeholder="搜索怪物..." oninput="app.searchMonsters()">
+                </div>
+                <div class="monster-list" id="monsterList">
+                    <!-- 怪物列表将在这里动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 预设战斗模态框 -->
+    <div id="presetEncountersModal" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3>⚔️ 预设战斗</h3>
+                <button class="close-btn" onclick="app.closePresetEncounters()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="encounter-campaigns" id="encounterCampaigns">
+                    <!-- 战役列表将在这里动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/monsters_data.js"></script>
+    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/app.js"></script>
+</body>
+</html>
