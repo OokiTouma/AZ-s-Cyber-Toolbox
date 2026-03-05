@@ -50,7 +50,6 @@ class CharacterApp {
             wealth: {
                 pp: 0,
                 gp: 0,
-                ep: 0,
                 sp: 0,
                 cp: 0
             },
@@ -562,6 +561,80 @@ class CharacterApp {
         document.getElementById('flaws').addEventListener('input', (e) => {
             this.character.flaws = e.target.value;
         });
+        
+        // 语言选择（旧的多选下拉框，保留兼容性）
+        const languageSelect = document.getElementById('languages');
+        if (languageSelect) {
+            languageSelect.addEventListener('change', (e) => {
+                const selected = Array.from(e.target.selectedOptions).map(option => option.value);
+                this.character.languages = selected;
+            });
+        }
+    }
+
+    // 添加语言（新方式）
+    addLanguage() {
+        const select = document.getElementById('languageSelect');
+        const langKey = select.value;
+        if (!langKey || !LANGUAGES[langKey]) return;
+        
+        if (!this.character.languages) {
+            this.character.languages = [];
+        }
+        
+        if (!this.character.languages.includes(langKey)) {
+            this.character.languages.push(langKey);
+            this.renderLanguagesList();
+        }
+        
+        select.value = '';
+    }
+
+    // 移除语言
+    removeLanguage(langKey) {
+        if (this.character.languages) {
+            this.character.languages = this.character.languages.filter(l => l !== langKey);
+            this.renderLanguagesList();
+        }
+    }
+
+    // 渲染语言列表
+    renderLanguagesList() {
+        const container = document.getElementById('languagesList');
+        if (!container) return;
+        
+        if (!this.character.languages || this.character.languages.length === 0) {
+            container.innerHTML = '<span style="color: #999; font-size: 0.9rem;">暂无语言</span>';
+            return;
+        }
+        
+        container.innerHTML = this.character.languages.map(langKey => {
+            const lang = LANGUAGES[langKey];
+            const langName = lang ? lang.name : langKey;
+            return `
+                <span class="language-tag" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.25rem;
+                    padding: 0.25rem 0.5rem;
+                    background: rgba(139, 69, 19, 0.1);
+                    border: 1px solid var(--primary-color);
+                    border-radius: 4px;
+                    font-size: 0.85rem;
+                ">
+                    ${langName}
+                    <button type="button" onclick="characterApp.removeLanguage('${langKey}')" style="
+                        background: none;
+                        border: none;
+                        cursor: pointer;
+                        padding: 0;
+                        color: #c0392b;
+                        font-size: 1rem;
+                        line-height: 1;
+                    " title="移除">×</button>
+                </span>
+            `;
+        }).join('');
     }
 
     // 检查子职业是否可用
@@ -1840,14 +1913,22 @@ class CharacterApp {
         
         // 渲染远程武器
         if (rangedContainer) {
-            rangedContainer.innerHTML = this.character.weapons.ranged.map(weapon => `
+            rangedContainer.innerHTML = this.character.weapons.ranged.map(weapon => {
+                // 处理射程显示
+                let rangeDisplay = '';
+                if (weapon.range && typeof weapon.range === 'object') {
+                    rangeDisplay = `${weapon.range.normal}/${weapon.range.long}`;
+                } else if (weapon.range) {
+                    rangeDisplay = weapon.range;
+                }
+                return `
                 <div class="weapon-item">
                     <span class="weapon-name">${weapon.name}</span>
                     <span class="weapon-damage">${weapon.damage} ${weapon.damageType}</span>
-                    <span class="weapon-range">射程: ${weapon.range}</span>
+                    <span class="weapon-range">射程: ${rangeDisplay || '-'}</span>
                     <button onclick="characterApp.removeWeapon('ranged', ${weapon.id})" class="btn-remove">移除</button>
                 </div>
-            `).join('') || '<p>暂无远程武器</p>';
+            `}).join('') || '<p>暂无远程武器</p>';
         }
     }
 
@@ -1922,6 +2003,15 @@ class CharacterApp {
         const spellData = SPELLS[spellKey]?.find(s => s.name === spellName);
         return spellData?.description || '';
     }
+    
+    // 检查法术是否需要专注
+    checkSpellConcentration(spellName, spellLevel) {
+        const spellKey = spellLevel === 0 ? 'cantrips' : `level${spellLevel}`;
+        const spellData = SPELLS[spellKey]?.find(s => s.name === spellName);
+        if (!spellData) return false;
+        const duration = spellData.duration || '';
+        return duration.includes('至多') || duration.includes('专注');
+    }
 
     // 渲染法术列表
     renderSpells() {
@@ -1933,65 +2023,113 @@ class CharacterApp {
             return;
         }
         
-        container.innerHTML = this.character.spells.map(spell => {
-            // 构建法术信息
-            let spellInfo = '';
-            
-            // 显示来源
+        // 按来源分类法术
+        const playerSpells = [];      // 玩家自行添加的
+        const classSpells = [];       // 职业技能给予的
+        const raceSpells = [];        // 种族技能给予的
+        
+        this.character.spells.forEach(spell => {
             if (spell.fromFeature && spell.source) {
-                spellInfo += `<span class="spell-source">来自: ${spell.source}</span>`;
-            }
-            
-            // 显示施法属性
-            if (spell.ability) {
-                spellInfo += `<span class="spell-ability">施法属性: ${spell.ability}</span>`;
-            }
-            
-            // 显示次数限制
-            if (spell.freeCast) {
-                if (spell.freeCast.count === Infinity) {
-                    spellInfo += `<span class="spell-limit">随意施展</span>`;
-                } else if (spell.freeCast.count === 1) {
-                    spellInfo += `<span class="spell-limit">1次/${spell.freeCast.reset}</span>`;
+                // 检查是职业还是种族
+                const source = spell.source.toLowerCase();
+                const isRace = this.character.race && (
+                    source.includes(RACES[this.character.race]?.name?.toLowerCase() || '') ||
+                    source.includes('种族') || source.includes('龙裔') || source.includes('精灵') || 
+                    source.includes('矮人') || source.includes('半身人') || source.includes('人类')
+                );
+                if (isRace) {
+                    raceSpells.push(spell);
                 } else {
-                    spellInfo += `<span class="spell-limit">${spell.freeCast.count}次/${spell.freeCast.reset}</span>`;
+                    classSpells.push(spell);
                 }
+            } else {
+                playerSpells.push(spell);
             }
-            
-            // 显示始终准备状态
-            if (spell.alwaysPrepared) {
-                spellInfo += `<span class="spell-prepared">始终准备</span>`;
-            }
-            
-            // 显示始终已知状态
-            if (spell.alwaysKnown) {
-                spellInfo += `<span class="spell-known">始终已知</span>`;
-            }
-            
-            const removeButton = spell.fromFeature ? '' : `<button onclick="characterApp.removeSpell('${spell.name}')" class="btn-remove">移除</button>`;
-            
-            // 获取法术描述用于tooltip
-            const description = this.getSpellDescription(spell.name, spell.level);
-            const tooltipAttr = description ? `data-tooltip="${description}"` : '';
+        });
+        
+        // 渲染单个分类的法术
+        const renderSpellCategory = (spells, categoryClass, title) => {
+            if (spells.length === 0) return '';
             
             return `
-                <div class="spell-item ${spell.fromFeature ? 'feature-spell' : ''}" ${tooltipAttr}>
-                    <div class="spell-main-info">
-                        <span class="spell-name" title="${description}">${spell.name}</span>
-                        <span class="spell-level">${spell.level === 0 ? '戏法' : spell.level + '环'}</span>
-                        <span class="spell-school">${spell.school}</span>
-                        ${removeButton}
-                    </div>
-                    ${spellInfo ? `<div class="spell-extra-info">${spellInfo}</div>` : ''}
+                <div class="spell-category ${categoryClass}">
+                    <div class="spell-category-title">${title} (${spells.length})</div>
+                    ${spells.map(spell => this.renderSpellItem(spell)).join('')}
                 </div>
             `;
-        }).join('');
+        };
+        
+        container.innerHTML = 
+            renderSpellCategory(playerSpells, 'player-spells', '玩家法术') +
+            renderSpellCategory(classSpells, 'class-spells', '职业技能') +
+            renderSpellCategory(raceSpells, 'race-spells', '种族技能');
         
         // 添加tooltip事件监听
         this.setupSpellTooltips(container);
     }
+    
+    // 渲染单个法术项
+    renderSpellItem(spell) {
+        // 构建法术信息
+        let spellInfo = '';
+        
+        // 显示来源
+        if (spell.fromFeature && spell.source) {
+            spellInfo += `<span class="spell-source">来自: ${spell.source}</span>`;
+        }
+        
+        // 显示施法属性
+        if (spell.ability) {
+            spellInfo += `<span class="spell-ability">施法属性: ${spell.ability}</span>`;
+        }
+        
+        // 显示次数限制
+        if (spell.freeCast) {
+            if (spell.freeCast.count === Infinity) {
+                spellInfo += `<span class="spell-limit">随意施展</span>`;
+            } else if (spell.freeCast.count === 1) {
+                spellInfo += `<span class="spell-limit">1次/${spell.freeCast.reset}</span>`;
+            } else {
+                spellInfo += `<span class="spell-limit">${spell.freeCast.count}次/${spell.freeCast.reset}</span>`;
+            }
+        }
+        
+        // 显示专注状态
+        const needsConcentration = this.checkSpellConcentration(spell.name, spell.level);
+        if (needsConcentration) {
+            spellInfo += `<span class="spell-concentration">需专注</span>`;
+        }
+        
+        // 显示始终准备状态
+        if (spell.alwaysPrepared) {
+            spellInfo += `<span class="spell-prepared">始终准备</span>`;
+        }
+        
+        // 显示始终已知状态
+        if (spell.alwaysKnown) {
+            spellInfo += `<span class="spell-known">始终已知</span>`;
+        }
+        
+        const removeButton = spell.fromFeature ? '' : `<button onclick="characterApp.removeSpell('${spell.name}')" class="btn-remove">移除</button>`;
+        
+        // 获取法术描述用于tooltip
+        const description = this.getSpellDescription(spell.name, spell.level);
+        const tooltipAttr = description ? `data-tooltip="${description}"` : '';
+        
+        return `
+            <div class="spell-item" ${tooltipAttr}>
+                <div class="spell-main-info">
+                    <span class="spell-name" title="${description}">${spell.name}</span>
+                    <span class="spell-level">${spell.level === 0 ? '戏法' : spell.level + '环'}</span>
+                    <span class="spell-school">${spell.school}</span>
+                    ${removeButton}
+                </div>
+                ${spellInfo ? `<div class="spell-extra-info">${spellInfo}</div>` : ''}
+            </div>
+        `;
+    }
 
-    // 设置法术tooltip事件
+    // 设置法术 tooltip 事件
     setupSpellTooltips(container) {
         const spellItems = container.querySelectorAll('.spell-item[data-tooltip]');
         spellItems.forEach(item => {
@@ -2007,6 +2145,41 @@ class CharacterApp {
                     this.moveTooltip(e);
                 });
             }
+        });
+    }
+
+    // 设置准备法术 tooltip 事件
+    setupPreparedSpellTooltips(container) {
+        const spellItems = container.querySelectorAll('.prepared-spell-item[data-tooltip]');
+        spellItems.forEach(item => {
+            const spellName = item.querySelector('.prepared-spell-name');
+            if (spellName) {
+                spellName.addEventListener('mouseenter', (e) => {
+                    this.showTooltip(e, item.dataset.tooltip);
+                });
+                spellName.addEventListener('mouseleave', () => {
+                    this.hideTooltip();
+                });
+                spellName.addEventListener('mousemove', (e) => {
+                    this.moveTooltip(e);
+                });
+            }
+        });
+    }
+
+    // 设置角色卡片法术 tooltip 事件
+    setupSheetSpellTooltips(container) {
+        const spellNames = container.querySelectorAll('.sheet-spell-name[data-tooltip]');
+        spellNames.forEach(spellName => {
+            spellName.addEventListener('mouseenter', (e) => {
+                this.showTooltip(e, spellName.dataset.tooltip);
+            });
+            spellName.addEventListener('mouseleave', () => {
+                this.hideTooltip();
+            });
+            spellName.addEventListener('mousemove', (e) => {
+                this.moveTooltip(e);
+            });
         });
     }
 
@@ -2394,12 +2567,19 @@ class CharacterApp {
         container.innerHTML = allWeapons.map(weapon => {
             const attackBonus = this.calculateWeaponAttackBonus(weapon);
             const unarmedClass = weapon.isUnarmed ? 'unarmed-weapon' : '';
+            // 处理射程显示
+            let rangeDisplay = '';
+            if (weapon.range && typeof weapon.range === 'object') {
+                rangeDisplay = `${weapon.range.normal}/${weapon.range.long}`;
+            } else if (weapon.range) {
+                rangeDisplay = weapon.range;
+            }
             return `
                 <div class="sheet-weapon-item ${unarmedClass}">
                     <span class="sheet-weapon-name">${weapon.name}</span>
                     <span class="sheet-weapon-bonus">攻击${attackBonus >= 0 ? '+' : ''}${attackBonus}</span>
                     <span class="sheet-weapon-damage">${weapon.damage} ${weapon.damageType}</span>
-                    ${weapon.range ? `<span class="sheet-weapon-range">射程${weapon.range}</span>` : ''}
+                    ${rangeDisplay ? `<span class="sheet-weapon-range">射程${rangeDisplay}</span>` : ''}
                 </div>
             `;
         }).join('');
@@ -2608,13 +2788,20 @@ class CharacterApp {
                 <div class="sheet-spell-level-group">
                     <span class="sheet-spell-level">${levelName}</span>
                     <div class="sheet-spell-names">
-                        ${spellsByLevel[level].map(spell => `<span class="sheet-spell-name">${spell.name}</span>`).join(', ')}
+                        ${spellsByLevel[level].map(spell => {
+                            const description = this.getSpellDescription(spell.name, spell.level);
+                            const tooltipAttr = description ? `data-tooltip="${description}"` : '';
+                            return `<span class="sheet-spell-name" ${tooltipAttr}>${spell.name}</span>`;
+                        }).join(', ')}
                     </div>
                 </div>
             `;
         });
         
         container.innerHTML = html;
+        
+        // 添加 tooltip 事件监听
+        this.setupSheetSpellTooltips(container);
     }
 
     // 渲染角色卡预览 - 专长
@@ -2798,7 +2985,27 @@ class CharacterApp {
         // 生成随机背景元素
         this.generateRandomBackground();
         
-        // 更新UI
+        // 随机阵营
+        const alignments = ['守序善良', '中立善良', '混乱善良', '守序中立', '绝对中立', '混乱中立', '守序邪恶', '中立邪恶', '混乱邪恶'];
+        this.character.alignment = alignments[Math.floor(Math.random() * alignments.length)];
+        document.getElementById('alignment').value = this.character.alignment;
+        
+        // 随机子职业（如果达到等级）
+        if (this.character.level >= 3 && SUBCLASSES[randomClass]) {
+            const subclassKeys = Object.keys(SUBCLASSES[randomClass]);
+            if (subclassKeys.length > 0) {
+                const randomSubclass = subclassKeys[Math.floor(Math.random() * subclassKeys.length)];
+                this.selectSubclass(randomSubclass);
+            }
+        }
+        
+        // 生成随机语言
+        this.generateRandomLanguages(randomRace, randomBackground, randomClass);
+        
+        // 生成背景故事
+        this.generateBackstory(randomRace, randomClass, randomBackground);
+        
+        // 更新 UI
         this.updateUI();
         this.updateCharacterSheet();
         
@@ -2925,6 +3132,171 @@ class CharacterApp {
                 });
             }
         }
+    }
+
+    // 生成随机语言
+    generateRandomLanguages(race, background, charClass) {
+        const languages = [];
+        
+        // 添加种族语言
+        if (typeof RACE_LANGUAGES !== 'undefined' && RACE_LANGUAGES[race]) {
+            RACE_LANGUAGES[race].forEach(lang => {
+                if (!languages.includes(lang)) languages.push(lang);
+            });
+        }
+        
+        // 添加背景语言
+        if (typeof BACKGROUND_LANGUAGES !== 'undefined' && BACKGROUND_LANGUAGES[background]) {
+            const bonusLanguages = BACKGROUND_LANGUAGES[background];
+            const availableLanguages = Object.keys(LANGUAGES || {}).filter(lang => !languages.includes(lang));
+            for (let i = 0; i < bonusLanguages && availableLanguages.length > 0; i++) {
+                const randomLang = availableLanguages[Math.floor(Math.random() * availableLanguages.length)];
+                languages.push(randomLang);
+                const idx = availableLanguages.indexOf(randomLang);
+                if (idx > -1) availableLanguages.splice(idx, 1);
+            }
+        }
+        
+        // 保存语言选择
+        this.character.languages = languages;
+        
+        // 更新语言列表显示
+        this.renderLanguagesList();
+    }
+
+    // 生成背景故事
+    generateBackstory(race, charClass, background) {
+        const raceName = RACES[race]?.name || '未知种族';
+        const className = CLASSES[charClass]?.name || '未知职业';
+        
+        // 背景故事模板
+        const backstoryTemplates = [
+            `${this.character.name} 是一位${raceName}${className}，出生于${this.getRandomRegion()}。${this.generateBackstoryEvent(charClass)} 为了${this.generateGoal()}，${this.character.name} 踏上了冒险的旅程。`,
+            `在${this.getRandomRegion()}的${this.getRandomLocation()}，${this.character.name} 开始了${className}的生涯。${this.generateBackstoryEvent(charClass)} 如今，${this.character.name} 渴望${this.generateGoal()}。`,
+            `${this.character.name} 的${className}之路始于${this.getRandomRegion()}。${this.generateBackstoryEvent(charClass)} 现在，${this.character.name} 的目标是${this.generateGoal()}。`
+        ];
+        
+        // 性格特点模板
+        const personalityTemplates = [
+            '勇敢而谨慎，总是三思而后行。',
+            '乐观开朗，即使在最黑暗的时刻也能看到希望。',
+            '沉默寡言，但行动胜于言语。',
+            '好奇心强，对未知充满探索欲。',
+            '忠诚可靠，对朋友不离不弃。',
+            '独立自主，不喜欢依赖他人。',
+            '富有同情心，总是帮助弱者。',
+            '冷静理智，很少被情绪左右。'
+        ];
+        
+        // 理想模板
+        const idealsTemplates = [
+            '正义：保护无辜者，惩罚邪恶。',
+            '自由：每个人都有选择自己命运的权利。',
+            '知识：追求真理和智慧。',
+            '力量：变得更强，保护所爱之人。',
+            '荣耀：为家族和传统赢得荣誉。',
+            '平衡：维持世界的和谐与平衡。'
+        ];
+        
+        // 羁绊模板
+        const bondsTemplates = [
+            '我的家人是我的一切。',
+            '我欠一位恩人一份救命之恩。',
+            '我的传家宝是我最大的财富。',
+            '我的组织是我真正的家。',
+            '我在寻找失散多年的亲人。'
+        ];
+        
+        // 缺点模板
+        const flawsTemplates = [
+            '有时过于冲动，不考虑后果。',
+            '对某些事物有无法控制的恐惧。',
+            '太容易相信别人。',
+            '贪婪，难以抗拒财富的诱惑。',
+            '骄傲自大，不愿承认错误。',
+            '记仇，难以原谅冒犯过我的人。'
+        ];
+        
+        // 生成内容
+        const backstory = backstoryTemplates[Math.floor(Math.random() * backstoryTemplates.length)];
+        const personality = personalityTemplates[Math.floor(Math.random() * personalityTemplates.length)];
+        const ideals = idealsTemplates[Math.floor(Math.random() * idealsTemplates.length)];
+        const bonds = bondsTemplates[Math.floor(Math.random() * bondsTemplates.length)];
+        const flaws = flawsTemplates[Math.floor(Math.random() * flawsTemplates.length)];
+        
+        // 更新 UI 字段
+        const backstoryEl = document.getElementById('backstory');
+        if (backstoryEl) backstoryEl.value = backstory;
+        
+        const personalityEl = document.getElementById('personality');
+        if (personalityEl) personalityEl.value = personality;
+        
+        const idealsEl = document.getElementById('ideals');
+        if (idealsEl) idealsEl.value = ideals;
+        
+        const bondsEl = document.getElementById('bonds');
+        if (bondsEl) bondsEl.value = bonds;
+        
+        const flawsEl = document.getElementById('flaws');
+        if (flawsEl) flawsEl.value = flaws;
+        
+        // 保存到角色对象
+        this.character.backstory = backstory;
+        this.character.personality = personality;
+        this.character.ideals = ideals;
+        this.character.bonds = bonds;
+        this.character.flaws = flaws;
+    }
+    
+    // 辅助函数：随机地区
+    getRandomRegion() {
+        const regions = ['北境', '南方平原', '东方群岛', '西方海岸', '中央高地', '幽暗森林', '沙漠边缘', '雪山脚下'];
+        return regions[Math.floor(Math.random() * regions.length)];
+    }
+    
+    // 辅助函数：随机地点
+    getRandomLocation() {
+        const locations = ['小村庄', '繁华城市', '偏远小镇', '古老城堡', '神秘森林', '废弃矿井', '海边渔村', '山脉隘口'];
+        return locations[Math.floor(Math.random() * locations.length)];
+    }
+    
+    // 辅助函数：生成背景事件
+    generateBackstoryEvent(charClass) {
+        const events = {
+            fighter: ['在一次战斗中展现了非凡的勇气，', '接受了严格的军事训练，', '为了复仇而拿起武器，'],
+            wizard: ['发现了古老的魔法书，', '被送到魔法学院学习，', '天生具有魔法天赋，'],
+            cleric: ['听到了神祇的召唤，', '在神殿中长大，', '经历了一次神迹后皈依，'],
+            rogue: ['在街头摸爬滚打长大，', '加入了盗贼公会，', '为了生存学会了潜行和欺骗，'],
+            paladin: ['立下了神圣的誓言，', '被骑士团收养，', '目睹了邪恶的暴行后决心对抗，'],
+            ranger: ['在荒野中独自长大，', '师从一位老练的游侠，', '发誓保护自然免受侵害，'],
+            bard: ['从小就展现出音乐天赋，', '加入了巡回剧团，', '用歌声记录历史和传说，'],
+            barbarian: ['在部落的严酷环境中成长，', '被放逐后学会了生存，', '继承了祖先的狂暴之力，'],
+            druid: ['在森林中与动物为伴，', '被德鲁伊教团收养，', '感受到了自然的呼唤，'],
+            sorcerer: ['天生拥有魔法血脉，', '在一次意外中觉醒了力量，', '家族世代拥有魔法天赋，'],
+            warlock: ['与强大的存在签订了契约，', '在禁忌知识中找到了力量，', '被选为邪神的代言人，'],
+            monk: ['在修道院中修行多年，', '师从一位武学大师，', '追求身心的完美统一，'],
+            artificer: ['从小就对机械着迷，', '在工坊中长大，', '发现了失传的锻造技术，']
+        };
+        
+        const classEvents = events[charClass] || ['经历了一次改变人生的事件，', '从小就与众不同，', '命运安排走上了这条道路，'];
+        return classEvents[Math.floor(Math.random() * classEvents.length)];
+    }
+    
+    // 辅助函数：生成目标
+    generateGoal() {
+        const goals = [
+            '寻找失落的宝藏',
+            '成为传奇英雄',
+            '复仇雪恨',
+            '保护无辜者',
+            '探索未知的世界',
+            '获得无上的力量',
+            '解开身世之谜',
+            '建立自己的家园',
+            '消灭邪恶势力',
+            '寻找真爱'
+        ];
+        return goals[Math.floor(Math.random() * goals.length)];
     }
 
     // 自动添加武器
@@ -3313,21 +3685,23 @@ class CharacterApp {
         document.getElementById('charName').value = this.character.name;
         document.getElementById('playerName').value = this.character.playerName;
         document.getElementById('charLevel').value = this.character.level;
+        const levelDisplay = document.getElementById('levelDisplay');
+        if (levelDisplay) {
+            levelDisplay.textContent = this.character.level;
+        }
         document.getElementById('charXP').value = this.character.xp;
         document.getElementById('raceSelect').value = this.character.race;
         document.getElementById('classSelect').value = this.character.class;
         document.getElementById('backgroundSelect').value = this.character.background;
         
         // 更新财富输入
-        const wealth = this.character.wealth || { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 };
+        const wealth = this.character.wealth || { pp: 0, gp: 0, sp: 0, cp: 0 };
         const wealthPP = document.getElementById('wealthPP');
         const wealthGP = document.getElementById('wealthGP');
-        const wealthEP = document.getElementById('wealthEP');
         const wealthSP = document.getElementById('wealthSP');
         const wealthCP = document.getElementById('wealthCP');
         if (wealthPP) wealthPP.value = wealth.pp || 0;
         if (wealthGP) wealthGP.value = wealth.gp || 0;
-        if (wealthEP) wealthEP.value = wealth.ep || 0;
         if (wealthSP) wealthSP.value = wealth.sp || 0;
         if (wealthCP) wealthCP.value = wealth.cp || 0;
         
@@ -3344,6 +3718,21 @@ class CharacterApp {
         this.updateAbilityScores();
         this.renderSkills();
         this.renderMulticlass();
+        
+        // 更新护甲选择器
+        const armorSelect = document.getElementById('armorSelect');
+        if (armorSelect && this.character.armor) {
+            armorSelect.value = this.character.armor;
+        }
+        
+        // 更新盾牌复选框
+        const shieldCheckbox = document.getElementById('shieldCheckbox');
+        if (shieldCheckbox) {
+            shieldCheckbox.checked = this.character.shield || false;
+        }
+        
+        // 更新护甲显示
+        this.updateArmorDisplay();
     }
 
     // 清除角色（新建角色）
@@ -3356,32 +3745,248 @@ class CharacterApp {
         }
     }
 
-    // 保存角色到本地存储
+    // 获取所有保存的角色列表
+    getSavedCharactersList() {
+        const list = localStorage.getItem('dnd_characters_list');
+        return list ? JSON.parse(list) : [];
+    }
+
+    // 保存角色列表
+    saveCharactersList(list) {
+        localStorage.setItem('dnd_characters_list', JSON.stringify(list));
+    }
+
+    // 保存角色到本地存储（支持多角色）
     saveCharacter() {
         try {
-            const characterData = JSON.stringify(this.character);
-            localStorage.setItem('dnd_character', characterData);
-            this.showNotification('角色已保存到本地存储', 'success');
+            // 生成角色ID（使用角色名+时间戳）
+            const characterId = this.character.name 
+                ? `${this.character.name}_${Date.now()}` 
+                : `未命名角色_${Date.now()}`;
+            
+            // 添加保存时间
+            const characterToSave = {
+                ...this.character,
+                id: characterId,
+                savedAt: new Date().toLocaleString('zh-CN')
+            };
+            
+            // 保存角色数据
+            const characterData = JSON.stringify(characterToSave);
+            localStorage.setItem(`dnd_character_${characterId}`, characterData);
+            
+            // 更新角色列表
+            const list = this.getSavedCharactersList();
+            const existingIndex = list.findIndex(c => c.id === characterId);
+            const listItem = {
+                id: characterId,
+                name: this.character.name || '未命名角色',
+                race: this.character.race ? RACES[this.character.race]?.name : '',
+                class: this.character.class ? CLASSES[this.character.class]?.name : '',
+                level: this.character.level,
+                savedAt: characterToSave.savedAt
+            };
+            
+            if (existingIndex >= 0) {
+                list[existingIndex] = listItem;
+            } else {
+                list.push(listItem);
+            }
+            this.saveCharactersList(list);
+            
+            this.showNotification(`角色"${listItem.name}"已保存`, 'success');
         } catch (e) {
             this.showNotification('保存失败：' + e.message, 'error');
         }
     }
 
-    // 从本地存储加载角色
-    loadCharacter() {
+    // 显示角色列表对话框
+    showLoadCharacterDialog() {
+        const list = this.getSavedCharactersList();
+        if (list.length === 0) {
+            this.showNotification('没有找到保存的角色', 'warning');
+            return;
+        }
+        
+        // 创建对话框
+        const dialog = document.createElement('div');
+        dialog.className = 'character-list-dialog';
+        dialog.innerHTML = `
+            <div class="dialog-overlay" onclick="this.parentElement.remove()"></div>
+            <div class="dialog-content">
+                <div class="dialog-header">
+                    <h3>选择要加载的角色</h3>
+                    <button class="btn-close" onclick="this.closest('.character-list-dialog').remove()">&times;</button>
+                </div>
+                <div class="dialog-body">
+                    <div class="character-list">
+                        ${list.map(char => `
+                            <div class="character-list-item" data-id="${char.id}">
+                                <div class="character-info">
+                                    <div class="character-name">${char.name}</div>
+                                    <div class="character-details">${char.race} ${char.class} ${char.level}级</div>
+                                    <div class="character-saved">保存于: ${char.savedAt}</div>
+                                </div>
+                                <div class="character-actions">
+                                    <button class="btn btn-primary btn-sm" onclick="characterApp.loadCharacterById('${char.id}'); this.closest('.character-list-dialog').remove()">加载</button>
+                                    <button class="btn btn-danger btn-sm" onclick="characterApp.deleteCharacter('${char.id}')">删除</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(dialog);
+    }
+
+    // 根据ID加载角色
+    loadCharacterById(characterId) {
         try {
-            const characterData = localStorage.getItem('dnd_character');
-            if (characterData) {
-                this.character = { ...this.getDefaultCharacter(), ...JSON.parse(characterData) };
-                this.updateUI();
-                this.updateCharacterSheet();
-                this.showNotification('角色已加载', 'success');
-            } else {
-                this.showNotification('没有找到保存的角色', 'warning');
+            const characterData = localStorage.getItem(`dnd_character_${characterId}`);
+            if (!characterData) {
+                this.showNotification('角色数据不存在', 'error');
+                return;
             }
+            this.loadCharacterFromData(JSON.parse(characterData));
         } catch (e) {
+            console.error('加载角色失败:', e);
             this.showNotification('加载失败：' + e.message, 'error');
         }
+    }
+
+    // 删除保存的角色
+    deleteCharacter(characterId) {
+        if (!confirm('确定要删除这个角色吗？')) return;
+        
+        try {
+            localStorage.removeItem(`dnd_character_${characterId}`);
+            
+            const list = this.getSavedCharactersList();
+            const newList = list.filter(c => c.id !== characterId);
+            this.saveCharactersList(newList);
+            
+            // 刷新对话框
+            const dialog = document.querySelector('.character-list-dialog');
+            if (dialog) {
+                dialog.remove();
+                this.showLoadCharacterDialog();
+            }
+            
+            this.showNotification('角色已删除', 'success');
+        } catch (e) {
+            this.showNotification('删除失败：' + e.message, 'error');
+        }
+    }
+
+    // 从数据加载角色（内部方法）
+    loadCharacterFromData(savedCharacter) {
+        try {
+            // 完整合并保存的角色数据
+            this.character = {
+                ...this.getDefaultCharacter(),
+                name: savedCharacter.name || '',
+                playerName: savedCharacter.playerName || '',
+                race: savedCharacter.race || '',
+                subrace: savedCharacter.subrace || '',
+                class: savedCharacter.class || '',
+                subclass: savedCharacter.subclass || '',
+                level: savedCharacter.level || 1,
+                background: savedCharacter.background || '',
+                alignment: savedCharacter.alignment || '',
+                backstory: savedCharacter.backstory || '',
+                personality: savedCharacter.personality || '',
+                ideals: savedCharacter.ideals || '',
+                bonds: savedCharacter.bonds || '',
+                flaws: savedCharacter.flaws || '',
+                languages: savedCharacter.languages || [],
+                abilities: { ...this.getDefaultCharacter().abilities, ...(savedCharacter.abilities || {}) },
+                proficiencies: { ...this.getDefaultCharacter().proficiencies, ...(savedCharacter.proficiencies || {}) },
+                feats: savedCharacter.feats || [],
+                spells: savedCharacter.spells || [],
+                equipment: savedCharacter.equipment || '',
+                armor: savedCharacter.armor || '',
+                shield: savedCharacter.shield || false,
+                features: savedCharacter.features || [],
+                weapons: savedCharacter.weapons || []
+            };
+            
+            // 更新所有表单字段
+            this.updateUI();
+            
+            // 特别更新可能被遗漏的字段
+            const alignmentSelect = document.getElementById('alignment');
+            if (alignmentSelect && savedCharacter.alignment) {
+                alignmentSelect.value = savedCharacter.alignment;
+            }
+            
+            const subclassSelect = document.getElementById('subclassSelect');
+            if (subclassSelect && savedCharacter.subclass) {
+                subclassSelect.value = savedCharacter.subclass;
+                // 调用子职业选择方法来渲染子职业技能
+                if (savedCharacter.subclass && this.character.class) {
+                    this.selectSubclass(savedCharacter.subclass);
+                }
+            }
+            
+            const subraceSelect = document.getElementById('subraceSelect');
+            if (subraceSelect && savedCharacter.subrace) {
+                subraceSelect.value = savedCharacter.subrace;
+            }
+            
+            // 更新背景故事字段
+            const backstoryEl = document.getElementById('backstory');
+            if (backstoryEl) backstoryEl.value = savedCharacter.backstory || '';
+            
+            const personalityEl = document.getElementById('personality');
+            if (personalityEl) personalityEl.value = savedCharacter.personality || '';
+            
+            const idealsEl = document.getElementById('ideals');
+            if (idealsEl) idealsEl.value = savedCharacter.ideals || '';
+            
+            const bondsEl = document.getElementById('bonds');
+            if (bondsEl) bondsEl.value = savedCharacter.bonds || '';
+            
+            const flawsEl = document.getElementById('flaws');
+            if (flawsEl) flawsEl.value = savedCharacter.flaws || '';
+            
+            // 更新语言列表
+            if (savedCharacter.languages && savedCharacter.languages.length > 0) {
+                this.renderLanguagesList();
+            }
+            
+            // 重新渲染职业特性以显示子职业特性
+            if (this.character.class) {
+                this.renderClassFeatures(this.character.class);
+            }
+            
+            // 特别更新护甲选择器（确保在UI更新后设置）
+            const armorSelect = document.getElementById('armorSelect');
+            if (armorSelect && this.character.armor) {
+                armorSelect.value = this.character.armor;
+            }
+            
+            // 特别更新盾牌复选框
+            const shieldCheckbox = document.getElementById('shieldCheckbox');
+            if (shieldCheckbox) {
+                shieldCheckbox.checked = this.character.shield || false;
+            }
+            
+            // 更新护甲显示
+            this.updateArmorDisplay();
+            
+            this.updateCharacterSheet();
+            this.showNotification(`角色"${savedCharacter.name || '未命名'}"加载成功！`, 'success');
+        } catch (e) {
+            console.error('加载角色失败:', e);
+            this.showNotification('加载失败：' + e.message, 'error');
+        }
+    }
+
+    // 从本地存储加载角色（显示列表）
+    loadCharacter() {
+        this.showLoadCharacterDialog();
     }
 
     // 随机创建角色
@@ -3411,7 +4016,6 @@ class CharacterApp {
             }
             classDisplay = `${mainClassName} ${this.character.level}级`;
             
-            // 添加兼职信息
             if (this.character.multiclass && this.character.multiclass.length > 0) {
                 const multiclassDisplay = this.character.multiclass.map(mc => {
                     return `${mc.name} ${mc.level}级`;
@@ -3420,7 +4024,6 @@ class CharacterApp {
             }
         }
         
-        let abilitiesHTML = '';
         const abilityNames = {
             strength: '力量',
             dexterity: '敏捷',
@@ -3430,71 +4033,195 @@ class CharacterApp {
             charisma: '魅力'
         };
         
+        const abilitySkills = {
+            strength: ['athletics'],
+            dexterity: ['acrobatics', 'stealth', 'sleight_of_hand'],
+            intelligence: ['arcana', 'history', 'investigation', 'nature', 'religion'],
+            wisdom: ['animal_handling', 'insight', 'medicine', 'perception', 'survival'],
+            charisma: ['deception', 'intimidation', 'persuasion', 'performance']
+        };
+        
+        // 生成属性与技能结合的HTML
+        let abilitiesSkillsHTML = '';
         for (const [ability, scores] of Object.entries(this.character.abilities)) {
             const total = scores.base + scores.racial;
             const mod = this.calculateModifier(total);
-            abilitiesHTML += `
-                <div class="ability-box">
-                    <div class="ability-name">${abilityNames[ability]}</div>
-                    <div class="ability-score">${total}</div>
-                    <div class="ability-mod">${mod >= 0 ? '+' : ''}${mod}</div>
-                </div>
-            `;
-        }
-        
-        let skillsHTML = '';
-        for (const [key, skill] of Object.entries(SKILLS)) {
-            const isProficient = this.character.proficiencies.skills.includes(key);
-            const abilityMod = this.calculateModifier(
-                (this.character.abilities[skill.ability].base || 10) + 
-                this.character.abilities[skill.ability].racial
-            );
-            let modifier = abilityMod;
-            if (isProficient) {
-                modifier += this.getProficiencyBonus();
+            const abilityLabel = abilityNames[ability];
+            const profBonus = this.getProficiencyBonus();
+            
+            let skillsList = '';
+            if (abilitySkills[ability]) {
+                const skillsForAbility = abilitySkills[ability].map(skillKey => {
+                    const skill = SKILLS[skillKey];
+                    if (!skill) return '';
+                    const isProficient = this.character.proficiencies.skills.includes(skillKey);
+                    const abilityMod = this.calculateModifier(
+                        (this.character.abilities[ability].base || 10) + 
+                        this.character.abilities[ability].racial
+                    );
+                    let modifier = abilityMod;
+                    if (isProficient) modifier += profBonus;
+                    return `<div class="skill-row ${isProficient ? 'proficient' : ''}">
+                        <span class="skill-mark">${isProficient ? '●' : '○'}</span>
+                        <span class="skill-name">${skill.name}</span>
+                        <span class="skill-mod">${modifier >= 0 ? '+' : ''}${modifier}</span>
+                    </div>`;
+                }).join('');
+                skillsList = `<div class="ability-skills">${skillsForAbility}</div>`;
             }
-            skillsHTML += `
-                <div class="skill-item ${isProficient ? 'proficient' : ''}">
-                    ${isProficient ? '●' : '○'} ${skill.name} ${modifier >= 0 ? '+' : ''}${modifier}
+            
+            abilitiesSkillsHTML += `
+                <div class="ability-skill-group">
+                    <div class="ability-header">
+                        <div class="ability-name">${abilityLabel}</div>
+                        <div class="ability-score">${total}</div>
+                        <div class="ability-mod">${mod >= 0 ? '+' : ''}${mod}</div>
+                    </div>
+                    ${skillsList}
                 </div>
             `;
         }
         
+        // 武器列表（分开近战和远程）
         let weaponsHTML = '';
-        if (this.character.weapons.melee.length > 0) {
-            weaponsHTML += '<h4>近战武器</h4>';
-            weaponsHTML += this.character.weapons.melee.map(w => `
-                <div>${w.name} - ${w.damage} ${w.damageType}</div>
-            `).join('');
-        }
-        if (this.character.weapons.ranged.length > 0) {
-            weaponsHTML += '<h4>远程武器</h4>';
-            weaponsHTML += this.character.weapons.ranged.map(w => `
-                <div>${w.name} - ${w.damage} ${w.damageType} (射程: ${w.range})</div>
-            `).join('');
+        const meleeWeapons = this.character.weapons.melee || [];
+        const rangedWeapons = this.character.weapons.ranged || [];
+        
+        if (meleeWeapons.length > 0 || rangedWeapons.length > 0) {
+            weaponsHTML = '<div class="weapon-section">';
+            
+            // 近战武器
+            if (meleeWeapons.length > 0) {
+                weaponsHTML += '<div class="weapon-type-header">近战武器</div>';
+                weaponsHTML += '<div class="weapon-table melee-table">';
+                weaponsHTML += '<div class="weapon-header-row"><span>名称</span><span>攻击</span><span>伤害</span><span>类型</span></div>';
+                meleeWeapons.forEach(w => {
+                    const attackBonus = this.calculateWeaponAttackBonus(w);
+                    const attackStr = attackBonus >= 0 ? `+${attackBonus}` : `${attackBonus}`;
+                    weaponsHTML += `<div class="weapon-data-row">
+                        <span class="weapon-name">${w.name}</span>
+                        <span class="weapon-atk">${attackStr}</span>
+                        <span class="weapon-dmg">${w.damage} ${w.damageType || ''}</span>
+                        <span class="weapon-type">${w.damageType || '-'}</span>
+                    </div>`;
+                });
+                weaponsHTML += '</div>';
+            }
+            
+            // 远程武器
+            if (rangedWeapons.length > 0) {
+                weaponsHTML += '<div class="weapon-type-header">远程武器</div>';
+                weaponsHTML += '<div class="weapon-table ranged-table">';
+                weaponsHTML += '<div class="weapon-header-row ranged-header"><span>名称</span><span>攻击</span><span>伤害</span><span>射程</span><span>类型</span></div>';
+                rangedWeapons.forEach(w => {
+                    const attackBonus = this.calculateWeaponAttackBonus(w);
+                    const attackStr = attackBonus >= 0 ? `+${attackBonus}` : `${attackBonus}`;
+                    let rangeDisplay = '-';
+                    if (w.range && typeof w.range === 'object') {
+                        rangeDisplay = `${w.range.normal}/${w.range.long}`;
+                    } else if (w.range) {
+                        rangeDisplay = w.range;
+                    }
+                    weaponsHTML += `<div class="weapon-data-row ranged-row">
+                        <span class="weapon-name">${w.name}</span>
+                        <span class="weapon-atk">${attackStr}</span>
+                        <span class="weapon-dmg">${w.damage} ${w.damageType || ''}</span>
+                        <span class="weapon-range">${rangeDisplay}</span>
+                        <span class="weapon-type">${w.damageType || '-'}</span>
+                    </div>`;
+                });
+                weaponsHTML += '</div>';
+            }
+            
+            weaponsHTML += '</div>';
         }
         
+        // 法术列表（按环阶分组显示详细）
         let spellsHTML = '';
-        if (this.character.spells.length > 0) {
-            spellsHTML = '<h4>法术</h4>';
-            spellsHTML += this.character.spells.map(s => `
-                <div>${s.name} - ${s.level === 0 ? '戏法' : s.level + '环'} ${s.school}</div>
-            `).join('');
+        if (this.character.spells && this.character.spells.length > 0) {
+            const spellsByLevel = {};
+            this.character.spells.forEach(s => {
+                const level = s.level || 0;
+                if (!spellsByLevel[level]) spellsByLevel[level] = [];
+                spellsByLevel[level].push(s);
+            });
+            
+            const sortedLevels = Object.keys(spellsByLevel).sort((a, b) => a - b);
+            spellsHTML = '<div class="spells-section">';
+            sortedLevels.forEach(level => {
+                const levelNum = parseInt(level);
+                const levelName = levelNum === 0 ? '戏法' : `${levelNum}环`;
+                spellsHTML += `<div class="spell-level-group">
+                    <div class="spell-level-header">${levelName} (${spellsByLevel[level].length}个)</div>
+                    <div class="spell-items">`;
+                
+                spellsByLevel[level].forEach(s => {
+                    // 获取完整法术数据
+                    const spellKey = levelNum === 0 ? 'cantrips' : `level${levelNum}`;
+                    const fullSpellData = SPELLS[spellKey]?.find(sp => sp.name === s.name);
+                    const spellDesc = fullSpellData?.description || s.description || '-';
+                    const spellCastingTime = fullSpellData?.castingTime || '-';
+                    const spellRange = fullSpellData?.range || '-';
+                    const spellDuration = fullSpellData?.duration || '-';
+                    const spellComponents = fullSpellData?.components || '-';
+                    
+                    const needsConcentration = this.checkSpellConcentration(s.name, s.level);
+                    const concentrationTag = needsConcentration ? '<span class="spell-concentration-tag">需专注</span>' : '';
+                    
+                    spellsHTML += `<div class="spell-item">
+                        <div class="spell-item-header">
+                            <span class="spell-name">${s.name}${concentrationTag}</span>
+                            <span class="spell-school">${s.school || '-'}</span>
+                        </div>
+                        <div class="spell-item-desc" title="施法时间: ${spellCastingTime}\n范围: ${spellRange}\n成分: ${spellComponents}\n持续时间: ${spellDuration}">
+                            ${spellDesc.length > 80 ? spellDesc.substring(0, 80) + '...' : spellDesc}
+                        </div>
+                    </div>`;
+                });
+                
+                spellsHTML += `</div></div>`;
+            });
+            spellsHTML += '</div>';
         }
         
-        // 财富信息
-        const wealth = this.character.wealth || { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 };
-        const totalGP = (wealth.pp || 0) * 10 + (wealth.gp || 0) + (wealth.ep || 0) * 0.5 + (wealth.sp || 0) * 0.1 + (wealth.cp || 0) * 0.01;
+        // 专长列表
+        let featsHTML = '';
+        if (this.character.feats && this.character.feats.length > 0) {
+            featsHTML = '<div class="feature-group"><h4>专长</h4>';
+            this.character.feats.forEach(featKey => {
+                const feat = FEATS[featKey];
+                if (feat) {
+                    featsHTML += `<div class="feature-item"><strong>${feat.name}</strong>: ${feat.description}</div>`;
+                }
+            });
+            featsHTML += '</div>';
+        }
+        
+        // 特性列表
+        let allFeaturesHTML = '';
         
         // 职业特性
-        let classFeaturesHTML = '';
         if (this.character.class && CLASSES[this.character.class]) {
             const cls = CLASSES[this.character.class];
             if (cls.features) {
                 const features = cls.features.filter(f => f.level <= this.character.level);
                 if (features.length > 0) {
-                    classFeaturesHTML += `<h4>${cls.name} 特性</h4>`;
-                    classFeaturesHTML += features.map(f => `<div><strong>${f.name}</strong> (${f.level}级): ${f.description}</div>`).join('');
+                    allFeaturesHTML += `<div class="feature-group"><h4>${cls.name} 特性</h4>`;
+                    allFeaturesHTML += features.map(f => `<div class="feature-item"><strong>${f.name}</strong> (${f.level}级): ${f.description}</div>`).join('');
+                    allFeaturesHTML += '</div>';
+                }
+            }
+        }
+        
+        // 子职业特性
+        if (this.character.subclass && this.character.class && SUBCLASSES[this.character.class] && SUBCLASSES[this.character.class][this.character.subclass]) {
+            const subclass = SUBCLASSES[this.character.class][this.character.subclass];
+            if (subclass.features) {
+                const subclassFeatures = subclass.features.filter(f => f.level <= this.character.level);
+                if (subclassFeatures.length > 0) {
+                    allFeaturesHTML += `<div class="feature-group"><h4>${subclass.name} 子职业特性</h4>`;
+                    allFeaturesHTML += subclassFeatures.map(f => `<div class="feature-item"><strong>${f.name}</strong> (${f.level}级): ${f.description}</div>`).join('');
+                    allFeaturesHTML += '</div>';
                 }
             }
         }
@@ -3507,8 +4234,9 @@ class CharacterApp {
                     if (mcClass.features) {
                         const features = mcClass.features.filter(f => f.level <= mc.level);
                         if (features.length > 0) {
-                            classFeaturesHTML += `<h4>${mcClass.name} (兼职) 特性</h4>`;
-                            classFeaturesHTML += features.map(f => `<div><strong>${f.name}</strong> (${f.level}级): ${f.description}</div>`).join('');
+                            allFeaturesHTML += `<div class="feature-group"><h4>${mcClass.name} (兼职) 特性</h4>`;
+                            allFeaturesHTML += features.map(f => `<div class="feature-item"><strong>${f.name}</strong> (${f.level}级): ${f.description}</div>`).join('');
+                            allFeaturesHTML += '</div>';
                         }
                     }
                 }
@@ -3516,14 +4244,38 @@ class CharacterApp {
         }
         
         // 种族特性
-        let raceFeaturesHTML = '';
         if (this.character.race && RACES[this.character.race]) {
             const race = RACES[this.character.race];
             if (race.traits) {
-                raceFeaturesHTML += `<h4>${race.name} 特性</h4>`;
-                raceFeaturesHTML += race.traits.map(t => `<div><strong>${t.name}</strong>: ${t.description}</div>`).join('');
+                allFeaturesHTML += `<div class="feature-group"><h4>${race.name} 特性</h4>`;
+                allFeaturesHTML += race.traits.map(t => `<div class="feature-item"><strong>${t.name}</strong>: ${t.description}</div>`).join('');
+                allFeaturesHTML += '</div>';
             }
         }
+        
+        // 添加专长到特性HTML
+        if (featsHTML) {
+            allFeaturesHTML = featsHTML + allFeaturesHTML;
+        }
+        
+        // 背景故事
+        let backstoryHTML = '';
+        if (this.character.backstory || this.character.personality || this.character.ideals || this.character.bonds || this.character.flaws) {
+            backstoryHTML = `
+                <div class="feature-group">
+                    <h4>背景故事</h4>
+                    ${this.character.backstory ? `<div class="feature-item">${this.character.backstory}</div>` : ''}
+                    ${this.character.personality ? `<div class="feature-item"><strong>性格:</strong> ${this.character.personality}</div>` : ''}
+                    ${this.character.ideals ? `<div class="feature-item"><strong>理想:</strong> ${this.character.ideals}</div>` : ''}
+                    ${this.character.bonds ? `<div class="feature-item"><strong>羁绊:</strong> ${this.character.bonds}</div>` : ''}
+                    ${this.character.flaws ? `<div class="feature-item"><strong>缺点:</strong> ${this.character.flaws}</div>` : ''}
+                </div>
+            `;
+        }
+        
+        // 财富信息
+        const wealth = this.character.wealth || { pp: 0, gp: 0, sp: 0, cp: 0 };
+        const totalGP = (wealth.pp || 0) * 10 + (wealth.gp || 0) + (wealth.sp || 0) * 0.1 + (wealth.cp || 0) * 0.01;
         
         const htmlContent = `
             <!DOCTYPE html>
@@ -3531,209 +4283,402 @@ class CharacterApp {
             <head>
                 <title>${this.character.name || '未命名角色'} - 角色卡</title>
                 <style>
+                    @page {
+                        size: A4;
+                        margin: 10mm;
+                    }
+                    @page :first {
+                        margin-top: 10mm;
+                    }
+                    * { box-sizing: border-box; margin: 0; padding: 0; }
                     body {
-                        font-family: 'Georgia', serif;
-                        max-width: 800px;
-                        margin: 0 auto;
-                        padding: 20px;
+                        font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+                        font-size: 9pt;
+                        line-height: 1.3;
+                        padding: 5px;
                         background: white;
+                        color: #333;
+                    }
+                    .page {
+                        page-break-after: always;
+                        min-height: 277mm;
+                    }
+                    .page:last-child {
+                        page-break-after: auto;
                     }
                     .character-header {
                         text-align: center;
-                        border-bottom: 3px double #333;
-                        padding-bottom: 20px;
-                        margin-bottom: 30px;
+                        border: 2px solid #8B4513;
+                        border-radius: 6px;
+                        padding: 10px;
+                        margin-bottom: 10px;
+                        background: linear-gradient(135deg, #f5f0e6 0%, #e8dcc8 100%);
                     }
                     .character-name {
-                        font-size: 2.5em;
+                        font-size: 20pt;
                         font-weight: bold;
-                        margin-bottom: 10px;
+                        color: #8B4513;
+                        margin-bottom: 3px;
                     }
                     .character-info {
-                        font-size: 1.1em;
-                        color: #666;
+                        font-size: 10pt;
+                        color: #555;
                     }
-                    .section {
-                        margin-bottom: 25px;
-                        page-break-inside: avoid;
-                    }
-                    .section-title {
-                        font-size: 1.3em;
-                        font-weight: bold;
-                        border-bottom: 2px solid #333;
-                        padding-bottom: 5px;
-                        margin-bottom: 15px;
-                        color: #333;
-                    }
-                    .abilities-grid {
+                    .top-stats {
                         display: grid;
                         grid-template-columns: repeat(6, 1fr);
-                        gap: 10px;
+                        gap: 5px;
+                        margin-bottom: 10px;
                     }
-                    .ability-box {
-                        border: 2px solid #333;
-                        padding: 10px;
+                    .stat-box {
+                        border: 1px solid #8B4513;
+                        border-radius: 4px;
+                        padding: 5px 3px;
                         text-align: center;
+                        background: #fff;
+                    }
+                    .stat-box strong {
+                        display: block;
+                        font-size: 8pt;
+                        color: #666;
+                        margin-bottom: 2px;
+                    }
+                    .stat-box .value {
+                        font-size: 14pt;
+                        font-weight: bold;
+                        color: #8B4513;
+                    }
+                    .abilities-skills-section {
+                        display: grid;
+                        grid-template-columns: repeat(6, 1fr);
+                        gap: 5px;
+                        margin-bottom: 10px;
+                    }
+                    .ability-skill-group {
+                        border: 1px solid #ccc;
+                        border-radius: 4px;
+                        padding: 5px;
+                        background: #fafafa;
+                    }
+                    .ability-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 1px solid #ddd;
+                        padding-bottom: 3px;
+                        margin-bottom: 3px;
                     }
                     .ability-name {
                         font-weight: bold;
-                        font-size: 0.9em;
-                        margin-bottom: 5px;
+                        color: #8B4513;
+                        font-size: 8pt;
                     }
                     .ability-score {
-                        font-size: 1.8em;
+                        font-size: 14pt;
                         font-weight: bold;
                     }
                     .ability-mod {
-                        font-size: 1em;
+                        font-size: 10pt;
                         color: #666;
                     }
-                    .skills-list {
-                        column-count: 3;
-                        column-gap: 20px;
+                    .ability-skills {
+                        font-size: 7.5pt;
                     }
-                    .skill-item {
-                        padding: 2px 0;
-                        font-size: 0.9em;
+                    .skill-row {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 0;
+                        color: #666;
+                        line-height: 1.2;
                     }
-                    .proficient {
+                    .skill-row.proficient {
                         font-weight: bold;
-                    }
-                    .combat-info {
-                        display: grid;
-                        grid-template-columns: repeat(6, 1fr);
-                        gap: 10px;
-                        margin-bottom: 20px;
-                    }
-                    .combat-box {
-                        border: 1px solid #333;
-                        padding: 10px;
-                        text-align: center;
-                    }
-                    .wealth-info {
-                        display: grid;
-                        grid-template-columns: repeat(5, 1fr);
-                        gap: 10px;
-                        margin-bottom: 10px;
-                    }
-                    .wealth-box {
-                        border: 1px solid #333;
-                        padding: 8px;
-                        text-align: center;
-                    }
-                    .wealth-total-box {
-                        text-align: center;
-                        font-weight: bold;
-                        padding: 10px;
-                        background: #f5f5f5;
-                        border: 1px solid #333;
-                    }
-                    .features-section h4 {
                         color: #333;
-                        margin: 15px 0 10px 0;
-                        padding-bottom: 5px;
-                        border-bottom: 1px solid #ccc;
                     }
-                    .features-section div {
+                    .skill-mark {
+                        width: 10px;
+                        color: #8B4513;
+                        font-size: 8pt;
+                    }
+                    .skill-name {
+                        flex: 1;
+                    }
+                    .skill-mod {
+                        width: 25px;
+                        text-align: right;
+                    }
+                    .section-title {
+                        font-size: 10pt;
+                        font-weight: bold;
+                        color: #8B4513;
+                        border-bottom: 2px solid #8B4513;
+                        padding-bottom: 2px;
+                        margin-bottom: 5px;
+                    }
+                    .section {
                         margin-bottom: 8px;
-                        font-size: 0.9em;
                     }
+                    
+                    /* 武器表格样式 - 紧凑版 */
+                    .weapon-section {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 5px;
+                    }
+                    .weapon-type-header {
+                        font-weight: bold;
+                        color: #8B4513;
+                        font-size: 9pt;
+                        padding: 2px 0;
+                        border-bottom: 1px solid #ddd;
+                    }
+                    .weapon-table {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1px;
+                        font-size: 8pt;
+                    }
+                    .weapon-header-row, .weapon-data-row {
+                        display: grid;
+                        grid-template-columns: 2fr 0.6fr 1fr 0.8fr;
+                        gap: 3px;
+                        padding: 2px 4px;
+                    }
+                    .weapon-header-row {
+                        background: #8B4513;
+                        color: white;
+                        font-weight: bold;
+                        border-radius: 2px 2px 0 0;
+                    }
+                    .weapon-data-row {
+                        background: #f5f5f5;
+                        border-bottom: 1px solid #eee;
+                    }
+                    .weapon-data-row:last-child {
+                        border-radius: 0 0 2px 2px;
+                    }
+                    .weapon-atk { text-align: center; color: #8B4513; font-weight: bold; }
+                    .weapon-dmg { text-align: center; }
+                    .weapon-range { text-align: center; color: #2E7D32; font-weight: bold; }
+                    
+                    /* 远程武器表格 - 5列 */
+                    .ranged-table .weapon-header-row,
+                    .ranged-table .weapon-data-row {
+                        grid-template-columns: 1.8fr 0.6fr 1fr 0.8fr 0.8fr;
+                    }
+                    
+                    /* 法术样式 - 紧凑版 */
+                    .spells-section {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 4px;
+                    }
+                    .spell-level-group {
+                        background: #f9f4e8;
+                        border-radius: 3px;
+                        padding: 3px;
+                    }
+                    .spell-level-header {
+                        font-weight: bold;
+                        color: #8B4513;
+                        font-size: 9pt;
+                        margin-bottom: 2px;
+                        padding-bottom: 2px;
+                        border-bottom: 1px solid #e0d8c8;
+                    }
+                    .spell-items {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 2px;
+                    }
+                    .spell-item {
+                        display: block;
+                        padding: 3px 5px;
+                        background: rgba(255,255,255,0.7);
+                        border-radius: 3px;
+                        font-size: 8pt;
+                        border: 1px solid #e0d8c8;
+                        margin-bottom: 3px;
+                    }
+                    .spell-item-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 2px;
+                    }
+                    .spell-item-desc {
+                        font-size: 7.5pt;
+                        color: #555;
+                        line-height: 1.3;
+                    }
+                    .spell-name { font-weight: bold; color: #333; }
+                    .spell-school { color: #666; font-size: 7pt; }
+                    .spell-concentration-tag {
+                        display: inline-block;
+                        font-size: 6pt;
+                        color: #9b59b6;
+                        background: rgba(155, 89, 182, 0.15);
+                        padding: 0 2px;
+                        border-radius: 2px;
+                        margin-left: 2px;
+                        border: 1px solid #9b59b6;
+                    }
+                    
+                    /* 特性样式 - 紧凑版 */
+                    .feature-group {
+                        margin-bottom: 6px;
+                    }
+                    .feature-group h4 {
+                        font-size: 9pt;
+                        color: #8B4513;
+                        margin-bottom: 3px;
+                        padding-bottom: 2px;
+                        border-bottom: 1px solid #ddd;
+                    }
+                    .feature-item {
+                        font-size: 8pt;
+                        margin-bottom: 2px;
+                        padding: 1px 0;
+                        line-height: 1.3;
+                    }
+                    
+                    /* 财富样式 */
+                    .wealth-row {
+                        display: flex;
+                        justify-content: center;
+                        gap: 10px;
+                        margin-bottom: 3px;
+                    }
+                    .wealth-item {
+                        display: inline-block;
+                        padding: 2px 6px;
+                        background: #f5f5f5;
+                        border-radius: 2px;
+                        font-size: 8pt;
+                    }
+                    .wealth-total {
+                        text-align: center;
+                        font-weight: bold;
+                        color: #8B4513;
+                        padding: 3px;
+                        background: #f9f4e8;
+                        border-radius: 2px;
+                        font-size: 9pt;
+                    }
+                    
+                    /* 两栏布局 */
+                    .two-col {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 10px;
+                    }
+                    
+                    /* 第二页布局 */
+                    .page2-content {
+                        column-count: 2;
+                        column-gap: 15px;
+                    }
+                    .page2-content .section {
+                        break-inside: avoid;
+                    }
+                    
                     @media print {
-                        body { padding: 0; }
+                        body { padding: 0; margin: 0; }
                         .no-print { display: none; }
-                        .section { page-break-inside: avoid; }
+                        .page { page-break-after: always; }
+                    }
+                    @media screen {
+                        body { max-width: 210mm; margin: 0 auto; }
+                        .page { border: 1px dashed #ccc; margin-bottom: 20px; padding: 10mm; }
                     }
                 </style>
             </head>
             <body>
-                <div class="character-header">
-                    <div class="character-name">${this.character.name || '未命名角色'}</div>
-                    <div class="character-info">
-                        ${raceName} | ${classDisplay}<br>
-                        玩家: ${this.character.playerName || '-'} | 
-                        经验值: ${this.character.xp} | 
-                        总等级: ${totalLevel}
+                <!-- 第一页：基础信息、属性、武器、法术 -->
+                <div class="page page1">
+                    <div class="character-header">
+                        <div class="character-name">${this.character.name || '未命名角色'}</div>
+                        <div class="character-info">
+                            <strong>${raceName}</strong> | <strong>${classDisplay}</strong> | 
+                            阵营: ${this.character.alignment || '-'} | 背景: ${this.character.background ? BACKGROUNDS[this.character.background]?.name || '-' : '-'}
+                        </div>
+                    </div>
+
+                    <div class="top-stats">
+                        <div class="stat-box">
+                            <strong>护甲等级</strong>
+                            <div class="value">${document.getElementById('sheetAC').textContent}</div>
+                        </div>
+                        <div class="stat-box">
+                            <strong>生命值</strong>
+                            <div class="value">${this.character.currentHP}/${this.character.maxHP}</div>
+                        </div>
+                        <div class="stat-box">
+                            <strong>先攻</strong>
+                            <div class="value">${document.getElementById('sheetInitiative').textContent}</div>
+                        </div>
+                        <div class="stat-box">
+                            <strong>速度</strong>
+                            <div class="value">${document.getElementById('sheetSpeed').textContent}</div>
+                        </div>
+                        <div class="stat-box">
+                            <strong>熟练加值</strong>
+                            <div class="value">+${this.getProficiencyBonus()}</div>
+                        </div>
+                        <div class="stat-box">
+                            <strong>生命骰</strong>
+                            <div class="value">d${this.character.class ? CLASSES[this.character.class]?.hitDice || 8 : 8}</div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">属性与技能</div>
+                        <div class="abilities-skills-section">
+                            ${abilitiesSkillsHTML}
+                        </div>
+                    </div>
+
+                    <div class="two-col">
+                        <div>
+                            ${weaponsHTML ? `<div class="section"><div class="section-title">武器</div>${weaponsHTML}</div>` : ''}
+                            ${spellsHTML ? `<div class="section"><div class="section-title">法术</div>${spellsHTML}</div>` : ''}
+                        </div>
+                        <div>
+                            <div class="section">
+                                <div class="section-title">财富</div>
+                                <div class="wealth-row">
+                                    <span class="wealth-item">PP: ${wealth.pp || 0}</span>
+                                    <span class="wealth-item">GP: ${wealth.gp || 0}</span>
+                                    <span class="wealth-item">SP: ${wealth.sp || 0}</span>
+                                    <span class="wealth-item">CP: ${wealth.cp || 0}</span>
+                                </div>
+                                <div class="wealth-total">总计: ${totalGP.toFixed(2)} GP</div>
+                            </div>
+                            
+                            <!-- 护甲信息 -->
+                            <div class="section">
+                                <div class="section-title">护甲</div>
+                                <div class="armor-display">
+                                    ${this.character.armor ? `<div class="armor-item"><strong>护甲:</strong> ${ARMOR[this.character.armor]?.name || this.character.armor}</div>` : '<div class="armor-item">无护甲</div>'}
+                                    ${this.character.shield ? '<div class="armor-item"><strong>盾牌:</strong> 已装备 (+2 AC)</div>' : ''}
+                                </div>
+                            </div>
+                            
+                            ${this.character.equipment ? `<div class="section"><div class="section-title">装备</div><div class="feature-item">${this.character.equipment}</div></div>` : ''}
+                        </div>
                     </div>
                 </div>
 
-                <div class="section">
-                    <div class="section-title">战斗信息</div>
-                    <div class="combat-info">
-                        <div class="combat-box">
-                            <strong>护甲等级</strong><br>
-                            ${document.getElementById('sheetAC').textContent}
-                        </div>
-                        <div class="combat-box">
-                            <strong>生命值</strong><br>
-                            ${this.character.currentHP}/${this.character.maxHP}
-                        </div>
-                        <div class="combat-box">
-                            <strong>先攻</strong><br>
-                            ${document.getElementById('sheetInitiative').textContent}
-                        </div>
-                        <div class="combat-box">
-                            <strong>速度</strong><br>
-                            ${document.getElementById('sheetSpeed').textContent}
-                        </div>
-                        <div class="combat-box">
-                            <strong>熟练加值</strong><br>
-                            +${this.getProficiencyBonus()}
-                        </div>
-                        <div class="combat-box">
-                            <strong>生命骰</strong><br>
-                            d${this.character.class ? CLASSES[this.character.class]?.hitDice || 8 : 8}
-                        </div>
+                <!-- 第二页：特性、背景故事 -->
+                <div class="page page2">
+                    <div class="page2-content">
+                        ${allFeaturesHTML ? `<div class="section"><div class="section-title">特性</div>${allFeaturesHTML}</div>` : ''}
+                        ${backstoryHTML ? `<div class="section">${backstoryHTML}</div>` : ''}
                     </div>
                 </div>
 
-                <div class="section">
-                    <div class="section-title">财富</div>
-                    <div class="wealth-info">
-                        <div class="wealth-box">
-                            <strong>铂金币 (PP)</strong><br>${wealth.pp || 0}
-                        </div>
-                        <div class="wealth-box">
-                            <strong>金币 (GP)</strong><br>${wealth.gp || 0}
-                        </div>
-                        <div class="wealth-box">
-                            <strong>银金币 (EP)</strong><br>${wealth.ep || 0}
-                        </div>
-                        <div class="wealth-box">
-                            <strong>银币 (SP)</strong><br>${wealth.sp || 0}
-                        </div>
-                        <div class="wealth-box">
-                            <strong>铜币 (CP)</strong><br>${wealth.cp || 0}
-                        </div>
-                    </div>
-                    <div class="wealth-total-box">
-                        总价值: ${totalGP.toFixed(2)} GP
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-title">属性值</div>
-                    <div class="abilities-grid">
-                        ${abilitiesHTML}
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-title">技能</div>
-                    <div class="skills-list">
-                        ${skillsHTML}
-                    </div>
-                </div>
-
-                ${weaponsHTML ? `<div class="section"><div class="section-title">武器</div>${weaponsHTML}</div>` : ''}
-                
-                ${spellsHTML ? `<div class="section"><div class="section-title">法术</div>${spellsHTML}</div>` : ''}
-
-                ${classFeaturesHTML ? `<div class="section features-section"><div class="section-title">职业特性</div>${classFeaturesHTML}</div>` : ''}
-                
-                ${raceFeaturesHTML ? `<div class="section features-section"><div class="section-title">种族特性</div>${raceFeaturesHTML}</div>` : ''}
-
-                <div class="no-print" style="text-align: center; margin-top: 30px;">
-                    <button onclick="window.print()" style="padding: 10px 20px; font-size: 1.1em;">打印角色卡</button>
+                <div class="no-print" style="text-align: center; margin-top: 20px; padding: 15px; border-top: 1px solid #ddd;">
+                    <button onclick="window.print()" style="padding: 10px 25px; font-size: 12pt; background: #8B4513; color: white; border: none; border-radius: 5px; cursor: pointer;">打印角色卡</button>
                 </div>
             </body>
             </html>
@@ -4442,10 +5387,18 @@ class CharacterApp {
                 const sourceText = spell.source ? `<span class="prepared-spell-source">${spell.source}</span>` : '';
                 const abilityText = spell.ability ? `<span class="prepared-spell-source">${spell.ability}</span>` : '';
                 
+                // 获取法术描述用于 tooltip
+                const description = this.getSpellDescription(spell.name, spell.level);
+                const tooltipAttr = description ? `data-tooltip="${description}"` : '';
+                
+                // 检查专注
+                const needsConcentration = this.checkSpellConcentration(spell.name, spell.level);
+                const concentrationTag = needsConcentration ? '<span class="spell-concentration">需专注</span>' : '';
+                
                 html += `
-                    <div class="prepared-spell-item ${itemClass}">
+                    <div class="prepared-spell-item ${itemClass}" ${tooltipAttr}>
                         <div>
-                            <span class="prepared-spell-name">${spell.name}</span>
+                            <span class="prepared-spell-name" title="${description}">${spell.name}${concentrationTag}</span>
                             ${sourceText}
                             ${abilityText}
                         </div>
@@ -4458,6 +5411,9 @@ class CharacterApp {
         });
         
         spellsContainer.innerHTML = html;
+        
+        // 添加 tooltip 事件监听
+        this.setupPreparedSpellTooltips(spellsContainer);
     }
 
     // 渲染法术环位
@@ -4808,6 +5764,811 @@ class CharacterApp {
         const tempHP = parseInt(value) || 0;
         this.character.tempHP = Math.max(0, tempHP);
         this.showNotification(`临时生命值已更新: ${this.character.tempHP}`, 'success');
+    }
+
+    // 打开空白卡生成器
+    openBlankCardGenerator() {
+        const modal = document.getElementById('blankCardModal');
+        if (modal) {
+            modal.classList.add('show');
+        }
+    }
+
+    // 关闭空白卡生成器
+    closeBlankCardGenerator() {
+        const modal = document.getElementById('blankCardModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    }
+
+    // 生成空白角色卡
+    generateBlankCard() {
+        const printWindow = window.open('', '_blank');
+        
+        // 属性列表
+        const abilities = [
+            { key: 'strength', name: '力量', skills: ['运动'] },
+            { key: 'dexterity', name: '敏捷', skills: ['体操', '巧手', '隐匿'] },
+            { key: 'constitution', name: '体质', skills: [] },
+            { key: 'intelligence', name: '智力', skills: ['奥秘', '历史', '调查', '自然', '宗教'] },
+            { key: 'wisdom', name: '感知', skills: ['驯兽', '洞悉', '医药', '察觉', '生存'] },
+            { key: 'charisma', name: '魅力', skills: ['欺瞒', '威吓', '表演', '游说'] }
+        ];
+
+        // 生成属性区域HTML
+        const abilitiesHTML = abilities.map(ability => {
+            const skillsHTML = ability.skills.map(skill => `
+                <div class="blank-skill-row">
+                    <span class="blank-skill-dot"></span>
+                    <span class="blank-skill-name">${skill}</span>
+                </div>
+            `).join('');
+            
+            return `
+                <div class="blank-ability-box">
+                    <div class="blank-ability-header">${ability.name}</div>
+                    <div class="blank-ability-score"></div>
+                    <div class="blank-ability-mod"></div>
+                    ${ability.skills.length > 0 ? `<div class="blank-ability-skills">${skillsHTML}</div>` : ''}
+                </div>
+            `;
+        }).join('');
+
+        // 生成武器攻击表格行（5行）
+        const attackRows = Array(5).fill(0).map(() => `
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+        `).join('');
+
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>D&D 5E 空白角色卡</title>
+                <style>
+                    @page {
+                        size: A4;
+                        margin: 5mm;
+                    }
+                    * { box-sizing: border-box; margin: 0; padding: 0; }
+                    body {
+                        font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+                        font-size: 8pt;
+                        line-height: 1.2;
+                        background: white;
+                        color: #333;
+                    }
+                    .blank-card-page {
+                        width: 200mm;
+                        height: 287mm;
+                        padding: 3mm;
+                        margin: 0 auto;
+                        page-break-after: always;
+                        overflow: hidden;
+                    }
+                    .blank-card-page:last-child {
+                        page-break-after: auto;
+                    }
+                    
+                    /* 页眉 */
+                    .blank-header {
+                        display: flex;
+                        align-items: stretch;
+                        gap: 8px;
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 6px;
+                        margin-bottom: 6px;
+                        background: #f5f5f5;
+                        height: 65px;
+                    }
+                    .blank-logo-section {
+                        width: 70px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        border-right: 1.5px solid #ccc;
+                        padding-right: 6px;
+                    }
+                    .blank-logo {
+                        font-size: 1.5rem;
+                        margin-bottom: 2px;
+                    }
+                    .blank-logo-text {
+                        font-size: 6pt;
+                        text-align: center;
+                        font-weight: bold;
+                        line-height: 1.1;
+                    }
+                    .blank-char-name {
+                        width: 90px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: flex-end;
+                        border-right: 1.5px solid #ccc;
+                        padding-right: 6px;
+                    }
+                    .blank-char-name-label {
+                        font-size: 6pt;
+                        color: #666;
+                        text-transform: uppercase;
+                    }
+                    .blank-char-name-value {
+                        font-size: 11pt;
+                        font-weight: bold;
+                        min-height: 18px;
+                        border-bottom: 1px solid #333;
+                    }
+                    .blank-header-fields {
+                        flex: 1;
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 4px;
+                    }
+                    .blank-field {
+                        border: 1px solid #999;
+                        border-radius: 3px;
+                        padding: 2px 4px;
+                        min-height: 24px;
+                        display: flex;
+                        flex-direction: column;
+                        background: white;
+                    }
+                    .blank-field-label {
+                        font-size: 5pt;
+                        color: #666;
+                        text-transform: uppercase;
+                    }
+                    .blank-field-value {
+                        font-size: 8pt;
+                        min-height: 12px;
+                        flex: 1;
+                    }
+                    
+                    /* 主体三栏布局 */
+                    .blank-main {
+                        display: grid;
+                        grid-template-columns: 130px 1fr 150px;
+                        gap: 5px;
+                        margin-bottom: 5px;
+                        height: 200mm;
+                    }
+                    
+                    /* 左侧属性栏 */
+                    .blank-abilities {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 3px;
+                    }
+                    .blank-ability-box {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 3px;
+                        text-align: center;
+                        background: #fafafa;
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                    }
+                    .blank-ability-box.inspiration {
+                        background: #e8e8e8;
+                        flex: 0.6;
+                    }
+                    .blank-ability-box.prof-bonus {
+                        background: #e8e8e8;
+                        flex: 0.6;
+                    }
+                    .blank-ability-box.passive {
+                        background: #e8e8e8;
+                        flex: 0.8;
+                    }
+                    .blank-ability-header {
+                        font-size: 7pt;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        margin-bottom: 1px;
+                        padding-bottom: 1px;
+                        border-bottom: 1px solid #ccc;
+                    }
+                    .blank-ability-score {
+                        font-size: 13pt;
+                        font-weight: bold;
+                        min-height: 18px;
+                    }
+                    .blank-ability-mod {
+                        font-size: 8pt;
+                        color: #666;
+                        min-height: 12px;
+                    }
+                    .blank-ability-skills {
+                        margin-top: 2px;
+                        padding-top: 2px;
+                        border-top: 1px solid #eee;
+                        text-align: left;
+                        font-size: 6pt;
+                    }
+                    .blank-skill-row {
+                        display: flex;
+                        align-items: center;
+                        gap: 2px;
+                        padding: 0.5px 0;
+                    }
+                    .blank-skill-dot {
+                        width: 6px;
+                        height: 6px;
+                        border: 1px solid #333;
+                        border-radius: 50%;
+                        flex-shrink: 0;
+                    }
+                    .blank-skill-name {
+                        flex: 1;
+                    }
+                    
+                    /* 中间区域 */
+                    .blank-center {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 4px;
+                    }
+                    
+                    /* 战斗信息 */
+                    .blank-combat-top {
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 4px;
+                    }
+                    .blank-combat-box {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 3px;
+                        text-align: center;
+                        background: #fafafa;
+                    }
+                    .blank-combat-box.shield-shape {
+                        border-radius: 50% 50% 6px 6px / 25% 25% 6px 6px;
+                    }
+                    .blank-combat-label {
+                        font-size: 5pt;
+                        text-transform: uppercase;
+                        color: #666;
+                        margin-bottom: 1px;
+                    }
+                    .blank-combat-value {
+                        font-size: 10pt;
+                        font-weight: bold;
+                        min-height: 16px;
+                    }
+                    
+                    /* HP区域 */
+                    .blank-hp-section {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 4px;
+                        background: #fafafa;
+                    }
+                    .blank-hp-row {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 6px;
+                    }
+                    .blank-hp-box {
+                        text-align: center;
+                    }
+                    .blank-hp-label {
+                        font-size: 5pt;
+                        text-transform: uppercase;
+                        color: #666;
+                    }
+                    .blank-hp-value {
+                        font-size: 9pt;
+                        min-height: 16px;
+                        border-bottom: 1px solid #ccc;
+                        margin-top: 1px;
+                    }
+                    
+                    /* 生命骰和死亡豁免 */
+                    .blank-hd-death {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 4px;
+                    }
+                    .blank-hd-box, .blank-death-box {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 3px;
+                        background: #fafafa;
+                    }
+                    .blank-death-saves {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 2px;
+                    }
+                    .blank-death-row {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 3px;
+                        font-size: 6pt;
+                    }
+                    .blank-death-dots {
+                        display: flex;
+                        gap: 2px;
+                    }
+                    .blank-death-dot {
+                        width: 8px;
+                        height: 8px;
+                        border: 1px solid #333;
+                        border-radius: 50%;
+                    }
+                    
+                    /* 武器攻击区域 */
+                    .blank-attacks {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 4px;
+                        background: #fafafa;
+                        flex: 1;
+                    }
+                    .blank-attacks-header {
+                        font-size: 7pt;
+                        font-weight: bold;
+                        text-align: center;
+                        margin-bottom: 3px;
+                        text-transform: uppercase;
+                        padding-bottom: 2px;
+                        border-bottom: 1px solid #ccc;
+                    }
+                    .blank-attack-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 7pt;
+                    }
+                    .blank-attack-table th {
+                        font-size: 5pt;
+                        text-align: left;
+                        padding: 2px 3px;
+                        border-bottom: 1px solid #333;
+                        text-transform: uppercase;
+                        background: #e8e8e8;
+                    }
+                    .blank-attack-table td {
+                        padding: 3px;
+                        border-bottom: 1px solid #ddd;
+                        height: 18px;
+                    }
+                    
+                    /* 右侧特性区域 */
+                    .blank-features {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 4px;
+                    }
+                    .blank-feature-box {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 4px;
+                        background: #fafafa;
+                        flex: 1;
+                        min-height: 45px;
+                    }
+                    .blank-feature-title {
+                        font-size: 6pt;
+                        font-weight: bold;
+                        text-align: center;
+                        text-transform: uppercase;
+                        margin-bottom: 2px;
+                        padding-bottom: 2px;
+                        border-bottom: 1px solid #ccc;
+                        color: #555;
+                    }
+                    
+                    /* 底部区域 */
+                    .blank-bottom {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 5px;
+                        height: 60px;
+                    }
+                    .blank-bottom-box {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 4px;
+                        background: #fafafa;
+                    }
+                    .blank-bottom-title {
+                        font-size: 6pt;
+                        font-weight: bold;
+                        text-align: center;
+                        text-transform: uppercase;
+                        margin-bottom: 2px;
+                        padding-bottom: 2px;
+                        border-bottom: 1px solid #ccc;
+                        color: #555;
+                    }
+                    
+                    /* 第二页 */
+                    .blank-page2-header {
+                        display: flex;
+                        align-items: stretch;
+                        gap: 8px;
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 6px;
+                        margin-bottom: 6px;
+                        background: #f5f5f5;
+                        height: 55px;
+                    }
+                    .blank-page2-logo {
+                        width: 60px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.2rem;
+                        font-weight: bold;
+                        border-right: 1.5px solid #ccc;
+                        padding-right: 6px;
+                    }
+                    .blank-appearance-fields {
+                        flex: 1;
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 4px;
+                    }
+                    
+                    .blank-page2-content {
+                        display: grid;
+                        grid-template-columns: 110px 1fr 110px;
+                        gap: 5px;
+                        margin-bottom: 5px;
+                        height: 130mm;
+                    }
+                    .blank-portrait-box {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        background: #fafafa;
+                        padding: 4px;
+                    }
+                    .blank-portrait-icon {
+                        font-size: 2rem;
+                        margin-bottom: 4px;
+                    }
+                    .blank-portrait-title {
+                        font-size: 6pt;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        color: #666;
+                    }
+                    .blank-allies-box {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 4px;
+                        background: #fafafa;
+                    }
+                    .blank-symbol-box {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        background: #fafafa;
+                        padding: 4px;
+                    }
+                    .blank-symbol-icon {
+                        font-size: 1.5rem;
+                        margin-bottom: 4px;
+                    }
+                    
+                    .blank-page2-bottom {
+                        display: grid;
+                        grid-template-columns: 140px 1fr;
+                        gap: 5px;
+                        height: 140mm;
+                    }
+                    .blank-backstory-box {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 4px;
+                        background: #fafafa;
+                    }
+                    .blank-backstory-right {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 5px;
+                    }
+                    .blank-extra-features {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 4px;
+                        background: #fafafa;
+                        flex: 1;
+                    }
+                    .blank-treasure-box {
+                        border: 1.5px solid #333;
+                        border-radius: 6px;
+                        padding: 4px;
+                        background: #fafafa;
+                        flex: 1;
+                    }
+                    
+                    @media print {
+                        body { margin: 0; padding: 0; }
+                        .blank-card-page {
+                            page-break-after: always;
+                            height: 287mm;
+                            width: 200mm;
+                        }
+                        .blank-card-page:last-child {
+                            page-break-after: auto;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <!-- 第一页 -->
+                <div class="blank-card-page">
+                    <!-- 页眉 -->
+                    <div class="blank-header">
+                        <div class="blank-logo-section">
+                            <div class="blank-logo">🐉</div>
+                            <div class="blank-logo-text">DUNGEONS<br>&<br>DRAGONS</div>
+                        </div>
+                        <div class="blank-char-name">
+                            <div class="blank-char-name-label">角色名</div>
+                            <div class="blank-char-name-value"></div>
+                        </div>
+                        <div class="blank-header-fields">
+                            <div class="blank-field">
+                                <span class="blank-field-label">职业与等级</span>
+                                <span class="blank-field-value"></span>
+                            </div>
+                            <div class="blank-field">
+                                <span class="blank-field-label">背景</span>
+                                <span class="blank-field-value"></span>
+                            </div>
+                            <div class="blank-field">
+                                <span class="blank-field-label">玩家名</span>
+                                <span class="blank-field-value"></span>
+                            </div>
+                            <div class="blank-field">
+                                <span class="blank-field-label">种族</span>
+                                <span class="blank-field-value"></span>
+                            </div>
+                            <div class="blank-field">
+                                <span class="blank-field-label">阵营</span>
+                                <span class="blank-field-value"></span>
+                            </div>
+                            <div class="blank-field">
+                                <span class="blank-field-label">经验值</span>
+                                <span class="blank-field-value"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 主体 -->
+                    <div class="blank-main">
+                        <!-- 左侧属性 -->
+                        <div class="blank-abilities">
+                            <div class="blank-ability-box prof-bonus">
+                                <div class="blank-ability-header">熟练加值</div>
+                                <div class="blank-ability-score"></div>
+                            </div>
+                            <div class="blank-ability-box inspiration">
+                                <div class="blank-ability-header">激励</div>
+                                <div class="blank-ability-score"></div>
+                            </div>
+                            ${abilitiesHTML}
+                            <div class="blank-ability-box passive">
+                                <div class="blank-ability-header">被动感知（察觉）</div>
+                                <div class="blank-ability-score"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- 中间战斗信息 -->
+                        <div class="blank-center">
+                            <div class="blank-combat-top">
+                                <div class="blank-combat-box shield-shape">
+                                    <div class="blank-combat-label">护甲等级</div>
+                                    <div class="blank-combat-value"></div>
+                                </div>
+                                <div class="blank-combat-box">
+                                    <div class="blank-combat-label">先攻</div>
+                                    <div class="blank-combat-value"></div>
+                                </div>
+                                <div class="blank-combat-box">
+                                    <div class="blank-combat-label">速度</div>
+                                    <div class="blank-combat-value"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="blank-hp-section">
+                                <div class="blank-hp-row">
+                                    <div class="blank-hp-box">
+                                        <div class="blank-hp-label">生命值上限</div>
+                                        <div class="blank-hp-value"></div>
+                                    </div>
+                                    <div class="blank-hp-box">
+                                        <div class="blank-hp-label">当前生命值</div>
+                                        <div class="blank-hp-value"></div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 4px; text-align: center;">
+                                    <div class="blank-hp-label">临时生命值</div>
+                                    <div class="blank-hp-value"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="blank-hd-death">
+                                <div class="blank-hd-box">
+                                    <div class="blank-combat-label">生命骰</div>
+                                    <div class="blank-combat-value" style="margin-top: 2px;"></div>
+                                </div>
+                                <div class="blank-death-box">
+                                    <div class="blank-combat-label">死亡豁免</div>
+                                    <div class="blank-death-saves">
+                                        <div class="blank-death-row">
+                                            <span>成功</span>
+                                            <div class="blank-death-dots">
+                                                <div class="blank-death-dot"></div>
+                                                <div class="blank-death-dot"></div>
+                                                <div class="blank-death-dot"></div>
+                                            </div>
+                                        </div>
+                                        <div class="blank-death-row">
+                                            <span>失败</span>
+                                            <div class="blank-death-dots">
+                                                <div class="blank-death-dot"></div>
+                                                <div class="blank-death-dot"></div>
+                                                <div class="blank-death-dot"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="blank-attacks">
+                                <div class="blank-attacks-header">攻击与法术</div>
+                                <table class="blank-attack-table">
+                                    <thead>
+                                        <tr>
+                                            <th>攻击名</th>
+                                            <th>攻击加值</th>
+                                            <th>伤害/类型</th>
+                                            <th>射程</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${attackRows}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- 右侧特性 -->
+                        <div class="blank-features">
+                            <div class="blank-feature-box">
+                                <div class="blank-feature-title">个人特点</div>
+                            </div>
+                            <div class="blank-feature-box">
+                                <div class="blank-feature-title">理想</div>
+                            </div>
+                            <div class="blank-feature-box">
+                                <div class="blank-feature-title">牵绊</div>
+                            </div>
+                            <div class="blank-feature-box">
+                                <div class="blank-feature-title">缺点</div>
+                            </div>
+                            <div class="blank-feature-box" style="flex: 2;">
+                                <div class="blank-feature-title">特性与特质</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 底部 -->
+                    <div class="blank-bottom">
+                        <div class="blank-bottom-box">
+                            <div class="blank-bottom-title">其他熟练项和语言</div>
+                        </div>
+                        <div class="blank-bottom-box">
+                            <div class="blank-bottom-title">角色的装备与钱币</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 第二页 -->
+                <div class="blank-card-page">
+                    <!-- 页眉 -->
+                    <div class="blank-page2-header">
+                        <div class="blank-page2-logo">D&D</div>
+                        <div class="blank-char-name">
+                            <div class="blank-char-name-label">角色名</div>
+                            <div class="blank-char-name-value"></div>
+                        </div>
+                        <div class="blank-appearance-fields">
+                            <div class="blank-field">
+                                <span class="blank-field-label">年龄</span>
+                                <span class="blank-field-value"></span>
+                            </div>
+                            <div class="blank-field">
+                                <span class="blank-field-label">身高</span>
+                                <span class="blank-field-value"></span>
+                            </div>
+                            <div class="blank-field">
+                                <span class="blank-field-label">体重</span>
+                                <span class="blank-field-value"></span>
+                            </div>
+                            <div class="blank-field">
+                                <span class="blank-field-label">瞳色</span>
+                                <span class="blank-field-value"></span>
+                            </div>
+                            <div class="blank-field">
+                                <span class="blank-field-label">肤色</span>
+                                <span class="blank-field-value"></span>
+                            </div>
+                            <div class="blank-field">
+                                <span class="blank-field-label">发色</span>
+                                <span class="blank-field-value"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第二页内容 -->
+                    <div class="blank-page2-content">
+                        <div class="blank-portrait-box">
+                            <div class="blank-portrait-icon">👤</div>
+                            <div class="blank-portrait-title">角色形象</div>
+                        </div>
+                        <div class="blank-allies-box">
+                            <div class="blank-feature-title">同盟与组织</div>
+                        </div>
+                        <div class="blank-symbol-box">
+                            <div class="blank-symbol-icon">🏛️</div>
+                            <div class="blank-portrait-title">徽记</div>
+                        </div>
+                    </div>
+                    
+                    <div class="blank-page2-bottom">
+                        <div class="blank-backstory-box">
+                            <div class="blank-feature-title">角色背景故事</div>
+                        </div>
+                        <div class="blank-backstory-right">
+                            <div class="blank-extra-features">
+                                <div class="blank-feature-title">额外的特性与特质</div>
+                            </div>
+                            <div class="blank-treasure-box">
+                                <div class="blank-feature-title">财宝</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                        }, 500);
+                    };
+                </script>
+            </body>
+            </html>
+        `;
+        
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        
+        // 关闭模态框
+        this.closeBlankCardGenerator();
     }
 }
 

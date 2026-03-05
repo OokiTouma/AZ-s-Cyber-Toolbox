@@ -88,7 +88,15 @@ const SPELLS = {
         { name: '隐形仆役', nameEn: 'Unseen Servant', level: 1, class: ['wizard', 'bard', 'warlock'], school: '咒法', castingTime: '1动作', range: '60尺', components: 'V,S,M', duration: '1小时', description: '你创造出一个隐形的力场仆役，可以执行简单的任务。' },
         { name: '巫术箭', nameEn: 'Hex', level: 1, class: ['warlock'], school: '惑控', castingTime: '1附赠动作', range: '90尺', components: 'V,S,M', duration: '至多1小时', description: '你对一个生物施加诅咒，你对它的攻击额外造成1d6黯蚀伤害，且它选择一项能力检定具有劣势。' },
         { name: '护甲之主', nameEn: 'Armor of Agathys', level: 1, class: ['warlock'], school: '防护', castingTime: '1动作', range: '自身', components: 'V,S,M', duration: '1小时', description: '你获得5点临时生命值，当生物用近战攻击命中你时，它受到5点冷冻伤害。使用更高环阶法术位施放时，效果增强。' },
-        { name: '强令对决', nameEn: 'Compulsion', level: 1, class: ['warlock'], school: '惑控', castingTime: '1动作', range: '30尺', components: 'V,S', duration: '至多1分钟', description: '你尝试强迫一个生物与你战斗，它必须通过一次智慧豁免，失败在法术持续期间被你吸引。' }
+        { name: '强令对决', nameEn: "Compelled Duel", level: 1, class: ['paladin'], school: '惑控', castingTime: '1附赠动作', range: '30尺', components: 'V', duration: '至多1分钟', description: '你尝试与一个生物进行对决。目标必须通过一次智慧豁免，否则在法术持续期间被限制与你战斗。它对你以外的生物攻击具有劣势，且必须尝试靠近你。' },
+        { name: '至圣斩', nameEn: "Divine Smite", level: 1, class: ['paladin'], school: '塑能', castingTime: '1反应', range: '自身', components: 'V', duration: '立即', description: '当你用近战武器攻击命中一个生物时，你可以消耗一个法术位造成额外光耀伤害。2环或更低环阶造成2d8光耀伤害，对邪魔或不死生物额外增加1d8，如果目标是不死生物则再增加1d8。' },
+        { name: '侦测善恶', nameEn: 'Detect Evil and Good', level: 1, class: ['paladin', 'cleric'], school: '预言', castingTime: '1动作', range: '自身', components: 'V,S', duration: '至多10分钟', description: '你可以感知30尺内的天界、元素、妖精、邪魔或不死生物，并感知被祝圣或亵渎的物品和地点。' },
+        { name: '炽焰斩', nameEn: 'Searing Smite', level: 1, class: ['paladin'], school: '塑能', castingTime: '1附赠动作', range: '自身', components: 'V', duration: '至多1分钟', description: '你的下一次武器攻击命中时，目标受到额外1d6火焰伤害，并在每个回合开始时受到1d6火焰伤害，直到它通过一次体质豁免。' },
+        { name: '激愤斩', nameEn: 'Wrathful Smite', level: 1, class: ['paladin'], school: '塑能', castingTime: '1附赠动作', range: '自身', components: 'V', duration: '至多1分钟', description: '你的下一次武器攻击命中时，目标受到额外1d6心灵伤害，并必须通过一次智慧豁免，否则恐慌直到法术结束。' },
+        { name: '净化饮食', nameEn: 'Purify Food and Drink', level: 1, class: ['paladin', 'cleric', 'druid'], school: '变化', castingTime: '1 动作', range: '10 尺', components: 'V,S', duration: '立即', description: '你净化 5 尺半径内的所有非魔法食物和饮水，移除毒素和疾病。' },
+        { name: '哈达之臂', nameEn: 'Arms of Hadar', level: 1, class: ['warlock'], school: '咒法', castingTime: '1 动作', range: '自身（10 尺半径）', components: 'V,S', duration: '立即', description: '你召唤出哈达的触手能量，10 尺半径内生物必须进行力量豁免，失败受到 2d6 黯蚀伤害且本回合无法进行反应，成功则伤害减半。' },
+        { name: '炼狱叱喝', nameEn: 'Hellish Rebuke', level: 1, class: ['warlock'], school: '塑能', castingTime: '1 反应', range: '60 尺', components: 'V,S', duration: '立即', description: '当你受到伤害时，你可以反应让伤害来源进行敏捷豁免，失败受到 2d10 火焰伤害，成功伤害减半。' },
+        { name: '迷幻手稿', nameEn: 'Illusory Script', level: 1, class: ['warlock', 'wizard'], school: '幻术', castingTime: '1 分钟', range: '触及', components: 'S,M', duration: '10 天', description: '你触碰一段墨水或文字，为其施加幻觉，只有你指定的生物才能看到真实内容，其他人看到的内容由你决定。' }
     ],
     
     // 2环法术
@@ -124,7 +132,21 @@ const SPELLS = {
         { name: '守护之链', nameEn: 'Warding Bond', level: 2, class: ['cleric', 'paladin'], school: '防护', castingTime: '1动作', range: '触及', components: 'V,S,M', duration: '1小时', description: '你与一个生物建立魔法链接，你获得+1AC、+1豁免检定，且它受到的伤害的一半由你承担。' },
         { name: '野兽形态', nameEn: 'Beast Sense', level: 2, class: ['druid', 'ranger'], school: '预言', castingTime: '1动作', range: '触及', components: 'S', duration: '1小时', description: '你可以通过一只自愿野兽的感官来感知，直到你使用动作结束法术。' },
         { name: '荆棘丛生', nameEn: 'Spike Growth', level: 2, class: ['druid', 'ranger'], school: '变化', castingTime: '1动作', range: '150尺', components: 'V,S,M', duration: '至多10分钟', description: '你在范围内创造出一片棘刺区域，区域内成为困难地形，生物移动时受到2d4穿刺伤害。' },
-        { name: '火焰刀', nameEn: 'Flame Blade', level: 2, class: ['druid'], school: '塑能', castingTime: '1附赠动作', range: '自身', components: 'V,S,M', duration: '至多10分钟', description: '你召唤出一把炽热的火焰刀，可以造成3d6火焰伤害。' }
+        { name: '火焰刀', nameEn: 'Flame Blade', level: 2, class: ['druid'], school: '塑能', castingTime: '1附赠动作', range: '自身', components: 'V,S,M', duration: '至多10分钟', description: '你召唤出一把炽热的火焰刀，可以造成3d6火焰伤害。' },
+        { name: '寻获坐骑', nameEn: 'Find Steed', level: 2, class: ['paladin'], school: '咒法', castingTime: '10分钟', range: '30尺', components: 'V,S', duration: '立即', description: '你召唤出一个智能坐骑（战马、矮种马、骆驼、野猪或獒犬），它服从你的命令，与你心灵感应，并在你召唤时获得你的法术位加成。' },
+        { name: '遗体防腐', nameEn: 'Gentle Repose', level: 2, class: ['paladin', 'cleric', 'wizard'], school: '死灵', castingTime: '1动作', range: '触及', components: 'V,S,M', duration: '10天', description: '你触碰一具尸体或其他遗骸，使其在持续时间内不会腐烂，且无法被转化为不死生物。' },
+        { name: '物件定位术', nameEn: 'Locate Object', level: 2, class: ['paladin', 'bard', 'cleric', 'druid', 'ranger', 'wizard'], school: '预言', castingTime: '1动作', range: '自身', components: 'V,S,M', duration: '至多10分钟', description: '你可以感知一个你熟悉的特定物品或一类物品的方向和距离，只要在1000尺内且不被铅或薄银片阻挡。' },
+        { name: '魔化武器', nameEn: 'Magic Weapon', level: 2, class: ['paladin', 'wizard', 'artificer'], school: '变化', castingTime: '1附赠动作', range: '触及', components: 'V,S', duration: '至多1小时', description: '你触碰一把非魔法武器，使其成为+1魔法武器，攻击检定和伤害检定获得+1加值。' },
+        { name: '治疗祷言', nameEn: 'Prayer of Healing', level: 2, class: ['paladin', 'cleric'], school: '塑能', castingTime: '10分钟', range: '30尺', components: 'V', duration: '立即', description: '你让至多六个生物恢复2d8+施法属性调整值的生命值。' },
+        { name: '防护毒素', nameEn: 'Protection from Poison', level: 2, class: ['paladin', 'cleric', 'druid', 'ranger'], school: '防护', castingTime: '1动作', range: '触及', components: 'V,S', duration: '1小时', description: '你触碰一个生物，中和其体内的毒素，结束中毒状态，并在持续时间内对毒素伤害具有抗性。' },
+        { name: '闪耀斩', nameEn: 'Branding Smite', level: 2, class: ['paladin'], school: '塑能', castingTime: '1附赠动作', range: '自身', components: 'V', duration: '至多1分钟', description: '你的下一次武器攻击命中时，目标受到额外2d6光耀伤害，发出光芒，无法隐形，并在每次攻击时额外受到1d6光耀伤害。' },
+        { name: '诚实之域', nameEn: "Zone of Truth", level: 2, class: ['paladin', 'cleric', 'bard'], school: '惑控', castingTime: '1 动作', range: '60 尺', components: 'V,S', duration: '10 分钟', description: '你创造一个 15 尺半径的球形区域，区域内的生物在说话时不能说谎，可以通过魅力豁免抵抗此效果。' },
+        { name: '匕首之云', nameEn: 'Cloud of Daggers', level: 2, class: ['warlock', 'wizard', 'sorcerer'], school: '咒法', castingTime: '1 动作', range: '60 尺', components: 'V,S,M', duration: '至多 1 分钟', description: '你在 5 尺立方内创造出一团旋转的魔法匕首，生物在区域内开始回合或进入时受到 2d4 挥砍伤害。' },
+        { name: '疯狂冠冕', nameEn: 'Crown of Madness', level: 2, class: ['warlock', 'wizard', 'sorcerer'], school: '惑控', castingTime: '1 动作', range: '120 尺', components: 'V,S', duration: '至多 1 分钟', description: '你尝试控制一个生物，它必须通过一次智慧豁免，失败被你魅惑，你可以用附赠动作控制它攻击。' },
+        { name: '注目术', nameEn: 'Enthrall', level: 2, class: ['warlock', 'bard'], school: '惑控', castingTime: '1 动作', range: '60 尺', components: 'V,S', duration: '1 分钟', description: '你说出魅惑之言，60 尺内能听到你的生物必须进行智慧豁免，失败在 1 分钟内对你的攻击具有劣势。' },
+        { name: '心灵尖刺', nameEn: 'Mind Spike', level: 2, class: ['warlock', 'wizard'], school: '预言', castingTime: '1 动作', range: '60 尺', components: 'S', duration: '至多 1 小时', description: '你刺穿目标的思想，造成 3d8 心灵伤害，并在持续时间内感知其位置。' },
+        { name: '蛛行术', nameEn: 'Spider Climb', level: 2, class: ['warlock', 'wizard', 'sorcerer'], school: '变化', castingTime: '1 动作', range: '触及', components: 'V,S,M', duration: '至多 1 小时', description: '你触碰一个自愿生物，赋予它在天花板和墙壁上攀爬的能力。' },
+        { name: '衰弱射线', nameEn: 'Ray of Enfeeblement', level: 2, class: ['warlock', 'wizard'], school: '死灵', castingTime: '1 动作', range: '60 尺', components: 'V,S', duration: '至多 1 分钟', description: '你射出一道黑色能量射线，目标必须进行体质豁免，失败在持续时间内进行武器攻击时伤害骰减半。' }
     ],
     
     // 3环法术
@@ -151,7 +173,22 @@ const SPELLS = {
         { name: '植物滋长', nameEn: 'Plant Growth', level: 3, class: ['druid', 'ranger', 'bard'], school: '变化', castingTime: '1动作或8小时', range: '150尺', components: 'V,S', duration: '立即', description: '你在范围内使植物快速生长，区域内成为困难地形，或者使作物产量翻倍。' },
         { name: '召雷术', nameEn: 'Call Lightning', level: 3, class: ['druid'], school: '塑能', castingTime: '1动作', range: '120尺', components: 'V,S', duration: '至多10分钟', description: '你召唤出一道雷云，可以用动作召唤闪电攻击，造成3d10闪电伤害。' },
         { name: '饥饿之刃', nameEn: 'Hunger of Hadar', level: 3, class: ['warlock'], school: '咒法', castingTime: '1动作', range: '150尺', components: 'V,S,M', duration: '至多1分钟', description: '你打开一个通往哈达尔黑暗领域的传送门，20尺半径球体内成为重度遮蔽，生物在其中开始回合时受到2d6冷冻伤害。' },
-        { name: '吸血鬼之触', nameEn: 'Vampiric Touch', level: 3, class: ['warlock', 'wizard', 'sorcerer'], school: '死灵', castingTime: '1动作', range: '自身', components: 'V,S', duration: '至多1分钟', description: '你的触碰造成3d6黯蚀伤害，你恢复等于造成伤害一半的生命值。' }
+        { name: '吸血鬼之触', nameEn: 'Vampiric Touch', level: 3, class: ['warlock', 'wizard', 'sorcerer'], school: '死灵', castingTime: '1动作', range: '自身', components: 'V,S', duration: '至多1分钟', description: '你的触碰造成3d6黯蚀伤害，你恢复等于造成伤害一半的生命值。' },
+        { name: '活力灵光', nameEn: 'Aura of Vitality', level: 3, class: ['paladin'], school: '塑能', castingTime: '1动作', range: '自身（30尺半径）', components: 'V', duration: '至多1分钟', description: '你散发出治愈能量，可以用附赠动作让30尺内的一个生物恢复2d6生命值。' },
+        { name: '致盲斩', nameEn: "Blinding Smite", level: 3, class: ['paladin'], school: '塑能', castingTime: '1附赠动作', range: '自身', components: 'V', duration: '至多1分钟', description: '你的下一次武器攻击命中时，目标受到额外3d8光耀伤害，并必须通过一次体质豁免，否则目盲直到法术结束。' },
+        { name: '造粮术', nameEn: 'Create Food and Water', level: 3, class: ['paladin', 'cleric', 'druid'], school: '咒法', castingTime: '1动作', range: '30尺', components: 'V,S', duration: '立即', description: '你创造出45磅的食物和30加仑的饮水，足够15个生物食用一天。' },
+        { name: '十字军披风', nameEn: "Crusader's Mantle", level: 3, class: ['paladin'], school: '塑能', castingTime: '1动作', range: '自身', components: 'V', duration: '至多1分钟', description: '你散发出神圣力量，30尺内的友方生物在命中生物时额外造成1d4光耀伤害。' },
+        { name: '昼明术', nameEn: 'Daylight', level: 3, class: ['paladin', 'cleric', 'druid', 'ranger', 'sorcerer', 'wizard'], school: '塑能', castingTime: '1动作', range: '60尺', components: 'V,S', duration: '1小时', description: '你触碰一个物体，使其发出60尺明亮光照和额外60尺微光光照，可驱散魔法黑暗。' },
+        { name: '元素武器', nameEn: 'Elemental Weapon', level: 3, class: ['paladin'], school: '变化', castingTime: '1动作', range: '触及', components: 'V,S', duration: '至多1小时', description: '你触碰一把非魔法武器，选择一种伤害类型（酸、冷、火、电、雷鸣），武器攻击检定获得+1，并额外造成1d4选定类型的伤害。' },
+        { name: '防护法阵', nameEn: 'Magic Circle', level: 3, class: ['paladin', 'cleric', 'warlock', 'wizard'], school: '防护', castingTime: '1 分钟', range: '10 尺', components: 'V,S,M', duration: '1 小时', description: '你创造一个 10 尺半径的圆柱形法阵，可以困住或保护天界、元素、妖精或邪魔。' },
+        { name: '妖精召唤术', nameEn: 'Summon Fey', level: 3, class: ['warlock', 'druid', 'ranger'], school: '咒法', castingTime: '1 动作', range: '90 尺', components: 'V,S,M', duration: '至多 1 小时', description: '你召唤出一个妖精生物为你战斗，可以选择迷雾生物（控制型）、欺诈妖精（幻术型）或狂怒精类（攻击型）。' },
+        { name: '亡灵召唤术', nameEn: 'Summon Undead', level: 3, class: ['warlock', 'wizard'], school: '死灵', castingTime: '1 动作', range: '90 尺', components: 'V,S,M', duration: '至多 1 小时', description: '你召唤出一个亡灵生物为你战斗，可以选择幽灵（飞行型）、骷髅（远程型）或僵尸（近战型）。' },
+        { name: '巧言术', nameEn: 'Tongues', level: 3, class: ['warlock', 'cleric', 'wizard', 'sorcerer', 'bard'], school: '预言', castingTime: '1 动作', range: '触及', components: 'V,M', duration: '1 小时', description: '你触碰一个生物，赋予它理解任何语言并让任何生物理解它的能力。' },
+        { name: '回生术', nameEn: 'Revivify', level: 3, class: ['cleric', 'paladin', 'druid', 'artificer'], school: '死灵', castingTime: '1 动作', range: '触及', components: 'V,S,M', duration: '立即', description: '你触碰一个死亡不超过 1 分钟的生物，使其恢复 1 点生命值。' },
+        { name: '闪现术', nameEn: 'Blink', level: 3, class: ['wizard', 'sorcerer', 'artificer'], school: '变化', castingTime: '1 动作', range: '自身', components: 'V,S', duration: '1 分钟', description: '你每回合结束时掷 d20，11 或更高则进入以太位面，回合开始时返回。' },
+        { name: '反制咒法', nameEn: 'Counterspell', level: 3, class: ['wizard', 'sorcerer', 'warlock'], school: '防护', castingTime: '1 反应', range: '60 尺', components: 'S', duration: '立即', description: '你试图打断一个生物正在施放的法术，如果目标法术环阶不高于 3 环则自动失败，否则进行施法属性检定。' },
+        { name: '火球术', nameEn: 'Fireball', level: 3, class: ['wizard', 'sorcerer'], school: '塑能', castingTime: '1 动作', range: '150 尺', components: 'V,S,M', duration: '立即', description: '你在范围内选择一个点，20 尺半径球体内爆发火焰，生物必须进行敏捷豁免，失败受到 8d6 火焰伤害。' },
+        { name: '探知术', nameEn: 'Clairvoyance', level: 3, class: ['cleric', 'wizard', 'sorcerer', 'bard'], school: '预言', castingTime: '10 分钟', range: '1 英里', components: 'V,S,M', duration: '至多 10 分钟', description: '你在熟悉的位置创造一个隐形的传感器，可以看到或听到该区域。' }
     ],
     
     // 4环法术
@@ -172,7 +209,11 @@ const SPELLS = {
         { name: '生物定位术', nameEn: 'Locate Creature', level: 4, class: ['cleric', 'druid', 'ranger', 'bard', 'wizard'], school: '预言', castingTime: '1动作', range: '自身', components: 'V,S,M', duration: '至多1小时', description: '你可以感知一个你熟悉的生物的方向和距离，只要它在1000尺内。' },
         { name: '净化灵体', nameEn: 'Death Ward', level: 4, class: ['cleric', 'paladin'], school: '防护', castingTime: '1动作', range: '触及', components: 'V,S', duration: '8小时', description: '你触碰一个生物，当其生命值降至0时改为1，或当受到即死效果时免疫。' },
         { name: '召唤林地生物', nameEn: 'Conjure Woodland Beings', level: 4, class: ['druid', 'ranger'], school: '咒法', castingTime: '1动作', range: '60尺', components: 'V,S,M', duration: '至多1小时', description: '你召唤出妖精生物为你战斗，可以选择召唤一个CR2或更低，或两个CR1或更低等。' },
-        { name: '支配野兽', nameEn: 'Dominate Beast', level: 4, class: ['druid', 'sorcerer', 'warlock', 'ranger'], school: '惑控', castingTime: '1动作', range: '60尺', components: 'V,S', duration: '至多1分钟', description: '你尝试控制一个野兽，它必须通过一次智慧豁免，失败被你控制。' }
+        { name: '支配野兽', nameEn: 'Dominate Beast', level: 4, class: ['druid', 'sorcerer', 'warlock', 'ranger'], school: '惑控', castingTime: '1动作', range: '60尺', components: 'V,S', duration: '至多1分钟', description: '你尝试控制一个野兽，它必须通过一次智慧豁免，失败被你控制。' },
+        { name: '生命灵光', nameEn: 'Aura of Life', level: 4, class: ['paladin'], school: '防护', castingTime: '1动作', range: '自身（30尺半径）', components: 'V', duration: '至多10分钟', description: '你散发出生命能量，30尺内的非敌对生物对黯蚀伤害具有抗性，生命值上限不会降低，且在其回合开始时若生命值为0则恢复1点生命值。' },
+        { name: '净化灵光', nameEn: 'Aura of Purity', level: 4, class: ['paladin'], school: '防护', castingTime: '1动作', range: '自身（30尺半径）', components: 'V', duration: '至多10分钟', description: '你散发出净化能量，30尺内的友方生物对毒素伤害具有抗性，不会中毒或患病，并对魅惑和恐慌具有优势。' },
+        { name: '防死结界', nameEn: 'Death Ward', level: 4, class: ['paladin', 'cleric'], school: '防护', castingTime: '1动作', range: '触及', components: 'V,S', duration: '8小时', description: '你触碰一个生物，当其生命值降至0时改为1，或当受到即死效果时免疫。' },
+        { name: '惊惧斩', nameEn: 'Staggering Smite', level: 4, class: ['paladin'], school: '塑能', castingTime: '1附赠动作', range: '自身', components: 'V', duration: '至多1分钟', description: '你的下一次武器攻击命中时，目标受到额外4d6心灵伤害，并必须通过一次智慧豁免，否则在法术持续期间攻击检定和豁免检定具有劣势，且不能进行反应。' }
     ],
     
     // 5环法术
@@ -196,10 +237,20 @@ const SPELLS = {
         { name: '死云术', nameEn: 'Cloudkill', level: 5, class: ['wizard', 'sorcerer'], school: '咒法', castingTime: '1动作', range: '120尺', components: 'V,S', duration: '至多10分钟', description: '你创造出一团20尺半径的黄色毒云，生物在其中开始回合时受到5d8毒素伤害。' },
         { name: '寒冰锥', nameEn: 'Cone of Cold', level: 5, class: ['wizard', 'sorcerer'], school: '塑能', castingTime: '1动作', range: '自身（60尺锥形）', components: 'V,S,M', duration: '立即', description: '你释放出一道极寒的能量波，60尺锥形区域内生物受到8d8冷冻伤害。' },
         { name: '造物术', nameEn: 'Creation', level: 5, class: ['wizard', 'sorcerer', 'artificer'], school: '幻术', castingTime: '1分钟', range: '30尺', components: 'V,S,M', duration: '特殊', description: '你创造出一个非魔法物体，材质决定持续时间，从布料到秘银。' },
-        { name: '启蒙术', nameEn: 'Awaken', level: 5, class: ['druid', 'bard', 'ranger'], school: '变化', castingTime: '8小时', range: '触及', components: 'V,S,M', duration: '立即', description: '你触碰一个野兽或植物，赋予它人类水平的智慧和说话能力。' }
+        { name: '启蒙术', nameEn: 'Awaken', level: 5, class: ['druid', 'bard', 'ranger'], school: '变化', castingTime: '8小时', range: '触及', components: 'V,S,M', duration: '立即', description: '你触碰一个野兽或植物，赋予它人类水平的智慧和说话能力。' },
+        { name: '放逐斩', nameEn: 'Banishing Smite', level: 5, class: ['paladin'], school: '防护', castingTime: '1 附赠动作', range: '自身', components: 'V', duration: '至多 1 分钟', description: '你的下一次武器攻击命中时，目标受到额外 5d10 力场伤害，如果目标生命值降至 50 或更低，你可以将其放逐到其家乡位面（如果是异界生物）或暂时困在无害的半位面（如果不是）。' },
+        { name: '原力法阵', nameEn: 'Circle of Power', level: 5, class: ['paladin'], school: '防护', castingTime: '1 动作', range: '自身（30 尺半径）', components: 'V', duration: '至多 10 分钟', description: '你散发出神圣能量，30 尺内的友方生物在对抗法术和其他魔法效果的豁免检定上具有优势，且如果成功豁免则不会受到任何伤害（即使通常成功豁免也会受到一半伤害）。' },
+        { name: '湮灭波', nameEn: 'Destructive Wave', level: 5, class: ['paladin'], school: '塑能', castingTime: '1 动作', range: '自身（30 尺半径）', components: 'V', duration: '立即', description: '你释放出一道神圣能量波，30 尺内你选择的所有生物必须进行体质豁免，失败受到 5d6 雷鸣伤害和 5d6 光耀或黯蚀伤害（你选择），成功伤害减半。' },
+        { name: '驱逐善恶', nameEn: 'Dispel Evil and Good', level: 5, class: ['paladin', 'cleric'], school: '防护', castingTime: '1 动作', range: '自身', components: 'V,S,M', duration: '至多 1 分钟', description: '你被神圣能量包围，对天界、元素、妖精、邪魔和不死生物的攻击具有优势，可以用动作尝试驱逐这些生物（它们必须进行魅力豁免，失败被放逐）。' },
+        { name: '指使术', nameEn: 'Geas', level: 5, class: ['paladin', 'bard', 'cleric', 'druid', 'wizard'], school: '惑控', castingTime: '1 分钟', range: '60 尺', components: 'V', duration: '30 天', description: '你对一个生物施加魔法命令，它必须通过一次智慧豁免，失败必须服从你的命令或受到 5d10 心灵伤害。' },
+        { name: '高等复原术', nameEn: 'Greater Restoration', level: 5, class: ['paladin', 'cleric', 'druid', 'bard', 'artificer'], school: '防护', castingTime: '1 动作', range: '触及', components: 'V,S,M', duration: '立即', description: '你触碰一个生物，结束一种削弱它的效应，可以恢复能力值减少、结束魅惑、石化、诅咒或恢复生命值上限。' },
+        { name: '天界召唤术', nameEn: 'Summon Celestial', level: 5, class: ['paladin', 'cleric'], school: '咒法', castingTime: '1 动作', range: '90 尺', components: 'V,S,M', duration: '至多 1 小时', description: '你召唤出一个天界生物为你战斗，可以选择复仇者（攻击型）或 Defender（防御型）。' },
+        { name: '召雷术', nameEn: 'Call Lightning', level: 5, class: ['druid'], school: '塑能', castingTime: '1 动作', range: '120 尺', components: 'V,S', duration: '至多 10 分钟', description: '你召唤出一道雷云，可以用动作召唤闪电攻击，造成 3d10 闪电伤害。' },
+        { name: '群体恢复术', nameEn: 'Mass Healing Word', level: 5, class: ['cleric'], school: '塑能', castingTime: '1 附赠动作', range: '60 尺', components: 'V', duration: '立即', description: '你让至多六个生物各恢复 1d4+ 施法属性调整值的生命值。' },
+        { name: '异界之门', nameEn: 'Gate', level: 5, class: ['cleric', 'wizard', 'sorcerer'], school: '咒法', castingTime: '1 动作', range: '60 尺', components: 'V,S,M', duration: '至多 1 分钟', description: '你打开一个通往另一个位面的传送门，可以召唤特定生物。' }
     ],
     
-    // 6环法术
+    // 6 环法术
     level6: [
         { name: '秘法门', nameEn: 'Arcane Gate', level: 6, class: ['wizard', 'sorcerer', 'warlock'], school: '咒法', castingTime: '1动作', range: '500尺', components: 'V,S', duration: '至多10分钟', description: '你创造出两个相连的传送门，生物可以从一个门进入从另一个门出来。' },
         { name: '连锁闪电', nameEn: 'Chain Lightning', level: 6, class: ['wizard', 'sorcerer'], school: '塑能', castingTime: '1动作', range: '150尺', components: 'V,S,M', duration: '立即', description: '你创造出一道闪电，对主目标造成10d8闪电伤害，然后可以跳跃到三个其他目标。' },
@@ -290,12 +341,12 @@ const CLASS_SPELLS = {
     wizard: {
         name: '法师',
         cantrips: ['酸液飞溅', '剑刃防护', '冻寒之触', '舞光术', '火焰箭', '法师之手', '冷冻射线', '电爪', '克敌机先', '光亮术', '修复术', '毒气喷溅', '魔法伎俩', '次级幻影', '交友术'],
-        level1: ['警报术', '燃烧之手', '魅惑人类', '七彩喷射', '通晓语言', '侦测魔法', '易容术', '脚底抹油', '虚假生命', '羽落术', '云雾术', '大步奔行', '法师护甲', '魔法飞弹', '防护善恶', '护盾术', '无声幻影', '睡眠术', '雷鸣波', '鉴定术', '油腻术', '跳跃术', '塔莎狂笑术', '隐形仆役'],
-        level2: ['变身术', '秘法锁', '黑暗术', '黑暗视觉', '侦测思想', '朦胧术', '马友夫强酸箭', '炽焰法球', '灼热射线', '隐形术', '敲击术', '浮空术', '镜面术', '迷雾步', '粉碎音波', '蛛网术'],
-        level3: ['活化死尸', '降咒', '爆炎术', '解除魔法', '飞行术', '加速术', '法术反制', '恐惧术', '气化形体', '催眠图纹', '闪电束', '高等幻影', '防护能量伤害', '移除诅咒', '缓慢术', '死者交谈'],
+        level1: ['警报术', '燃烧之手', '魅惑人类', '七彩喷射', '通晓语言', '侦测魔法', '易容术', '脚底抹油', '虚假生命', '羽落术', '云雾术', '大步奔行', '法师护甲', '魔法飞弹', '防护善恶', '护盾术', '无声幻影', '睡眠术', '雷鸣波', '鉴定术', '油腻术', '跳跃术', '塔莎狂笑术', '隐形仆役', '不谐低语'],
+        level2: ['变身术', '秘法锁', '黑暗术', '黑暗视觉', '侦测思想', '朦胧术', '马友夫强酸箭', '炽焰法球', '灼热射线', '隐形术', '敲击术', '浮空术', '镜面术', '迷雾步', '粉碎音波', '蛛网术', '人类定身术'],
+        level3: ['活化死尸', '降咒', '爆炎术', '解除魔法', '飞行术', '加速术', '法术反制', '恐惧术', '气化形体', '催眠图纹', '闪电束', '高等幻影', '防护能量伤害', '移除诅咒', '缓慢术', '死者交谈', '闪现术', '探知术', '火球术'],
         level4: ['秘法眼', '放逐术', '枯萎术', '高等隐形术', '幻景', '欧提路克弹力法球', '魅影杀手', '生物定位术', '变形术', '塑石术', '石肤术', '火墙术'],
-        level5: ['异界誓缚', '异界传送', '活化物体', '死云术', '支配人类', '怪物定身术', '托梦术', '力场墙', '传送术', '伪装术', '拉瑞心灵联结', '寒冰锥', '造物术'],
-        level6: ['秘法门', '连锁闪电', '死亡法阵', '解离术', '石化术', '群体暗示术', '奥图迷舞', '魔魂壶', '触发术', '摄心目光'],
+        level5: ['异界誓缚', '异界传送', '活化物体', '死云术', '支配人类', '怪物定身术', '托梦术', '力场墙', '传送术', '伪装术', '拉瑞心灵联结', '寒冰锥', '造物术', '异界之门'],
+        level6: ['秘法门', '连锁闪电', '死亡法阵', '解离术', '石化术', '群体暗示术', '魔魂壶', '触发术', '摄心目光', '真知术'],
         level7: ['延迟爆裂火球', '以太化', '死亡一指', '力场牢笼', '幻影囚笼', '魔邓肯豪宅术', '魔邓肯之剑', '虹光喷射', '投影术', '隔离术', '传送术'],
         level8: ['反魔法力场', '克隆术', '操控天气', '地震术', '禁锢术', '迷宫术', '心灵屏障', '律令震慑', '焚身爆', '心灵感应'],
         level9: ['星界投影', '预警术', '禁锢术', '律令死亡', '时间停止', '祈愿术', '异界之门', '流星爆']
@@ -306,10 +357,10 @@ const CLASS_SPELLS = {
         name: '术士',
         cantrips: ['酸液飞溅', '剑刃防护', '冻寒之触', '舞光术', '火焰箭', '法师之手', '冷冻射线', '电爪', '克敌机先', '光亮术', '修复术', '毒气喷溅', '魔法伎俩', '次级幻影', '交友术'],
         level1: ['燃烧之手', '魅惑人类', '七彩喷射', '通晓语言', '侦测魔法', '易容术', '脚底抹油', '虚假生命', '羽落术', '云雾术', '大步奔行', '法师护甲', '魔法飞弹', '防护善恶', '护盾术', '无声幻影', '睡眠术', '雷鸣波', '油腻术', '跳跃术'],
-        level2: ['变身术', '黑暗术', '黑暗视觉', '侦测思想', '朦胧术', '炽焰法球', '灼热射线', '隐形术', '敲击术', '浮空术', '镜面术', '迷雾步', '粉碎音波', '蛛网术'],
-        level3: ['爆炎术', '解除魔法', '飞行术', '加速术', '恐惧术', '气化形体', '催眠图纹', '闪电束', '防护能量伤害', '移除诅咒', '缓慢术'],
+        level2: ['变身术', '黑暗术', '黑暗视觉', '侦测思想', '朦胧术', '炽焰法球', '灼热射线', '隐形术', '敲击术', '浮空术', '镜面术', '迷雾步', '粉碎音波', '蛛网术', '人类定身术'],
+        level3: ['爆炎术', '解除魔法', '飞行术', '加速术', '恐惧术', '气化形体', '催眠图纹', '闪电束', '防护能量伤害', '移除诅咒', '缓慢术', '火球术', '闪现术'],
         level4: ['放逐术', '枯萎术', '高等隐形术', '变形术', '石肤术', '火墙术'],
-        level5: ['异界传送', '活化物体', '死云术', '支配人类', '怪物定身术', '托梦术', '寒冰锥', '造物术'],
+        level5: ['异界传送', '活化物体', '死云术', '支配人类', '怪物定身术', '托梦术', '寒冰锥', '造物术', '异界之门'],
         level6: ['秘法门', '连锁闪电', '死亡法阵', '解离术', '石化术', '群体暗示术', '阳炎射线', '真知术', '摄心目光'],
         level7: ['延迟爆裂火球', '以太化', '死亡一指', '火焰风暴', '异界传送'],
         level8: ['地震术', '律令震慑', '阳炎爆', '心灵感应'],
@@ -320,11 +371,11 @@ const CLASS_SPELLS = {
     cleric: {
         name: '牧师',
         cantrips: ['神导术', '光亮术', '修复术', '圣火术', '维生术', '奇术'],
-        level1: ['祝福术', '命令术', '治愈真言', '侦测毒性和疾病', '神恩', '虔诚护盾', '致伤术', '侦测魔法', '防护善恶', '庇护术', '灾祸术'],
-        level2: ['援助术', '卜筮术', '强化属性', '人类定身术', '次级复原术', '灵体武器', '沉默术', '守护之链'],
-        level3: ['活化死尸', '降咒', '解除魔法', '信仰守卫', '复活术', '死者交谈', '净化灵体'],
-        level4: ['放逐术', '行动自如', '信仰守卫', '塑石术', '生物定位术'],
-        level5: ['异界誓盟', '焰击术', '群体疗伤术', '死者复活', '圣居', '通神术', '疫病术'],
+        level1: ['祝福术', '命令术', '治愈真言', '侦测毒性和疾病', '神恩', '虔诚护盾', '致伤术', '侦测魔法', '防护善恶', '庇护术', '灾祸术', '侦测善恶'],
+        level2: ['援助术', '卜筮术', '强化属性', '人类定身术', '次级复原术', '灵体武器', '沉默术', '守护之链', '侦测思想'],
+        level3: ['活化死尸', '降咒', '解除魔法', '信仰守卫', '复活术', '死者交谈', '净化灵体', '回生术', '探知术'],
+        level4: ['放逐术', '行动自如', '信仰守卫', '塑石术', '生物定位术', '防死结界'],
+        level5: ['异界誓盟', '焰击术', '群体疗伤术', '死者复活', '圣居', '通神术', '疫病术', '群体恢复术', '异界之门', '指使术', '高等复原术', '天界召唤术'],
         level6: ['铜墙铁壁', '寻路术', '医疗术', '英雄宴', '剑刃护壁', '重伤术', '真知术'],
         level7: ['异界传送', '复生术', '圣言术', '火焰风暴', '再生术'],
         level8: ['反魔法力场', '圣洁光环', '地震术', '操控天气', '星界投影'],
@@ -339,7 +390,7 @@ const CLASS_SPELLS = {
         level2: ['动物信使', '卜筮术', '树肤术', '黑暗视觉', '强化属性', '灼热金属', '人类定身术', '月光术', '野兽形态', '荆棘丛生', '火焰刀'],
         level3: ['解除魔法', '召雷术', '植物滋长', '水下呼吸', '风墙术', '闪电束', '防护能量伤害'],
         level4: ['枯萎术', '行动自如', '塑石术', '石肤术', '火墙术', '召唤林地生物', '支配野兽'],
-        level5: ['异界誓缚', '群体疗伤术', '死者复活', '疫病术', '启蒙术'],
+        level5: ['异界誓缚', '群体疗伤术', '死者复活', '疫病术', '启蒙术', '召雷术'],
         level6: ['寻路术', '医疗术', '英雄宴', '地动术', '木遁术', '阳炎射线'],
         level7: ['火焰风暴', '异界传送', '复生术', '再生术', '反重力'],
         level8: ['动物形态', '嫌恶/关怀术', '地震术', '阳炎爆', '海啸术', '操控天气'],
@@ -350,11 +401,11 @@ const CLASS_SPELLS = {
     bard: {
         name: '吟游诗人',
         cantrips: ['剑刃防护', '舞光术', '法师之手', '克敌机先', '光亮术', '修复术', '毒气喷溅', '魔法伎俩', '次级幻影', '交友术', '恶毒嘲笑'],
-        level1: ['魅惑人类', '通晓语言', '侦测魔法', '易容术', '羽落术', '大步奔行', '无声幻影', '睡眠术', '雷鸣波', '治愈真言', '不谐低语', '塔莎狂笑术', '妖火', '化兽为友', '动物交谈', '英雄气概', '灾祸术'],
-        level2: ['动物信使', '侦测思想', '强化属性', '隐形术', '敲击术', '浮空术', '迷魅人类', '粉碎音波', '灼热金属', '沉默术'],
-        level3: ['解除魔法', '飞行术', '恐惧术', '催眠图纹', '高等幻影', '缓慢术', '死者交谈', '植物滋长'],
+        level1: ['魅惑人类', '通晓语言', '侦测魔法', '易容术', '羽落术', '大步奔行', '无声幻影', '睡眠术', '雷鸣波', '治愈真言', '不谐低语', '塔莎狂笑术', '妖火', '化兽为友', '动物交谈', '英雄气概', '灾祸术', '防护善恶', '隐形仆役'],
+        level2: ['动物信使', '侦测思想', '强化属性', '隐形术', '敲击术', '浮空术', '迷魅人类', '粉碎音波', '灼热金属', '沉默术', '人类定身术'],
+        level3: ['解除魔法', '飞行术', '恐惧术', '催眠图纹', '高等幻影', '缓慢术', '死者交谈', '植物滋长', '探知术'],
         level4: ['放逐术', '行动自如', '高等隐形术', '幻景', '生物定位术', '变形术'],
-        level5: ['异界誓缚', '异界传送', '活化物体', '支配人类', '托梦术', '伪装术', '拉瑞心灵联结', '死者复活'],
+        level5: ['异界誓缚', '异界传送', '活化物体', '支配人类', '托梦术', '伪装术', '拉瑞心灵联结', '死者复活', '指使术', '高等复原术'],
         level6: ['群体暗示术', '奥图迷舞', '真知术', '摄心目光', '寻路术', '医疗术'],
         level7: ['以太化', '异界传送', '复生术', '再生术', '投影术', '力场牢笼'],
         level8: ['心灵屏障', '律令震慑', '心灵感应'],
@@ -365,11 +416,11 @@ const CLASS_SPELLS = {
     paladin: {
         name: '圣武士',
         cantrips: [],
-        level1: ['祝福术', '命令术', '治愈真言', '侦测毒性和疾病', '神恩', '虔诚护盾', '雷鸣斩'],
-        level2: ['援助术', '次级复原术', '守护之链'],
-        level3: ['解除魔法', '复活术', '信仰守卫', '净化灵体'],
-        level4: ['放逐术', '行动自如'],
-        level5: ['焰击术', '死者复活', '圣居'],
+        level1: ['祝福术', '命令术', '强令对决', '治愈真言', '侦测善恶', '侦测魔法', '侦测毒性和疾病', '神恩', '至圣斩', '英雄气概', '防护善恶', '净化饮食', '炽焰斩', '虔诚护盾', '雷鸣斩', '激愤斩'],
+        level2: ['援助术', '寻获坐骑', '遗体防腐', '次级复原术', '物件定位术', '魔化武器', '治疗祷言', '防护毒素', '闪耀斩', '守护之链', '诚实之域'],
+        level3: ['活力灵光', '致盲斩', '造粮术', '十字军披风', '昼明术', '解除魔法', '元素武器', '防护法阵', '移除诅咒', '回生术'],
+        level4: ['生命灵光', '净化灵光', '放逐术', '防死结界', '生物定位术', '惊惧斩'],
+        level5: ['放逐斩', '原力法阵', '湮灭波', '驱逐善恶', '指使术', '高等复原术', '死者复活', '天界召唤术'],
         level6: [],
         level7: [],
         level8: [],
@@ -395,9 +446,9 @@ const CLASS_SPELLS = {
     warlock: {
         name: '邪术师',
         cantrips: ['剑刃防护', '冻寒之触', '法师之手', '克敌机先', '魔能爆', '毒气喷溅', '魔法伎俩', '次级幻影', '交友术'],
-        level1: ['魅惑人类', '通晓语言', '脚底抹油', '羽落术', '巫术箭', '护甲之主', '强令对决'],
-        level2: ['黑暗术', '隐形术', '镜面术', '迷雾步', '粉碎音波', '迷魅人类'],
-        level3: ['解除魔法', '飞行术', '法术反制', '恐惧术', '气化形体', '催眠图纹', '饥饿之刃', '吸血鬼之触'],
+        level1: ['魅惑人类', '通晓语言', '脚底抹油', '羽落术', '巫术箭', '护甲之主', '哈达之臂', '炼狱叱喝', '迷幻手稿', '防护善恶', '动物交谈', '塔莎狂笑术', '隐形仆役', '侦测魔法', '灾祸术'],
+        level2: ['黑暗术', '隐形术', '镜面术', '迷雾步', '粉碎音波', '迷魅人类', '匕首之云', '疯狂冠冕', '注目术', '心灵尖刺', '蛛行术', '衰弱射线', '人类定身术', '侦测思想'],
+        level3: ['解除魔法', '飞行术', '法术反制', '恐惧术', '气化形体', '催眠图纹', '饥饿之刃', '吸血鬼之触', '妖精召唤术', '亡灵召唤术', '巧言术', '防护法阵', '移除诅咒', '高等幻影'],
         level4: ['放逐术', '枯萎术', '高等隐形术', '魅影杀手', '变形术'],
         level5: ['死云术', '支配人类', '托梦术', '怪物定身术', '饥饿之刃'],
         level6: ['秘法门', '死亡法阵', '石化术', '摄心目光', '真知术', '群体暗示术'],

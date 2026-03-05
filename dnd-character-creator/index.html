@@ -53,6 +53,7 @@
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item" onclick="characterApp.exportPDF(); closeDropdown()">📄 导出PDF</button>
                         <button class="dropdown-item" onclick="characterApp.exportSpellList(); closeDropdown()">📋 导出法术表</button>
+                        <button class="dropdown-item" onclick="characterApp.openBlankCardGenerator(); closeDropdown()">📝 空白卡生成器</button>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item" onclick="characterApp.toggleDarkMode(); closeDropdown()">🌙 切换夜间模式</button>
                     </div>
@@ -450,6 +451,33 @@
                 <div class="card">
                     <h2 class="card-title">背景故事</h2>
                     <div class="form-group">
+                        <label>语言</label>
+                        <div id="languagesList" class="languages-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; min-height: 40px; padding: 0.5rem; background: rgba(0,0,0,0.02); border-radius: 4px;">
+                            <!-- 已选择的语言将显示在这里 -->
+                        </div>
+                        <select id="languageSelect" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 0.5rem;">
+                            <option value="">-- 选择语言添加 --</option>
+                            <option value="common">通用语 (Common)</option>
+                            <option value="dwarvish">矮人语 (Dwarvish)</option>
+                            <option value="elvish">精灵语 (Elvish)</option>
+                            <option value="giant">巨人语 (Giant)</option>
+                            <option value="gnomish">侏儒语 (Gnomish)</option>
+                            <option value="goblin">地精语 (Goblin)</option>
+                            <option value="halfling">半身人语 (Halfling)</option>
+                            <option value="orc">兽人语 (Orc)</option>
+                            <option value="abyssal">深渊语 (Abyssal)</option>
+                            <option value="celestial">天界语 (Celestial)</option>
+                            <option value="draconic">龙语 (Draconic)</option>
+                            <option value="infernal">炼狱语 (Infernal)</option>
+                            <option value="primordial">原初语 (Primordial)</option>
+                            <option value="sylvan">木精语 (Sylvan)</option>
+                            <option value="undercommon">地底通用语 (Undercommon)</option>
+                        </select>
+                        <button type="button" class="btn btn-primary" onclick="characterApp.addLanguage()" style="margin-top: 0.5rem; background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%); color: white; border: none; padding: 0.6rem 1.5rem; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 0.95rem; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(139,69,19,0.3);" onmouseover="this.style.background='linear-gradient(135deg, #A0522D 0%, #8B4513 100%)'; this.style.boxShadow='0 4px 8px rgba(139,69,19,0.4)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='linear-gradient(135deg, #8B4513 0%, #A0522D 100%)'; this.style.boxShadow='0 2px 4px rgba(139,69,19,0.3)'; this.style.transform='translateY(0)';">
+                            <span style="margin-right: 0.3rem; font-size: 1.1rem; font-weight: bold;">+</span> 添加语言
+                        </button>
+                    </div>
+                    <div class="form-group">
                         <label for="backstory">角色背景</label>
                         <textarea id="backstory" rows="6" placeholder="描述你的角色背景故事..."></textarea>
                     </div>
@@ -670,10 +698,32 @@
         </div>
     </div>
 
-    <script src="/AZ-s-Cy ber-Toolbox/dnd-character-creator/races_data.js"></script>
-    <script src="/AZ-s-Cy ber-Toolbox/dnd-character-creator/spells_data.js"></script>
-    <script src="/AZ-s-Cy ber-Toolbox/dnd-character-creator/data.js"></script>
-    <script src="/AZ-s-Cy ber-Toolbox/dnd-character-creator/weapons.js"></script>
-    <script src="/AZ-s-Cy ber-Toolbox/dnd-character-creator/app.js"></script>
+    <!-- 空白卡生成器模态框 -->
+    <div id="blankCardModal" class="modal">
+        <div class="modal-content blank-card-modal-content">
+            <div class="modal-header">
+                <h2>📝 空白角色卡生成器</h2>
+                <button class="close-btn" onclick="characterApp.closeBlankCardGenerator()">&times;</button>
+            </div>
+            <div class="blank-card-options">
+                <p class="blank-card-desc">生成可打印的空白D&D 5E角色卡，适合手写填写。</p>
+                <div class="blank-card-buttons">
+                    <button class="btn btn-primary" onclick="characterApp.generateBlankCard()">
+                        📄 生成空白卡
+                    </button>
+                    <button class="btn btn-secondary" onclick="characterApp.closeBlankCardGenerator()">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/races_data.js"></script>
+    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/spells_data.js"></script>
+    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/data.js"></script>
+    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/weapons.js"></script>
+    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/languages.js"></script>
+    <script src="/AZ-s-Cyber-Toolbox/dnd-character-creator/app.js"></script>
 </body>
 </html>

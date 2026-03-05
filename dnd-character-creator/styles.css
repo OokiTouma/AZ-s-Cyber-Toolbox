@@ -436,15 +436,6 @@ body {
     margin-top: 0.5rem;
 }
 
-.spell-item {
-    display: flex;
-    flex-direction: column;
-    padding: 0.75rem;
-    background: rgba(93, 46, 12, 0.05);
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
-}
-
 .spell-name {
     font-weight: 600;
     color: var(--primary-dark);
@@ -458,10 +449,93 @@ body {
     font-size: 0.8rem;
 }
 
-/* 特性法术样式 */
-.spell-item.feature-spell {
-    background: linear-gradient(135deg, rgba(92, 122, 234, 0.1) 0%, rgba(92, 122, 234, 0.05) 100%);
-    border-left: 3px solid #5c7aea;
+/* 法术分类容器样式 */
+.spell-category {
+    margin-bottom: 1.5rem;
+}
+
+.spell-category-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px 6px 0 0;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.spell-category-title::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+/* 玩家自行添加的法术 - 绿色系 */
+.player-spells .spell-category-title {
+    background: rgba(39, 174, 96, 0.15);
+    color: #27ae60;
+    border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+.player-spells .spell-category-title::before {
+    background: #27ae60;
+}
+
+.player-spells .spell-item {
+    border-left: 3px solid #27ae60;
+    background: linear-gradient(135deg, rgba(39, 174, 96, 0.08) 0%, rgba(255,255,255,0) 100%);
+}
+
+/* 职业技能给予的法术 - 蓝色系 */
+.class-spells .spell-category-title {
+    background: rgba(52, 152, 219, 0.15);
+    color: #3498db;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+.class-spells .spell-category-title::before {
+    background: #3498db;
+}
+
+.class-spells .spell-item {
+    border-left: 3px solid #3498db;
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.08) 0%, rgba(255,255,255,0) 100%);
+}
+
+/* 种族技能给予的法术 - 紫色系 */
+.race-spells .spell-category-title {
+    background: rgba(155, 89, 182, 0.15);
+    color: #9b59b6;
+    border: 1px solid rgba(155, 89, 182, 0.3);
+}
+
+.race-spells .spell-category-title::before {
+    background: #9b59b6;
+}
+
+.race-spells .spell-item {
+    border-left: 3px solid #9b59b6;
+    background: linear-gradient(135deg, rgba(155, 89, 182, 0.08) 0%, rgba(255,255,255,0) 100%);
+}
+
+/* 统一法术样式 - 所有法术使用相同设计 */
+.spell-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.spell-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow);
 }
 
 .spell-main-info {
@@ -519,6 +593,16 @@ body {
     background: rgba(243, 156, 18, 0.1);
     padding: 0.1rem 0.4rem;
     border-radius: 4px;
+}
+
+.spell-concentration {
+    font-size: 0.75rem;
+    color: #9b59b6;
+    font-weight: 600;
+    background: rgba(155, 89, 182, 0.15);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    border: 1px solid #9b59b6;
 }
 
 /* 种族属性加值显示 */
@@ -853,6 +937,51 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
+/* 法术区域 */
+.sheet-spells-section {
+    margin-bottom: 1rem;
+}
+
+.sheet-spells-section h3 {
+    color: var(--primary-color);
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sheet-spell-level-group {
+    margin-bottom: 0.5rem;
+    padding: 0.3rem 0;
+}
+
+.sheet-spell-level {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+}
+
+.sheet-spell-names {
+    display: inline;
+}
+
+.sheet-spell-name {
+    cursor: help;
+    transition: color 0.2s ease;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+}
+
+.sheet-spell-name:hover {
+    color: var(--primary-color);
+    background: rgba(139, 69, 19, 0.05);
+}
+
+[data-theme="dark"] .sheet-spell-name:hover {
+    background: rgba(92, 122, 234, 0.1);
+}
+
 .feature-section {
     margin-bottom: 1rem;
 }
@@ -1035,6 +1164,136 @@ body {
     color: var(--text-light);
 }
 
+/* 角色列表对话框 */
+.character-list-dialog {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.character-list-dialog .dialog-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.character-list-dialog .dialog-content {
+    position: relative;
+    background: var(--card-bg);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: var(--shadow-hover);
+    z-index: 1001;
+}
+
+.character-list-dialog .dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+    background: var(--primary-color);
+    color: white;
+}
+
+.character-list-dialog .dialog-header h3 {
+    margin: 0;
+    color: white;
+}
+
+.character-list-dialog .btn-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.character-list-dialog .btn-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.character-list-dialog .dialog-body {
+    padding: 1rem;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.character-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.character-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.character-list-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow);
+}
+
+.character-list-item .character-info {
+    flex: 1;
+}
+
+.character-list-item .character-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--primary-dark);
+    margin-bottom: 0.25rem;
+}
+
+.character-list-item .character-details {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 0.25rem;
+}
+
+.character-list-item .character-saved {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    opacity: 0.8;
+}
+
+.character-list-item .character-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.character-list-item .btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
 /* 法术选择对话框 */
 .spell-choice-item {
     display: flex;
@@ -1156,26 +1415,37 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem;
-    background: rgba(93, 46, 12, 0.05);
+    padding: 0.5rem 0.75rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     margin-bottom: 0.5rem;
-    border-left: 3px solid var(--primary-color);
+    transition: all 0.2s ease;
+}
+
+.prepared-spell-item:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow);
 }
 
 .prepared-spell-item.always-prepared {
-    border-left-color: #27ae60;
-    background: rgba(39, 174, 96, 0.05);
+    border-color: #27ae60;
 }
 
 .prepared-spell-item.feature-spell {
-    border-left-color: #5c7aea;
-    background: rgba(92, 122, 234, 0.05);
+    border-color: #5c7aea;
 }
 
 .prepared-spell-name {
     font-weight: 500;
     color: var(--text-primary);
+    cursor: help;
+    transition: color 0.2s ease;
+}
+
+.prepared-spell-name:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
 }
 
 .prepared-spell-level {
@@ -2095,6 +2365,465 @@ body {
 @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
+}
+
+/* 空白卡生成器模态框样式 */
+#blankCardModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+#blankCardModal.show {
+    display: flex;
+}
+
+.blank-card-modal-content {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: var(--shadow-hover);
+}
+
+.blank-card-modal-content .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.blank-card-modal-content .modal-header h2 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.4rem;
+}
+
+.blank-card-modal-content .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: color 0.2s;
+}
+
+.blank-card-modal-content .close-btn:hover {
+    color: var(--danger-color);
+}
+
+.blank-card-options {
+    text-align: center;
+}
+
+.blank-card-desc {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.blank-card-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.blank-card-buttons .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+/* 空白卡打印样式 */
+.blank-card-page {
+    font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+    font-size: 9pt;
+    line-height: 1.3;
+    padding: 10mm;
+    background: white;
+    color: #333;
+    width: 210mm;
+    min-height: 277mm;
+    margin: 0 auto;
+}
+
+.blank-card-page * {
+    box-sizing: border-box;
+}
+
+/* 页眉 */
+.blank-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+}
+
+.blank-logo {
+    width: 80px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    background: #333;
+    color: white;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.blank-header-fields {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.blank-field {
+    border-bottom: 1px solid #999;
+    padding: 4px 8px;
+    min-height: 28px;
+    display: flex;
+    flex-direction: column;
+}
+
+.blank-field-label {
+    font-size: 7pt;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.blank-field-value {
+    font-size: 10pt;
+    min-height: 16px;
+}
+
+/* 主体三栏布局 */
+.blank-main {
+    display: grid;
+    grid-template-columns: 180px 1fr 200px;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+/* 左侧属性栏 */
+.blank-abilities {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.blank-ability-box {
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 6px;
+    text-align: center;
+    background: #fafafa;
+}
+
+.blank-ability-header {
+    font-size: 8pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #ccc;
+}
+
+.blank-ability-score {
+    font-size: 18pt;
+    font-weight: bold;
+    margin: 4px 0;
+}
+
+.blank-ability-mod {
+    font-size: 10pt;
+    color: #666;
+}
+
+.blank-ability-skills {
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid #eee;
+    text-align: left;
+    font-size: 7pt;
+}
+
+.blank-skill-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 0;
+}
+
+.blank-skill-dot {
+    width: 8px;
+    height: 8px;
+    border: 1px solid #333;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.blank-skill-name {
+    flex: 1;
+}
+
+/* 中间战斗信息 */
+.blank-combat {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.blank-combat-box {
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 6px;
+    text-align: center;
+    background: #fafafa;
+}
+
+.blank-combat-box.shield {
+    border-radius: 50% 50% 8px 8px;
+}
+
+.blank-combat-label {
+    font-size: 7pt;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.blank-combat-value {
+    font-size: 14pt;
+    font-weight: bold;
+    min-height: 24px;
+}
+
+.blank-hp-section {
+    grid-column: span 3;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.blank-hp-box {
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 6px;
+    text-align: center;
+}
+
+.blank-hp-label {
+    font-size: 7pt;
+    text-transform: uppercase;
+    color: #666;
+}
+
+.blank-hp-max {
+    font-size: 8pt;
+    color: #999;
+}
+
+/* 死亡豁免 */
+.blank-death-saves {
+    grid-column: span 3;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 6px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.blank-death-section {
+    text-align: center;
+}
+
+.blank-death-label {
+    font-size: 7pt;
+    margin-bottom: 4px;
+}
+
+.blank-death-dots {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+}
+
+.blank-death-dot {
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid #333;
+    border-radius: 50%;
+}
+
+/* 武器攻击区域 */
+.blank-attacks {
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 8px;
+    margin-top: 10px;
+}
+
+.blank-attacks-header {
+    font-size: 9pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.blank-attack-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.blank-attack-table th {
+    font-size: 7pt;
+    text-align: left;
+    padding: 4px;
+    border-bottom: 1px solid #333;
+    text-transform: uppercase;
+}
+
+.blank-attack-table td {
+    padding: 6px 4px;
+    border-bottom: 1px solid #ddd;
+    min-height: 24px;
+}
+
+/* 右侧特性区域 */
+.blank-features {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.blank-feature-box {
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 8px;
+    flex: 1;
+    min-height: 80px;
+}
+
+.blank-feature-title {
+    font-size: 8pt;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #ccc;
+}
+
+/* 底部区域 */
+.blank-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.blank-bottom-box {
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 8px;
+    min-height: 100px;
+}
+
+.blank-bottom-title {
+    font-size: 8pt;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+/* 第二页 */
+.blank-page2 {
+    page-break-before: always;
+}
+
+.blank-appearance {
+    display: grid;
+    grid-template-columns: 150px 1fr 150px;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.blank-portrait {
+    border: 2px solid #333;
+    border-radius: 8px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8pt;
+    color: #999;
+}
+
+.blank-allies {
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.blank-symbol {
+    border: 2px solid #333;
+    border-radius: 8px;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8pt;
+    color: #999;
+}
+
+.blank-backstory-section {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 10px;
+}
+
+.blank-backstory-box {
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 8px;
+    min-height: 300px;
+}
+
+.blank-treasure-box {
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 8px;
+    min-height: 150px;
+}
+
+/* 打印样式 */
+@media print {
+    .blank-card-page {
+        page-break-after: always;
+    }
+    
+    .blank-card-page:last-child {
+        page-break-after: auto;
+    }
 }
 
 .score-set-values {
