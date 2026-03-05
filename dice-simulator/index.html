@@ -460,22 +460,6 @@
                 0 0 60px rgba(131, 56, 236, 0.4);
         }
 
-        .party-dice.locked {
-            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
-            box-shadow: 
-                0 0 30px rgba(0, 212, 255, 0.8),
-                inset 0 0 20px rgba(255, 255, 255, 0.2);
-            cursor: not-allowed;
-        }
-
-        .party-dice.locked::after {
-            content: '🔒';
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            font-size: 1rem;
-        }
-
         .party-dice.rolling {
             animation: diceRoll 0.5s ease-in-out;
         }
@@ -486,6 +470,106 @@
             50% { transform: rotate(180deg) scale(0.8); }
             75% { transform: rotate(270deg) scale(1.1); }
             100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* 点数皮肤样式 - 用点代替数字 */
+        .party-dice.dots-skin {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #00d4ff;
+            font-size: 0;
+        }
+
+        .party-dice.dots-skin .dice-dot {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        }
+
+        /* 标准骰子点位置定义 (3x3网格布局) */
+        /* 第一行 */
+        .party-dice.dots-skin .dice-dot:nth-child(1) { top: 12px; left: 12px; } /* 左上 */
+        .party-dice.dots-skin .dice-dot:nth-child(2) { top: 12px; left: 50%; transform: translateX(-50%); } /* 中上 */
+        .party-dice.dots-skin .dice-dot:nth-child(3) { top: 12px; right: 12px; } /* 右上 */
+        /* 第二行 */
+        .party-dice.dots-skin .dice-dot:nth-child(4) { top: 50%; left: 12px; transform: translateY(-50%); } /* 左中 */
+        .party-dice.dots-skin .dice-dot:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); } /* 中心 */
+        .party-dice.dots-skin .dice-dot:nth-child(6) { top: 50%; right: 12px; transform: translateY(-50%); } /* 右中 */
+        /* 第三行 */
+        .party-dice.dots-skin .dice-dot:nth-child(7) { bottom: 12px; left: 12px; } /* 左下 */
+        .party-dice.dots-skin .dice-dot:nth-child(8) { bottom: 12px; left: 50%; transform: translateX(-50%); } /* 中下 */
+        .party-dice.dots-skin .dice-dot:nth-child(9) { bottom: 12px; right: 12px; } /* 右下 */
+
+        /* 点数皮肤 - 不同点数的布局 (标准骰子排列) */
+        /* 1点: 中心 */
+        .party-dice.dots-skin[data-value="1"] .dice-dot { display: none; }
+        .party-dice.dots-skin[data-value="1"] .dice-dot:nth-child(5) { display: block; }
+
+        /* 2点: 左上-右下对角 */
+        .party-dice.dots-skin[data-value="2"] .dice-dot { display: none; }
+        .party-dice.dots-skin[data-value="2"] .dice-dot:nth-child(1),
+        .party-dice.dots-skin[data-value="2"] .dice-dot:nth-child(9) { display: block; }
+
+        /* 3点: 左上-中心-右下对角 */
+        .party-dice.dots-skin[data-value="3"] .dice-dot { display: none; }
+        .party-dice.dots-skin[data-value="3"] .dice-dot:nth-child(1),
+        .party-dice.dots-skin[data-value="3"] .dice-dot:nth-child(5),
+        .party-dice.dots-skin[data-value="3"] .dice-dot:nth-child(9) { display: block; }
+
+        /* 4点: 四角 */
+        .party-dice.dots-skin[data-value="4"] .dice-dot { display: none; }
+        .party-dice.dots-skin[data-value="4"] .dice-dot:nth-child(1),
+        .party-dice.dots-skin[data-value="4"] .dice-dot:nth-child(3),
+        .party-dice.dots-skin[data-value="4"] .dice-dot:nth-child(7),
+        .party-dice.dots-skin[data-value="4"] .dice-dot:nth-child(9) { display: block; }
+
+        /* 5点: 四角+中心 */
+        .party-dice.dots-skin[data-value="5"] .dice-dot { display: none; }
+        .party-dice.dots-skin[data-value="5"] .dice-dot:nth-child(1),
+        .party-dice.dots-skin[data-value="5"] .dice-dot:nth-child(3),
+        .party-dice.dots-skin[data-value="5"] .dice-dot:nth-child(5),
+        .party-dice.dots-skin[data-value="5"] .dice-dot:nth-child(7),
+        .party-dice.dots-skin[data-value="5"] .dice-dot:nth-child(9) { display: block; }
+
+        /* 6点: 左右各三个点 (竖排) */
+        .party-dice.dots-skin[data-value="6"] .dice-dot { display: none; }
+        .party-dice.dots-skin[data-value="6"] .dice-dot:nth-child(1),
+        .party-dice.dots-skin[data-value="6"] .dice-dot:nth-child(4),
+        .party-dice.dots-skin[data-value="6"] .dice-dot:nth-child(7),
+        .party-dice.dots-skin[data-value="6"] .dice-dot:nth-child(3),
+        .party-dice.dots-skin[data-value="6"] .dice-dot:nth-child(6),
+        .party-dice.dots-skin[data-value="6"] .dice-dot:nth-child(9) { display: block; }
+
+        /* 皮肤切换按钮 */
+        .party-skin-toggle {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .skin-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 0, 110, 0.2);
+            border: 2px solid #ff006e;
+            color: #ff006e;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .skin-btn:hover {
+            background: rgba(255, 0, 110, 0.4);
+            transform: scale(1.05);
+        }
+
+        .skin-btn.active {
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            color: white;
+            border-color: transparent;
         }
 
         .party-controls {
@@ -1103,6 +1187,27 @@
                 width: 100%;
             }
 
+            /* 皮肤切换按钮手机优化 */
+            .party-skin-toggle {
+                margin-bottom: 0.8rem;
+            }
+
+            .skin-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            /* 点数皮肤手机优化 */
+            .party-dice.dots-skin .dice-dot {
+                width: 10px;
+                height: 10px;
+            }
+
+            .party-dice.dots-skin[data-value="1"]::after {
+                width: 12px;
+                height: 12px;
+            }
+
             /* 重掷骰选择对话框手机优化 */
             .reroll-groups {
                 flex-direction: column;
@@ -1339,6 +1444,12 @@
                 <button class="party-close" onclick="exitPartyMode()">✕</button>
             </div>
             
+            <!-- 皮肤切换按钮 -->
+            <div class="party-skin-toggle">
+                <button class="skin-btn active" onclick="setDiceSkin('number')" id="skinNumber">🔢 数字</button>
+                <button class="skin-btn" onclick="setDiceSkin('dots')" id="skinDots">⚫ 点数</button>
+            </div>
+
             <div class="party-dice-area">
                 <div id="partyDiceContainer" class="party-dice-container">
                     <!-- 骰子将在这里生成 -->
@@ -1381,7 +1492,7 @@
             proMode: false,
             round: 1,
             dice: [],
-            locked: false,
+            skin: 'number', // 'number' 或 'dots'
             skills: {
                 reroll: 0,
                 small: 0,
@@ -1390,6 +1501,24 @@
             },
             skillHistory: []
         };
+
+        // 皮肤切换函数
+        function setDiceSkin(skin) {
+            partyMode.skin = skin;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.skin-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(skin === 'number' ? 'skinNumber' : 'skinDots').classList.add('active');
+            
+            // 重新渲染骰子
+            renderPartyDice();
+        }
+
+        // 生成点数骰子的HTML
+        function getDotsHTML(value) {
+            // 生成9个点 (3x3网格布局)
+            return '<span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span>';
+        }
 
         function selectDiceType(type) {
             selectedDiceType = type;
@@ -1472,15 +1601,13 @@
             partyMode.active = true;
             partyMode.proMode = false;
             partyMode.round = 1;
-            partyMode.locked = false;
             partyMode.dice = [];
             partyMode.skillHistory = [];
             
             // 初始化5个d6骰子
             for (let i = 0; i < 5; i++) {
                 partyMode.dice.push({
-                    value: null,
-                    locked: false
+                    value: null
                 });
             }
             
@@ -1621,7 +1748,6 @@
             for (let i = 0; i < 5; i++) {
                 const selectedIndex = texasSelection.selected[i];
                 partyMode.dice[i].value = texasSelection.results[selectedIndex];
-                partyMode.dice[i].locked = true;
             }
 
             document.getElementById('texasSelectDialog').style.display = 'none';
@@ -1709,7 +1835,6 @@
             // 将选中的骰子应用到游戏中
             for (let i = 0; i < 5; i++) {
                 partyMode.dice[i].value = selectedDice[i];
-                partyMode.dice[i].locked = true;
             }
 
             document.getElementById('rerollSelectDialog').style.display = 'none';
@@ -1830,10 +1955,8 @@
             // 应用到游戏
             for (let i = 0; i < 5; i++) {
                 partyMode.dice[i].value = customDiceSelection.values[i];
-                partyMode.dice[i].locked = true;
             }
 
-            partyMode.locked = true;
             customDiceBonusUsed = true;
 
             document.getElementById('customDiceDialog').style.display = 'none';
@@ -1877,8 +2000,16 @@
             
             container.innerHTML = partyMode.dice.map((die, index) => {
                 const value = die.value || '?';
-                const lockedClass = die.locked ? 'locked' : '';
-                return `<div class="party-dice ${lockedClass}" id="partyDie${index}" onclick="togglePartyDieLock(${index})">${value}</div>`;
+                const skinClass = partyMode.skin === 'dots' ? 'dots-skin' : '';
+                const dataAttr = value !== '?' ? `data-value="${value}"` : '';
+                
+                if (partyMode.skin === 'dots' && value !== '?') {
+                    // 点数皮肤
+                    return `<div class="party-dice ${skinClass}" id="partyDie${index}" ${dataAttr}>${getDotsHTML(value)}</div>`;
+                } else {
+                    // 数字皮肤
+                    return `<div class="party-dice ${skinClass}" id="partyDie${index}" ${dataAttr}>${value}</div>`;
+                }
             }).join('');
         }
         
@@ -1905,20 +2036,24 @@
         }
         
         function partyRoll() {
-            if (partyMode.locked) return;
-            
             // 掷骰子
             partyMode.dice.forEach((die, index) => {
-                if (!die.locked) {
-                    const dieEl = document.getElementById(`partyDie${index}`);
-                    dieEl.classList.add('rolling');
+                const dieEl = document.getElementById(`partyDie${index}`);
+                dieEl.classList.add('rolling');
+                
+                setTimeout(() => {
+                    die.value = Math.floor(Math.random() * 6) + 1;
+                    dieEl.classList.remove('rolling');
                     
-                    setTimeout(() => {
-                        die.value = Math.floor(Math.random() * 6) + 1;
+                    // 根据皮肤更新显示
+                    if (partyMode.skin === 'dots') {
+                        dieEl.setAttribute('data-value', die.value);
+                        dieEl.classList.add('dots-skin');
+                        dieEl.innerHTML = getDotsHTML(die.value);
+                    } else {
                         dieEl.textContent = die.value;
-                        dieEl.classList.remove('rolling');
-                    }, 500);
-                }
+                    }
+                }, 500);
             });
             
             setTimeout(() => {
@@ -1932,9 +2067,6 @@
                     return;
                 }
                 
-                // 锁定骰子
-                partyMode.locked = true;
-                partyMode.dice.forEach(die => die.locked = true);
                 renderPartyDice();
                 
                 // 显示下一局按钮（带倒计时）
@@ -1983,12 +2115,6 @@
             }
 
             partyMode.round++;
-            partyMode.locked = false;
-
-            // 解锁骰子但保留值
-            partyMode.dice.forEach(die => {
-                die.locked = false;
-            });
 
             document.getElementById('partyRound').textContent = partyMode.round;
             document.getElementById('partyRollBtn').style.display = 'block';
@@ -1997,13 +2123,6 @@
 
             renderPartyDice();
             updatePartyStatus(`第${partyMode.round}局开始！点击"掷骰子"`);
-        }
-        
-        function togglePartyDieLock(index) {
-            if (!partyMode.locked) return; // 只有在锁定状态下才能切换
-            
-            partyMode.dice[index].locked = !partyMode.dice[index].locked;
-            renderPartyDice();
         }
         
         function usePartySkill(skillKey) {
@@ -2018,10 +2137,9 @@
                     return; // 不执行后续的render和update
                     
                 case 'small':
-                    // 小小骰：无视锁定重掷5个d4
+                    // 小小骰：重掷5个d4
                     partyMode.dice.forEach((die, index) => {
                         die.value = Math.floor(Math.random() * 4) + 1;
-                        die.locked = true;
                     });
                     break;
                     
@@ -2029,7 +2147,6 @@
                     // 大大骰：重掷5个d6，结果只可能为4/5/6
                     partyMode.dice.forEach((die, index) => {
                         die.value = Math.floor(Math.random() * 3) + 4; // 4, 5, 或 6
-                        die.locked = true;
                     });
                     break;
                     
