@@ -17,27 +17,60 @@
     --text-light: #5a4a3a;
     --border-color: #d4c5b5;
     --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --error-color: #e74c3c;
+    --info-color: #3498db;
     --danger-color: #c0392b;
     --shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.2);
+    --shadow-active: 0 6px 24px rgba(0, 0, 0, 0.3);
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 2rem;
+    --font-size-4xl: 2.5rem;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
 }
 
-/* 夜间模式变量 */
+/* 夜间模式变量 - 统一使用暖色调 */
 [data-theme="dark"] {
-    --primary-color: #5c7aea;
-    --primary-dark: #4a63d4;
-    --primary-light: #7b8ff0;
-    --secondary-color: #1a1a2e;
-    --accent-color: #ffd700;
-    --bg-color: #0f0f1a;
-    --card-bg: #1a1a2e;
-    --text-color: #e0e0ff;
-    --text-light: #a0a0c0;
-    --border-color: #2d2d44;
-    --success-color: #4ade80;
-    --danger-color: #f87171;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.5);
+    --primary-color: #d4a574;
+    --primary-dark: #a0522d;
+    --primary-light: #e8c4a8;
+    --secondary-color: #1a1f2e;
+    --accent-color: #e67e22;
+    --bg-color: #1a1a2e;
+    --card-bg: #2d2d3a;
+    --text-color: #e8eaed;
+    --text-light: #a0aec0;
+    --border-color: #3d3d4d;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --error-color: #e74c3c;
+    --info-color: #3498db;
+    --danger-color: #c0392b;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-active: 0 6px 24px rgba(0, 0, 0, 0.5);
 }
 
 body {
@@ -233,6 +266,16 @@ body {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+.form-group button,
+.form-group .btn {
+    width: auto;
+    min-width: fit-content;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* 描述框 */
@@ -431,53 +474,79 @@ body {
     margin-top: 0.25rem;
 }
 
-/* 法术列表 */
+/* ============================================
+   法术列表 - 全新赛博朋克风格设计
+   ============================================ */
+
 .spells-list {
     margin-top: 0.5rem;
 }
 
-.spell-name {
-    font-weight: 600;
-    color: var(--primary-dark);
-}
-
-.spell-level {
-    background: var(--primary-color);
-    color: white;
-    padding: 0.2rem 0.6rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-}
-
-/* 法术分类容器样式 */
+/* 法术分类容器样式 - 魔法书卷轴风格 */
 .spell-category {
     margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.spell-category::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    opacity: 0.3;
 }
 
 .spell-category-title {
     font-size: 0.95rem;
-    font-weight: 600;
-    padding: 0.5rem 0.75rem;
-    border-radius: 6px 6px 0 0;
-    margin-bottom: 0.5rem;
+    font-weight: 700;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .spell-category-title::before {
     content: '';
     display: inline-block;
-    width: 8px;
-    height: 8px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+    animation: pulse-glow 2s ease-in-out infinite;
 }
 
-/* 玩家自行添加的法术 - 绿色系 */
+.spell-category-title::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, currentColor, transparent);
+    opacity: 0.5;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 8px currentColor; transform: scale(1); }
+    50% { box-shadow: 0 0 16px currentColor; transform: scale(1.1); }
+}
+
+/* 玩家自行添加的法术 - 翡翠魔法风格 */
 .player-spells .spell-category-title {
-    background: rgba(39, 174, 96, 0.15);
+    background: linear-gradient(135deg, rgba(39, 174, 96, 0.2) 0%, rgba(39, 174, 96, 0.05) 100%);
     color: #27ae60;
-    border: 1px solid rgba(39, 174, 96, 0.3);
+    border: 1px solid rgba(39, 174, 96, 0.4);
+    text-shadow: 0 0 10px rgba(39, 174, 96, 0.3);
 }
 
 .player-spells .spell-category-title::before {
@@ -485,15 +554,21 @@ body {
 }
 
 .player-spells .spell-item {
-    border-left: 3px solid #27ae60;
+    border-left: 4px solid #27ae60;
     background: linear-gradient(135deg, rgba(39, 174, 96, 0.08) 0%, rgba(255,255,255,0) 100%);
+    box-shadow: 0 0 0 1px rgba(39, 174, 96, 0.2), inset 0 0 20px rgba(39, 174, 96, 0.03);
 }
 
-/* 职业技能给予的法术 - 蓝色系 */
+.player-spells .spell-item:hover {
+    box-shadow: 0 0 0 1px rgba(39, 174, 96, 0.4), 0 4px 20px rgba(39, 174, 96, 0.2), inset 0 0 30px rgba(39, 174, 96, 0.05);
+}
+
+/* 职业技能给予的法术 - 奥术蓝风格 */
 .class-spells .spell-category-title {
-    background: rgba(52, 152, 219, 0.15);
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.2) 0%, rgba(52, 152, 219, 0.05) 100%);
     color: #3498db;
-    border: 1px solid rgba(52, 152, 219, 0.3);
+    border: 1px solid rgba(52, 152, 219, 0.4);
+    text-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
 }
 
 .class-spells .spell-category-title::before {
@@ -501,15 +576,21 @@ body {
 }
 
 .class-spells .spell-item {
-    border-left: 3px solid #3498db;
+    border-left: 4px solid #3498db;
     background: linear-gradient(135deg, rgba(52, 152, 219, 0.08) 0%, rgba(255,255,255,0) 100%);
+    box-shadow: 0 0 0 1px rgba(52, 152, 219, 0.2), inset 0 0 20px rgba(52, 152, 219, 0.03);
 }
 
-/* 种族技能给予的法术 - 紫色系 */
+.class-spells .spell-item:hover {
+    box-shadow: 0 0 0 1px rgba(52, 152, 219, 0.4), 0 4px 20px rgba(52, 152, 219, 0.2), inset 0 0 30px rgba(52, 152, 219, 0.05);
+}
+
+/* 种族技能给予的法术 - 神秘紫风格 */
 .race-spells .spell-category-title {
-    background: rgba(155, 89, 182, 0.15);
+    background: linear-gradient(135deg, rgba(155, 89, 182, 0.2) 0%, rgba(155, 89, 182, 0.05) 100%);
     color: #9b59b6;
-    border: 1px solid rgba(155, 89, 182, 0.3);
+    border: 1px solid rgba(155, 89, 182, 0.4);
+    text-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
 }
 
 .race-spells .spell-category-title::before {
@@ -517,92 +598,209 @@ body {
 }
 
 .race-spells .spell-item {
-    border-left: 3px solid #9b59b6;
+    border-left: 4px solid #9b59b6;
     background: linear-gradient(135deg, rgba(155, 89, 182, 0.08) 0%, rgba(255,255,255,0) 100%);
+    box-shadow: 0 0 0 1px rgba(155, 89, 182, 0.2), inset 0 0 20px rgba(155, 89, 182, 0.03);
 }
 
-/* 统一法术样式 - 所有法术使用相同设计 */
+.race-spells .spell-item:hover {
+    box-shadow: 0 0 0 1px rgba(155, 89, 182, 0.4), 0 4px 20px rgba(155, 89, 182, 0.2), inset 0 0 30px rgba(155, 89, 182, 0.05);
+}
+
+/* 统一法术样式 - 魔法卡片设计 */
 .spell-item {
     display: flex;
     flex-direction: column;
-    padding: 0.75rem;
+    padding: 1rem;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
-    transition: all 0.2s ease;
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.spell-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 .spell-item:hover {
+    transform: translateY(-2px) scale(1.01);
     border-color: var(--primary-color);
     box-shadow: var(--shadow);
 }
 
+/* 法术主信息区域 - 魔法符文风格 */
 .spell-main-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    gap: 0.75rem;
 }
 
+.spell-name {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1rem;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    position: relative;
+    padding-left: 1rem;
+}
+
+.spell-name::before {
+    content: '◆';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-size: 0.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.spell-level {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+    white-space: nowrap;
+}
+
+.spell-school {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    font-style: italic;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+/* 法术额外信息区域 - 魔法符文标签 */
 .spell-extra-info {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: 1px dashed rgba(92, 122, 234, 0.3);
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(139, 69, 19, 0.15);
 }
 
 .spell-source {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #5c7aea;
-    font-style: italic;
+    font-weight: 600;
+    background: linear-gradient(135deg, rgba(92, 122, 234, 0.15), rgba(92, 122, 234, 0.05));
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(92, 122, 234, 0.3);
 }
 
 .spell-ability {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-secondary);
-    background: rgba(0, 0, 0, 0.05);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.02));
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    font-weight: 600;
 }
 
 .spell-limit {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #e74c3c;
-    font-weight: 600;
-    background: rgba(231, 76, 60, 0.1);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
+    font-weight: 700;
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.15), rgba(231, 76, 60, 0.05));
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(231, 76, 60, 0.4);
+    animation: pulse-limit 2s ease-in-out infinite;
+}
+
+@keyframes pulse-limit {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+    50% { box-shadow: 0 0 8px 2px rgba(231, 76, 60, 0.2); }
 }
 
 .spell-prepared {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #27ae60;
-    font-weight: 600;
-    background: rgba(39, 174, 96, 0.1);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
+    font-weight: 700;
+    background: linear-gradient(135deg, rgba(39, 174, 96, 0.15), rgba(39, 174, 96, 0.05));
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(39, 174, 96, 0.4);
 }
 
 .spell-known {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #f39c12;
-    font-weight: 600;
-    background: rgba(243, 156, 18, 0.1);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
+    font-weight: 700;
+    background: linear-gradient(135deg, rgba(243, 156, 18, 0.15), rgba(243, 156, 18, 0.05));
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(243, 156, 18, 0.4);
 }
 
 .spell-concentration {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #9b59b6;
+    font-weight: 700;
+    background: linear-gradient(135deg, rgba(155, 89, 182, 0.15), rgba(155, 89, 182, 0.05));
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(155, 89, 182, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.spell-concentration::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* 移除法术按钮 */
+.btn-remove {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
     font-weight: 600;
-    background: rgba(155, 89, 182, 0.15);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-    border: 1px solid #9b59b6;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+}
+
+.btn-remove:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
 }
 
 /* 种族属性加值显示 */
@@ -1349,117 +1547,288 @@ body {
     font-style: italic;
 }
 
-/* 准备法术列表样式 */
+/* ============================================
+   准备法术列表样式 - 魔法水晶球风格
+   ============================================ */
+
+/* 法术环位信息面板 */
 .spell-slots-info {
-    background: linear-gradient(135deg, rgba(92, 122, 234, 0.1) 0%, rgba(92, 122, 234, 0.05) 100%);
-    border: 1px solid rgba(92, 122, 234, 0.3);
-    border-radius: 8px;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
+    background: linear-gradient(135deg, rgba(92, 122, 234, 0.15) 0%, rgba(92, 122, 234, 0.05) 100%);
+    border: 2px solid rgba(92, 122, 234, 0.4);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(92, 122, 234, 0.15), inset 0 0 30px rgba(92, 122, 234, 0.05);
+}
+
+.spell-slots-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(92, 122, 234, 0.6), transparent);
 }
 
 .spell-slots-text {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--text-primary);
-    font-weight: 500;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 0.75rem;
+    text-shadow: 0 0 10px rgba(92, 122, 234, 0.3);
 }
 
+/* 法术环位网格 - 魔法符文石风格 */
 .spell-slots-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: 0.5rem;
-    margin-top: 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.75rem;
 }
 
 .spell-slot-box {
-    background: var(--card-bg);
+    background: linear-gradient(145deg, var(--card-bg), rgba(255,255,255,0.5));
     border: 2px solid var(--border-color);
-    border-radius: 6px;
-    padding: 0.5rem;
+    border-radius: 10px;
+    padding: 0.75rem 0.5rem;
     text-align: center;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.spell-slot-box::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
+    transition: all 0.3s ease;
+    border-radius: 50%;
+}
+
+.spell-slot-box:hover::before {
+    width: 100%;
+    height: 100%;
 }
 
 .spell-slot-box.available {
     border-color: #27ae60;
-    background: rgba(39, 174, 96, 0.1);
+    background: linear-gradient(145deg, rgba(39, 174, 96, 0.15), rgba(39, 174, 96, 0.05));
+    box-shadow: 0 0 20px rgba(39, 174, 96, 0.2), inset 0 0 20px rgba(39, 174, 96, 0.1);
+    animation: slot-pulse 3s ease-in-out infinite;
+}
+
+@keyframes slot-pulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(39, 174, 96, 0.2), inset 0 0 20px rgba(39, 174, 96, 0.1); }
+    50% { box-shadow: 0 0 30px rgba(39, 174, 96, 0.3), inset 0 0 30px rgba(39, 174, 96, 0.15); }
 }
 
 .spell-slot-box.unavailable {
-    border-color: #e74c3c;
-    background: rgba(231, 76, 60, 0.05);
-    opacity: 0.6;
+    border-color: rgba(231, 76, 60, 0.3);
+    background: linear-gradient(145deg, rgba(231, 76, 60, 0.05), rgba(231, 76, 60, 0.02));
+    opacity: 0.5;
 }
 
 .spell-slot-level {
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.75rem;
+    font-weight: 700;
     color: var(--text-secondary);
     display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .spell-slot-count {
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-size: 1.4rem;
+    font-weight: 800;
     color: var(--primary-color);
     display: block;
     margin-top: 0.25rem;
+    text-shadow: 0 0 10px rgba(139, 69, 19, 0.2);
 }
 
+.spell-slot-box.available .spell-slot-count {
+    color: #27ae60;
+    text-shadow: 0 0 10px rgba(39, 174, 96, 0.4);
+}
+
+/* 准备法术列表容器 */
 .prepared-spells-list {
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
+    padding-right: 0.5rem;
 }
 
+.prepared-spells-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.prepared-spells-list::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+}
+
+.prepared-spells-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--primary-color), var(--primary-dark));
+    border-radius: 3px;
+}
+
+/* 法术等级分组标题 */
+.prepared-spell-level-group {
+    margin-bottom: 1.25rem;
+}
+
+.prepared-spell-level-group h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: linear-gradient(90deg, rgba(139, 69, 19, 0.15), transparent);
+    border-left: 4px solid var(--primary-color);
+    border-radius: 0 8px 8px 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.prepared-spell-level-group h4::before {
+    content: '◆';
+    font-size: 0.6rem;
+    color: var(--primary-color);
+}
+
+/* 准备法术项 - 魔法卷轴风格 */
 .prepared-spell-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 0.75rem;
-    background: var(--card-bg);
+    padding: 0.875rem 1rem;
+    background: linear-gradient(145deg, var(--card-bg), rgba(255,255,255,0.8));
     border: 1px solid var(--border-color);
-    border-radius: 6px;
-    margin-bottom: 0.5rem;
-    transition: all 0.2s ease;
+    border-radius: 10px;
+    margin-bottom: 0.625rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.prepared-spell-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--primary-color), var(--primary-dark));
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .prepared-spell-item:hover {
     border-color: var(--primary-color);
-    box-shadow: var(--shadow);
+    box-shadow: 0 4px 20px rgba(139, 69, 19, 0.15), 0 0 0 1px rgba(139, 69, 19, 0.2);
+    transform: translateX(4px);
 }
 
+.prepared-spell-item:hover::before {
+    opacity: 1;
+}
+
+/* 始终准备的法术 - 翡翠之光 */
 .prepared-spell-item.always-prepared {
-    border-color: #27ae60;
+    border-color: rgba(39, 174, 96, 0.4);
+    background: linear-gradient(145deg, rgba(39, 174, 96, 0.08), var(--card-bg));
+    box-shadow: 0 0 0 1px rgba(39, 174, 96, 0.2), inset 0 0 20px rgba(39, 174, 96, 0.05);
 }
 
+.prepared-spell-item.always-prepared::before {
+    background: linear-gradient(180deg, #27ae60, #1e8449);
+    opacity: 1;
+}
+
+.prepared-spell-item.always-prepared:hover {
+    box-shadow: 0 4px 20px rgba(39, 174, 96, 0.2), 0 0 0 1px rgba(39, 174, 96, 0.3);
+}
+
+/* 特性法术 - 奥术之光 */
 .prepared-spell-item.feature-spell {
-    border-color: #5c7aea;
+    border-color: rgba(92, 122, 234, 0.4);
+    background: linear-gradient(145deg, rgba(92, 122, 234, 0.08), var(--card-bg));
+    box-shadow: 0 0 0 1px rgba(92, 122, 234, 0.2), inset 0 0 20px rgba(92, 122, 234, 0.05);
 }
 
+.prepared-spell-item.feature-spell::before {
+    background: linear-gradient(180deg, #5c7aea, #4a5fd1);
+    opacity: 1;
+}
+
+.prepared-spell-item.feature-spell:hover {
+    box-shadow: 0 4px 20px rgba(92, 122, 234, 0.2), 0 0 0 1px rgba(92, 122, 234, 0.3);
+}
+
+/* 法术名称 */
 .prepared-spell-name {
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-primary);
     cursor: help;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .prepared-spell-name:hover {
     color: var(--primary-color);
-    text-decoration: underline;
 }
 
+/* 法术等级标签 */
 .prepared-spell-level {
     font-size: 0.75rem;
-    color: var(--text-secondary);
-    background: var(--bg-secondary);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    padding: 0.25rem 0.625rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+    white-space: nowrap;
 }
 
+/* 法术来源 */
 .prepared-spell-source {
     font-size: 0.7rem;
     color: #5c7aea;
-    font-style: italic;
+    font-weight: 600;
+    background: linear-gradient(135deg, rgba(92, 122, 234, 0.12), rgba(92, 122, 234, 0.04));
+    padding: 0.15rem 0.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(92, 122, 234, 0.25);
+    display: inline-block;
+    margin-top: 0.25rem;
+}
+
+/* 专注标签 */
+.prepared-spell-name .spell-concentration {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+    margin-left: 0;
 }
 
 /* 护甲选择样式 */
@@ -2260,6 +2629,77 @@ body {
         margin: 1rem;
         max-height: 90vh;
         overflow-y: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .header h1 {
+        font-size: 1rem;
+    }
+    
+    .header-actions {
+        gap: 0.3rem;
+    }
+    
+    .dropdown-toggle {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .main-content {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+    
+    .card {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-group label {
+        font-size: 0.85rem;
+        margin-bottom: 0.2rem;
+    }
+    
+    input, select, textarea {
+        padding: 0.5rem;
+        font-size: 14px;
+    }
+    
+    .ability-scores {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .ability-item {
+        padding: 0.5rem;
+    }
+    
+    .btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .skills-grid {
+        gap: 0.3rem;
+    }
+    
+    .skill-item {
+        padding: 0.4rem;
+        font-size: 0.85rem;
     }
 }
 
@@ -3500,4 +3940,223 @@ input[type="range"].level-slider::-webkit-slider-thumb:hover {
 
 [data-theme="dark"] .invocation-item:hover:not(.disabled) {
     background: rgba(92, 122, 234, 0.1);
+}
+
+/* ==================== 夜间模式视觉优化 ==================== */
+
+/* 夜间模式下的卡片增强 */
+[data-theme="dark"] .card {
+    background: linear-gradient(135deg, #2d2d3a 0%, #252532 100%);
+    border: 1px solid rgba(212, 165, 116, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 6px 20px rgba(212, 165, 116, 0.2);
+}
+
+/* 夜间模式下的表单输入框 */
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select,
+[data-theme="dark"] .form-group textarea {
+    background: #1e1e2e;
+    border-color: #3d3d4d;
+    color: #e8eaed;
+}
+
+[data-theme="dark"] .form-group input:focus,
+[data-theme="dark"] .form-group select:focus,
+[data-theme="dark"] .form-group textarea:focus {
+    border-color: var(--primary-color);
+    background: #252532;
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.2);
+}
+
+/* 夜间模式下的属性分数 */
+[data-theme="dark"] .ability-score {
+    background: linear-gradient(135deg, #252532 0%, #2d2d3a 100%);
+    border-color: #3d3d4d;
+}
+
+[data-theme="dark"] .ability-score:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.15);
+}
+
+/* 夜间模式下的技能组 */
+[data-theme="dark"] .skill-group {
+    background: linear-gradient(135deg, #252532 0%, #2d2d3a 100%);
+    border-color: #3d3d4d;
+}
+
+[data-theme="dark"] .skill-item {
+    background: rgba(212, 165, 116, 0.05);
+}
+
+[data-theme="dark"] .skill-item:hover {
+    background: rgba(212, 165, 116, 0.1);
+}
+
+/* 夜间模式下的法术项 */
+[data-theme="dark"] .spell-item {
+    background: linear-gradient(135deg, #252532 0%, #2d2d3a 100%);
+    border-color: #3d3d4d;
+}
+
+[data-theme="dark"] .spell-item:hover {
+    background: rgba(212, 165, 116, 0.1);
+    border-color: var(--primary-color);
+}
+
+/* 夜间模式下的描述框 */
+[data-theme="dark"] .description-box {
+    background: rgba(212, 165, 116, 0.08);
+    border-left-color: var(--primary-color);
+}
+
+/* 夜间模式下的特性标签 */
+[data-theme="dark"] .trait-tag {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-color) 100%);
+    box-shadow: 0 2px 6px rgba(212, 165, 116, 0.2);
+}
+
+/* 夜间模式下的按钮增强 */
+[data-theme="dark"] .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(212, 165, 116, 0.3);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.4);
+}
+
+[data-theme="dark"] .btn-secondary {
+    background: rgba(212, 165, 116, 0.2);
+    border-color: #3d3d4d;
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background: rgba(212, 165, 116, 0.3);
+}
+
+[data-theme="dark"] .btn-success {
+    background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%);
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+[data-theme="dark"] .btn-success:hover {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+/* 夜间模式下的标题增强 */
+[data-theme="dark"] .card-title {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .section-title {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 夜间模式下的滚动条样式 */
+[data-theme="dark"] ::-webkit-scrollbar {
+    width: 10px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: #1e1e2e;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #3d3d4d;
+    border-radius: 5px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+}
+
+/* 夜间模式下的角色卡预览 */
+[data-theme="dark"] .character-sheet {
+    background: linear-gradient(135deg, #2d2d3a 0%, #252532 100%);
+    border-color: #3d3d4d;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* 夜间模式下的对话框 */
+[data-theme="dark"] .modal-overlay {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .modal-content {
+    background: linear-gradient(135deg, #2d2d3a 0%, #252532 100%);
+    border-color: #3d3d4d;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* 夜间模式下的表格 */
+[data-theme="dark"] table {
+    background: #252532;
+}
+
+[data-theme="dark"] th {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+}
+
+[data-theme="dark"] td {
+    border-color: #3d3d4d;
+    color: #e8eaed;
+}
+
+[data-theme="dark"] tr:hover {
+    background: rgba(212, 165, 116, 0.08);
+}
+
+/* 夜间模式下的标签页 */
+[data-theme="dark"] .tab {
+    color: #a0aec0;
+}
+
+[data-theme="dark"] .tab:hover {
+    color: var(--primary-color);
+}
+
+[data-theme="dark"] .tab.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    background: rgba(212, 165, 116, 0.05);
+}
+
+/* 夜间模式下的提示框 */
+[data-theme="dark"] .tooltip {
+    background: linear-gradient(135deg, #2d2d3a 0%, #1a1a2e 100%);
+    border-color: var(--primary-color);
+    color: #e8eaed;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* 夜间模式下的武器列表 */
+[data-theme="dark"] .weapon-item {
+    background: linear-gradient(135deg, #252532 0%, #2d2d3a 100%);
+    border-color: #3d3d4d;
+}
+
+[data-theme="dark"] .weapon-item:hover {
+    border-color: var(--primary-color);
+    background: rgba(212, 165, 116, 0.08);
+}
+
+/* 夜间模式下的专长列表 */
+[data-theme="dark"] .feat-item {
+    background: linear-gradient(135deg, #252532 0%, #2d2d3a 100%);
+    border-color: #3d3d4d;
+}
+
+[data-theme="dark"] .feat-item:hover {
+    border-color: var(--primary-color);
+    background: rgba(212, 165, 116, 0.08);
 }

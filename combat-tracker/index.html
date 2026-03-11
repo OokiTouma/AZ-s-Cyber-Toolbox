@@ -1,255 +1,2987 @@
-<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D&D 5E 战斗追踪器</title>
-    <link rel="stylesheet" href="/AZ-s-Cyber-Toolbox/combat-tracker/styles.css">
+    <title>战斗追踪器 | 阿正的赛博工具箱</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/AZ-s-Cyber-Toolbox/design-system.css">
+    <style>
+        /* 战斗追踪器赛博朋克风格 */
+        .combat-tracker-page {
+            min-height: 100vh;
+            padding-bottom: var(--space-16);
+        }
+
+        /* 页面头部 */
+        .page-header {
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 100%);
+            padding: var(--space-8) 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-orange), transparent);
+        }
+
+        .page-title {
+            font-size: var(--text-4xl);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--neon-orange), var(--neon-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-2);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: var(--text-lg);
+        }
+
+        .back-link {
+            position: absolute;
+            left: var(--space-6);
+            top: 50%;
+            transform: translateY(-50%);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-5);
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-tertiary) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: var(--text-sm);
+            text-decoration: none;
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .back-link::before {
+            content: '←';
+            font-size: 1.2em;
+            transition: transform var(--transition-fast);
+        }
+
+        .back-link:hover {
+            color: var(--neon-orange);
+            border-color: var(--neon-orange);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+            transform: translateY(-50%) translateX(-4px);
+        }
+
+        .back-link:hover::before {
+            transform: translateX(-4px);
+        }
+
+        .back-link:active {
+            transform: translateY(-50%) translateX(-2px);
+        }
+
+        /* 主容器 */
+        .combat-container {
+            max-width: 1200px;
+            margin: var(--space-6) auto;
+            padding: 0 var(--space-6);
+        }
+
+        /* 轮次控制面板 */
+        .round-control-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--space-4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .round-control-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-orange), var(--neon-red), var(--neon-pink));
+        }
+
+        .round-display {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .round-label {
+            color: var(--text-secondary);
+            font-size: var(--text-lg);
+        }
+
+        .round-number {
+            font-size: var(--text-4xl);
+            font-weight: 800;
+            color: var(--neon-orange);
+            text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+        }
+
+        .combat-controls {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        /* 快捷操作栏 */
+        .quick-actions {
+            display: flex;
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+            flex-wrap: wrap;
+        }
+
+        /* 添加单位表单 */
+        .add-combatant-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+
+        .add-combatant-card::before {
+            content: '';
+            display: block;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+            margin: calc(-1 * var(--space-6)) calc(-1 * var(--space-6)) var(--space-6);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr auto;
+            gap: var(--space-3);
+            align-items: end;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .form-grid .form-group:nth-child(1) {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* 战斗列表 */
+        .initiative-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-5);
+            flex-wrap: wrap;
+            gap: var(--space-3);
+        }
+
+        .section-title {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* 战斗单位卡片 */
+        .combatant-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .combatant-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: var(--space-4);
+            align-items: center;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+
+        .combatant-card:hover {
+            border-color: var(--neon-cyan);
+            background: var(--bg-hover);
+        }
+
+        .combatant-card.active-turn {
+            border-color: var(--neon-orange);
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 0, 160, 0.05));
+            box-shadow: 0 0 30px rgba(255, 107, 53, 0.2);
+        }
+
+        .combatant-card.active-turn::before {
+            content: '▶';
+            position: absolute;
+            left: -20px;
+            color: var(--neon-orange);
+            font-size: var(--text-xl);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* 赛博朋克风格先攻编辑器 */
+        .initiative-badge {
+            position: relative;
+            width: 64px;
+            height: 72px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            z-index: 1;
+        }
+
+        .initiative-badge::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(145deg, 
+                rgba(255, 107, 53, 0.15) 0%, 
+                rgba(255, 0, 85, 0.1) 50%,
+                rgba(255, 107, 53, 0.15) 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            box-shadow: 
+                0 0 20px rgba(255, 107, 53, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .initiative-badge:hover::before {
+            border-color: rgba(255, 107, 53, 0.6);
+            box-shadow: 
+                0 0 30px rgba(255, 107, 53, 0.35),
+                0 0 60px rgba(255, 107, 53, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            transform: scale(1.02);
+        }
+
+        .initiative-badge .label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--neon-orange);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 先攻数值编辑器容器 */
+        .initiative-editor {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 数值调整按钮 */
+        .initiative-btn {
+            width: 18px;
+            height: 18px;
+            border: none;
+            background: rgba(255, 107, 53, 0.2);
+            color: var(--neon-orange);
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .initiative-badge:hover .initiative-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .initiative-btn:hover {
+            background: var(--neon-orange);
+            color: var(--bg-primary);
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.6);
+            transform: scale(1.1);
+        }
+
+        .initiative-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 先攻数值输入框 */
+        .initiative-input {
+            width: 32px;
+            height: 28px;
+            background: rgba(10, 10, 15, 0.8);
+            border: 1px solid rgba(255, 107, 53, 0.4);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 800;
+            text-align: center;
+            font-family: 'Inter', monospace;
+            text-shadow: 0 0 10px rgba(255, 107, 53, 0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .initiative-input::-webkit-outer-spin-button,
+        .initiative-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .initiative-input:focus {
+            outline: none;
+            border-color: var(--neon-orange);
+            background: rgba(10, 10, 15, 0.95);
+            box-shadow: 
+                0 0 0 3px rgba(255, 107, 53, 0.2),
+                0 0 20px rgba(255, 107, 53, 0.4),
+                inset 0 0 10px rgba(255, 107, 53, 0.1);
+            transform: scale(1.05);
+        }
+
+        .initiative-input:hover {
+            border-color: rgba(255, 107, 53, 0.7);
+        }
+
+        /* 数值变化时的闪光动画 */
+        @keyframes initiativeFlash {
+            0% { 
+                text-shadow: 0 0 10px rgba(255, 107, 53, 0.8);
+                color: #fff;
+            }
+            50% { 
+                text-shadow: 
+                    0 0 20px rgba(255, 107, 53, 1),
+                    0 0 40px rgba(255, 107, 53, 0.8),
+                    0 0 60px rgba(255, 0, 85, 0.6);
+                color: #fff;
+                transform: scale(1.15);
+            }
+            100% { 
+                text-shadow: 0 0 10px rgba(255, 107, 53, 0.8);
+                color: #fff;
+                transform: scale(1);
+            }
+        }
+
+        .initiative-input.changed {
+            animation: initiativeFlash 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 高先攻值特殊样式 */
+        .initiative-input[data-value-high="true"] {
+            color: #00ff9d;
+            border-color: rgba(0, 255, 157, 0.5);
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.8);
+        }
+
+        .initiative-input[data-value-high="true"]:focus {
+            box-shadow: 
+                0 0 0 3px rgba(0, 255, 157, 0.2),
+                0 0 20px rgba(0, 255, 157, 0.4);
+        }
+
+        /* 低先攻值特殊样式 */
+        .initiative-input[data-value-low="true"] {
+            color: #ff4757;
+            border-color: rgba(255, 71, 87, 0.5);
+            text-shadow: 0 0 10px rgba(255, 71, 87, 0.8);
+        }
+
+        .initiative-input[data-value-low="true"]:focus {
+            box-shadow: 
+                0 0 0 3px rgba(255, 71, 87, 0.2),
+                0 0 20px rgba(255, 71, 87, 0.4);
+        }
+
+        .combatant-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .combatant-name {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .combatant-type {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .combatant-type.player { color: var(--neon-green); }
+        .combatant-type.enemy { color: var(--neon-red); }
+        .combatant-type.npc { color: var(--neon-cyan); }
+
+        .combatant-stats {
+            display: flex;
+            gap: var(--space-4);
+            align-items: center;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: var(--space-2) var(--space-3);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            min-width: 60px;
+        }
+
+        .stat-box .label {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+            display: block;
+        }
+
+        .stat-box .value {
+            font-size: var(--text-lg);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .hp-bar-container {
+            width: 120px;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-top: var(--space-1);
+        }
+
+        .hp-bar {
+            height: 100%;
+            border-radius: var(--radius-full);
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .hp-bar.high { background: linear-gradient(90deg, var(--neon-green), #00cc00); }
+        .hp-bar.medium { background: linear-gradient(90deg, var(--neon-orange), #ff9500); }
+        .hp-bar.low { background: linear-gradient(90deg, var(--neon-red), #cc0000); }
+
+        .combatant-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            font-size: var(--text-lg);
+        }
+
+        .action-btn:hover {
+            border-color: var(--neon-cyan);
+            background: var(--bg-active);
+            transform: scale(1.1);
+        }
+
+        .action-btn.damage:hover { border-color: var(--neon-red); color: var(--neon-red); }
+        .action-btn.heal:hover { border-color: var(--neon-green); color: var(--neon-green); }
+        .action-btn.condition:hover { border-color: var(--neon-purple); color: var(--neon-purple); }
+        .action-btn.delete:hover { border-color: var(--error); color: var(--error); }
+
+        /* 状态标签 - 赛博朋克风格 */
+        .conditions-list {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: var(--space-2);
+        }
+
+        .condition-tag {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border: 1px solid transparent;
+        }
+
+        /* Debuff 状态 - 红色系 */
+        .condition-tag.debuff {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.15), rgba(255, 0, 85, 0.1));
+            border-color: rgba(255, 71, 87, 0.4);
+            color: #ff6b81;
+            text-shadow: 0 0 8px rgba(255, 71, 87, 0.4);
+        }
+
+        .condition-tag.debuff:hover {
+            background: linear-gradient(135deg, rgba(255, 71, 87, 0.3), rgba(255, 0, 85, 0.2));
+            border-color: rgba(255, 71, 87, 0.7);
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.4), 0 0 30px rgba(255, 71, 87, 0.2);
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        /* Buff 状态 - 绿色系 */
+        .condition-tag.buff {
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.15), rgba(0, 212, 170, 0.1));
+            border-color: rgba(0, 255, 157, 0.4);
+            color: #00ff9d;
+            text-shadow: 0 0 8px rgba(0, 255, 157, 0.4);
+        }
+
+        .condition-tag.buff:hover {
+            background: linear-gradient(135deg, rgba(0, 255, 157, 0.3), rgba(0, 212, 170, 0.2));
+            border-color: rgba(0, 255, 157, 0.7);
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.4), 0 0 30px rgba(0, 255, 157, 0.2);
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        /* 环境效果 - 蓝色系 */
+        .condition-tag.environmental {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(0, 150, 255, 0.1));
+            border-color: rgba(0, 212, 255, 0.4);
+            color: #00d4ff;
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
+        }
+
+        .condition-tag.environmental:hover {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 150, 255, 0.2));
+            border-color: rgba(0, 212, 255, 0.7);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4), 0 0 30px rgba(0, 212, 255, 0.2);
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        /* 中性状态 - 紫色系 */
+        .condition-tag.neutral {
+            background: linear-gradient(135deg, rgba(176, 38, 255, 0.15), rgba(138, 43, 226, 0.1));
+            border-color: rgba(176, 38, 255, 0.4);
+            color: #d980ff;
+            text-shadow: 0 0 8px rgba(176, 38, 255, 0.4);
+        }
+
+        .condition-tag.neutral:hover {
+            background: linear-gradient(135deg, rgba(176, 38, 255, 0.3), rgba(138, 43, 226, 0.2));
+            border-color: rgba(176, 38, 255, 0.7);
+            box-shadow: 0 0 15px rgba(176, 38, 255, 0.4), 0 0 30px rgba(176, 38, 255, 0.2);
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        /* 状态标签图标 */
+        .condition-tag .icon {
+            font-size: 12px;
+            filter: drop-shadow(0 0 4px currentColor);
+        }
+
+        /* 状态提示框 */
+        .condition-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-8px);
+            width: 220px;
+            padding: 12px 14px;
+            background: rgba(15, 15, 25, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .condition-tag:hover .condition-tooltip {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(-4px);
+        }
+
+        .condition-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: rgba(15, 15, 25, 0.95);
+        }
+
+        .condition-tooltip .tooltip-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .condition-tooltip .tooltip-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .condition-tooltip .tooltip-effect {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-style: italic;
+        }
+
+        .condition-tooltip .tooltip-type {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: auto;
+        }
+
+        .condition-tooltip .tooltip-type.debuff {
+            background: rgba(255, 71, 87, 0.3);
+            color: #ff6b81;
+        }
+
+        .condition-tooltip .tooltip-type.buff {
+            background: rgba(0, 255, 157, 0.3);
+            color: #00ff9d;
+        }
+
+        .condition-tooltip .tooltip-type.environmental {
+            background: rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+        }
+
+        .condition-tooltip .tooltip-type.neutral {
+            background: rgba(176, 38, 255, 0.3);
+            color: #d980ff;
+        }
+
+        /* 攻击信息展示 - 赛博朋克风格 */
+        .combatant-attack-summary {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, 
+                rgba(255, 107, 53, 0.08) 0%, 
+                rgba(255, 0, 85, 0.05) 100%);
+            border-left: 3px solid var(--neon-orange);
+            border-radius: 0 8px 8px 0;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .combatant-attack-label {
+            flex-shrink: 0;
+            padding: 2px 8px;
+            background: rgba(255, 107, 53, 0.2);
+            color: var(--neon-orange);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: 4px;
+            text-shadow: 0 0 8px rgba(255, 107, 53, 0.5);
+        }
+
+        .combatant-attack-summary span:last-child {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        /* 攻击信息悬停效果 */
+        .combatant-attack-summary:hover {
+            background: linear-gradient(135deg, 
+                rgba(255, 107, 53, 0.15) 0%, 
+                rgba(255, 0, 85, 0.1) 100%);
+            border-left-color: #ff8c5a;
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* 玩家先攻填写弹窗 - 赛博朋克风格 */
+        .player-initiative-modal .modal-content {
+            max-width: 600px;
+            background: linear-gradient(145deg, rgba(15, 15, 25, 0.98), rgba(25, 25, 40, 0.98));
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            box-shadow: 
+                0 0 60px rgba(0, 212, 255, 0.15),
+                0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .player-initiative-modal .modal-header {
+            background: linear-gradient(135deg, 
+                rgba(0, 212, 255, 0.1) 0%, 
+                rgba(0, 150, 255, 0.05) 100%);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .player-initiative-modal .modal-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, #00d4ff, #0096ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .player-initiative-modal .modal-title::before {
+            content: '🎲';
+            font-size: 1.6rem;
+            -webkit-text-fill-color: initial;
+        }
+
+        .player-initiative-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 20px 0;
+        }
+
+        .player-initiative-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.03) 0%, 
+                rgba(255, 255, 255, 0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player-initiative-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--neon-cyan), var(--neon-blue));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .player-initiative-item:hover {
+            background: linear-gradient(135deg, 
+                rgba(0, 212, 255, 0.08) 0%, 
+                rgba(0, 150, 255, 0.04) 100%);
+            border-color: rgba(0, 212, 255, 0.25);
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+        }
+
+        .player-initiative-item:hover::before {
+            opacity: 1;
+        }
+
+        .player-initiative-item.focused {
+            background: linear-gradient(135deg, 
+                rgba(0, 212, 255, 0.12) 0%, 
+                rgba(0, 150, 255, 0.06) 100%);
+            border-color: rgba(0, 212, 255, 0.4);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.15);
+        }
+
+        .player-initiative-item.focused::before {
+            opacity: 1;
+        }
+
+        .player-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .player-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .player-name .player-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .player-meta {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            display: flex;
+            gap: 12px;
+        }
+
+        .player-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .initiative-input-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .initiative-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 玩家先攻弹窗专用的输入框样式 */
+        .player-initiative-modal .initiative-input {
+            width: 80px;
+            height: 48px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            color: #00d4ff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 0 12px;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+
+        .player-initiative-modal .initiative-input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .player-initiative-modal .initiative-input::placeholder {
+            color: rgba(0, 212, 255, 0.3);
+        }
+
+        .roll-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 150, 255, 0.15));
+            border-radius: 10px;
+            color: var(--neon-cyan);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .roll-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.35), rgba(0, 150, 255, 0.25));
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .roll-btn:active {
+            transform: scale(0.95);
+        }
+
+        .roll-btn.spinning {
+            animation: diceSpin 0.6s ease-in-out;
+        }
+
+        @keyframes diceSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+            height: 48px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-actions .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .modal-actions .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        .modal-actions .btn-primary {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            border: none;
+            color: #000;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .modal-actions .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .modal-actions .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .encounter-info {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, 
+                rgba(255, 107, 53, 0.1) 0%, 
+                rgba(255, 0, 85, 0.05) 100%);
+            border-radius: 12px;
+            margin: 0 20px 16px;
+            border: 1px solid rgba(255, 107, 53, 0.2);
+        }
+
+        .encounter-info h4 {
+            font-size: 1rem;
+            color: var(--neon-orange);
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .encounter-info p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 0;
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: var(--space-4);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-content.large {
+            max-width: 800px;
+        }
+
+        .modal-header {
+            padding: var(--space-5);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: var(--text-xl);
+            color: var(--text-secondary);
+            transition: all var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background: var(--error);
+            color: white;
+        }
+
+        .modal-body {
+            padding: var(--space-5);
+        }
+
+        /* 怪物数据库 */
+        .monster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--space-4);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .monster-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .monster-card:hover {
+            border-color: var(--neon-orange);
+            background: var(--bg-hover);
+            transform: translateY(-2px);
+        }
+
+        .monster-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .monster-stats {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        /* 预设战斗样式 */
+        .preset-campaign {
+            margin-bottom: var(--space-6);
+            padding: var(--space-4);
+            background: linear-gradient(135deg, var(--bg-secondary), rgba(255, 107, 53, 0.05));
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+        }
+
+        .preset-campaign-title {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--neon-orange);
+            margin-bottom: var(--space-2);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .preset-campaign-title::before {
+            content: '📖';
+        }
+
+        .preset-campaign-desc {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-3);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .preset-chapter {
+            margin-left: var(--space-4);
+            margin-bottom: var(--space-4);
+            padding: var(--space-3);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--neon-orange);
+        }
+
+        .preset-chapter-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .preset-chapter-title::before {
+            content: '📂';
+        }
+
+        .preset-chapter-desc {
+            color: var(--text-secondary);
+            font-size: var(--text-xs);
+            margin-bottom: var(--space-3);
+        }
+
+        .preset-encounters {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: var(--space-3);
+        }
+
+        .preset-encounter-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--space-3);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preset-encounter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--neon-orange), var(--neon-red));
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+
+        .preset-encounter-card:hover {
+            border-color: var(--neon-orange);
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.15);
+        }
+
+        .preset-encounter-card:hover::before {
+            opacity: 1;
+        }
+
+        .preset-encounter-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .preset-encounter-name::before {
+            content: '⚔️';
+        }
+
+        .preset-encounter-desc {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-2);
+        }
+
+        .preset-encounter-monsters {
+            font-size: var(--text-xs);
+            color: var(--neon-orange);
+            font-weight: 500;
+            padding-top: var(--space-2);
+            border-top: 1px dashed var(--border-color);
+        }
+
+        /* 通知动画 */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* 搜索框 */
+        .search-box {
+            position: relative;
+            margin-bottom: var(--space-4);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            padding-left: var(--space-10);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            color: var(--text-primary);
+            font-size: var(--text-base);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: var(--space-4);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* 标签页 */
+        .tabs {
+            display: flex;
+            gap: var(--space-2);
+            margin-bottom: var(--space-4);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: var(--space-2);
+        }
+
+        .tab-btn {
+            padding: var(--space-2) var(--space-4);
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            border-radius: var(--radius-md);
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+        }
+
+        .tab-btn.active {
+            color: var(--neon-cyan);
+            background: rgba(0, 217, 255, 0.1);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-12);
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-4);
+            opacity: 0.5;
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: var(--text-3xl);
+            }
+
+            .back-link {
+                position: static;
+                transform: none;
+                margin-bottom: var(--space-4);
+                justify-content: center;
+            }
+
+            .round-control-panel {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .combatant-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .combatant-card.active-turn::before {
+                left: var(--space-2);
+                top: var(--space-2);
+            }
+
+            .combatant-stats {
+                justify-content: center;
+            }
+
+            .combatant-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <!-- 密码保护层 -->
-    <div id="passwordOverlay" class="password-overlay">
-        <div class="password-modal">
-            <div class="password-icon">🔒</div>
-            <h2 class="password-title">战斗追踪器已锁定</h2>
-            <p class="password-hint">请输入密码以继续</p>
-            <div class="password-input-group">
-                <input type="password" id="passwordInput" class="password-input" placeholder="输入密码" maxlength="10">
-                <button class="btn btn-primary password-btn" onclick="app.checkPassword()">解锁</button>
+<body class="combat-tracker-page">
+    <!-- 页面头部 -->
+    <header class="page-header">
+        <div class="page-header-shell">
+            <a href="/AZ-s-Cyber-Toolbox/index.html" class="back-link">返回首页</a>
+            <div class="page-header-content">
+                <p class="page-eyebrow">⚔️ 先攻排序 · ❤️ HP 管理 · ✨ 状态追踪</p>
+                <h1 class="page-title">⚔️ 战斗追踪器</h1>
+                <p class="page-subtitle">管理回合制战斗，追踪先攻、HP 和状态效果</p>
+                <div class="page-header-actions">
+                    <a class="btn btn-secondary btn-sm" href="/AZ-s-Cyber-Toolbox/dm-assistant/index.html">👑 打开 DM Assistant</a>
+                </div>
             </div>
-            <p id="passwordError" class="password-error"></p>
         </div>
-    </div>
+    </header>
 
-    <div id="app">
-        <!-- 头部 -->
-        <header class="header">
-            <div class="header-content">
-                <a href="../index.html" class="back-link">← 返回</a>
-                <h1>⚔️ D&D 5E 战斗追踪器</h1>
-                <button class="theme-toggle" onclick="app.toggleTheme()">🌙</button>
+    <!-- 主容器 -->
+    <main class="combat-container">
+        <!-- 轮次控制面板 -->
+        <div class="round-control-panel">
+            <div class="round-display">
+                <span class="round-label">第</span>
+                <span class="round-number" id="roundNumber">1</span>
+                <span class="round-label">轮</span>
             </div>
-        </header>
+            <div class="combat-controls">
+                <button class="btn btn-secondary" onclick="prevTurn()">← 上一回合</button>
+                <button class="btn btn-primary" onclick="nextTurn()">下一回合 →</button>
+                <button class="btn btn-danger" onclick="resetCombat()">🔄 重置</button>
+            </div>
+        </div>
 
-        <!-- 主内容区 -->
-        <main class="main-content">
-            <!-- 控制面板 -->
-            <div class="control-panel">
-                <div class="round-info">
-                    <span class="round-label">第</span>
-                    <span class="round-number" id="roundNumber">1</span>
-                    <span class="round-label">轮</span>
+        <!-- 快捷操作 -->
+        <div class="quick-actions">
+            <button class="btn btn-secondary" onclick="openMonsterDB()">📚 怪物数据库</button>
+            <button class="btn btn-secondary" onclick="openPresets()">⚔️ 预设战斗</button>
+            <button class="btn btn-secondary" onclick="sortByInitiative()">📊 按先攻排序</button>
+        </div>
+
+        <!-- 添加战斗单位 -->
+        <div class="add-combatant-card">
+            <h2 class="section-title" style="margin-bottom: var(--space-4);">➕ 添加战斗单位</h2>
+            <form class="form-grid" onsubmit="addCombatant(event)">
+                <div class="form-group">
+                    <label class="form-label">名称</label>
+                    <input type="text" class="form-input" id="unitName" placeholder="输入单位名称" required>
                 </div>
-                <div class="combat-controls">
-                    <button class="btn btn-primary" onclick="app.prevTurn()">← 上一回合</button>
-                    <button class="btn btn-success" onclick="app.nextTurn()">下一回合 →</button>
-                    <button class="btn btn-warning" onclick="app.resetCombat()">🔄 重置战斗</button>
+                <div class="form-group">
+                    <label class="form-label">类型</label>
+                    <select class="form-select" id="unitType">
+                        <option value="player">玩家</option>
+                        <option value="enemy">敌人</option>
+                        <option value="npc">NPC</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">先攻</label>
+                    <input type="number" class="form-input" id="unitInitiative" placeholder="0" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">HP</label>
+                    <input type="number" class="form-input" id="unitHP" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">最大HP</label>
+                    <input type="number" class="form-input" id="unitMaxHP" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">AC</label>
+                    <input type="number" class="form-input" id="unitAC" placeholder="10">
+                </div>
+                <button type="submit" class="btn btn-primary">添加</button>
+            </form>
+        </div>
+
+        <!-- 战斗列表 -->
+        <div class="initiative-section">
+            <div class="section-header">
+                <h2 class="section-title">📋 战斗顺序</h2>
+                <button class="btn btn-danger" onclick="clearAll()">清空全部</button>
+            </div>
+            <div class="combatant-list" id="combatantList">
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚔️</div>
+                    <p>暂无战斗单位</p>
+                    <p style="font-size: var(--text-sm);">添加单位开始战斗追踪</p>
                 </div>
             </div>
+        </div>
+    </main>
 
-            <!-- 快捷操作栏 -->
-            <div class="quick-actions">
-                <button class="btn btn-primary" onclick="app.openMonsterDatabase()">📚 怪物数据库</button>
-                <button class="btn btn-success" onclick="app.openPresetEncounters()">⚔️ 预设战斗</button>
+    <!-- HP调整模态框 -->
+    <div class="modal-overlay" id="hpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">调整生命值</h3>
+                <button class="modal-close" onclick="closeModal('hpModal')">×</button>
             </div>
-
-            <!-- 添加单位表单 -->
-            <div class="add-combatant-section">
-                <h2 class="section-title">添加战斗单位</h2>
-                <form class="add-form" onsubmit="app.addCombatant(event)">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="unitName">名称</label>
-                            <input type="text" id="unitName" placeholder="输入名称" required>
-                        </div>
-                        <div class="form-group small">
-                            <label for="unitType">类型</label>
-                            <select id="unitType">
-                                <option value="player">玩家</option>
-                                <option value="enemy">敌人</option>
-                                <option value="npc">NPC</option>
-                            </select>
-                        </div>
-                        <div class="form-group small">
-                            <label for="unitInitiative">先攻</label>
-                            <input type="number" id="unitInitiative" placeholder="0" required>
-                        </div>
-                        <div class="form-group small">
-                            <label for="unitHP">生命值</label>
-                            <input type="number" id="unitHP" placeholder="0">
-                        </div>
-                        <div class="form-group small">
-                            <label for="unitMaxHP">最大HP</label>
-                            <input type="number" id="unitMaxHP" placeholder="0">
-                        </div>
-                        <div class="form-group small">
-                            <label for="unitAC">AC</label>
-                            <input type="number" id="unitAC" placeholder="10">
-                        </div>
+            <div class="modal-body">
+                <form onsubmit="applyHPChange(event)">
+                    <input type="hidden" id="hpTargetId">
+                    <div class="form-group">
+                        <label class="form-label">数值</label>
+                        <input type="number" class="form-input" id="hpAmount" placeholder="输入数值" required autofocus>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group full">
-                            <label for="unitNotes">备注</label>
-                            <input type="text" id="unitNotes" placeholder="可选：添加备注信息">
-                        </div>
-                        <button type="submit" class="btn btn-primary add-btn">➕ 添加</button>
+                    <div style="display: flex; gap: var(--space-3); margin-bottom: var(--space-4);">
+                        <button type="button" class="btn btn-danger" style="flex: 1;" onclick="setHPAction('damage')">⚔️ 伤害</button>
+                        <button type="button" class="btn btn-success" style="flex: 1;" onclick="setHPAction('heal')">💚 治疗</button>
                     </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">确认</button>
                 </form>
             </div>
-
-            <!-- 先攻列表 -->
-            <div class="initiative-list-section">
-                <div class="section-header">
-                    <h2 class="section-title">战斗顺序</h2>
-                    <div class="section-actions">
-                        <button class="btn btn-secondary" onclick="app.sortInitiative()">📊 按先攻排序</button>
-                        <button class="btn btn-danger" onclick="app.clearAll()">🗑️ 清空全部</button>
-                    </div>
-                </div>
-                
-                <div class="initiative-list" id="initiativeList">
-                    <!-- 战斗单位将在这里动态生成 -->
-                </div>
-            </div>
-        </main>
+        </div>
     </div>
 
     <!-- 状态效果模态框 -->
-    <div id="conditionModal" class="modal">
+    <div class="modal-overlay" id="conditionModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>添加状态效果</h3>
-                <button class="close-btn" onclick="app.closeConditionModal()">&times;</button>
+                <h3 class="modal-title">添加状态效果</h3>
+                <button class="modal-close" onclick="closeModal('conditionModal')">×</button>
             </div>
             <div class="modal-body">
-                <form onsubmit="app.addCondition(event)">
+                <form onsubmit="addCondition(event)">
                     <input type="hidden" id="conditionTargetId">
                     <div class="form-group">
-                        <label for="conditionType">状态类型</label>
-                        <select id="conditionType" required>
+                        <label class="form-label">状态类型</label>
+                        <select class="form-select" id="conditionType" required>
                             <option value="">选择状态</option>
-                            <optgroup label="控制状态">
-                                <option value="blinded">目盲</option>
-                                <option value="charmed">魅惑</option>
-                                <option value="deafened">耳聋</option>
-                                <option value="frightened">恐慌</option>
-                                <option value="grappled">被擒抱</option>
-                                <option value="incapacitated">失能</option>
-                                <option value="invisible">隐形</option>
-                                <option value="paralyzed">麻痹</option>
-                                <option value="petrified">石化</option>
-                                <option value="poisoned">中毒</option>
-                                <option value="prone">倒地</option>
-                                <option value="restrained">被束缚</option>
-                                <option value="stunned">震慑</option>
-                                <option value="unconscious">昏迷</option>
+                            <optgroup label="控制状态 (Debuffs)">
+                                <option value="blinded">👁️ 目盲 - 无法视物</option>
+                                <option value="charmed">💕 魅惑 - 视施法者为友</option>
+                                <option value="deafened">👂 耳聋 - 无法听到声音</option>
+                                <option value="frightened">😱 恐慌 - 陷入恐惧</option>
+                                <option value="grappled">🤼 被擒抱 - 被敌人抓住</option>
+                                <option value="incapacitated">😵 失能 - 无法行动</option>
+                                <option value="paralyzed">⚡ 麻痹 - 全身无法动弹</option>
+                                <option value="petrified">🗿 石化 - 变成石头</option>
+                                <option value="poisoned">☠️ 中毒 - 毒素蔓延</option>
+                                <option value="prone">🛌 倒地 - 趴在地上</option>
+                                <option value="restrained">⛓️ 被束缚 - 限制移动</option>
+                                <option value="stunned">💫 震慑 - 暂时失意识</option>
+                                <option value="unconscious">😴 昏迷 - 失去意识</option>
                             </optgroup>
-                            <optgroup label="增益状态">
-                                <option value="blessed">祝福</option>
-                                <option value="hasted">加速</option>
-                                <option value="shield">护盾术</option>
-                                <option value="inspired">受激励</option>
-                                <option value="concentration">专注中</option>
+                            <optgroup label="增益状态 (Buffs)">
+                                <option value="invisible">👤 隐形 - 肉眼不可见</option>
+                                <option value="blessed">✨ 祝福 - 神圣祝福</option>
+                                <option value="hasted">⚡ 加速 - 速度翻倍</option>
+                                <option value="shield">🛡️ 护盾术 - 魔法护盾</option>
+                                <option value="inspired">🌟 受激励 - 诗人激励</option>
+                                <option value="concentration">🔮 专注中 - 维持法术</option>
+                                <option value="resistance">🛡️ 抗性 - 伤害减半</option>
+                                <option value="immunity">💎 免疫 - 完全免疫</option>
+                                <option value="advantage">👍 优势 - 双骰取高</option>
+                                <option value="dodging">🏃 闪避 - 采取闪避</option>
+                                <option value="dashing">💨 疾跑 - 速度翻倍</option>
                             </optgroup>
-                            <optgroup label="其他">
-                                <option value="hidden">隐藏</option>
-                                <option value="dodging">闪避</option>
-                                <option value="dashing">疾跑</option>
-                                <option value="readied">准备动作</option>
-                                <option value="custom">自定义</option>
+                            <optgroup label="环境效果">
+                                <option value="difficult_terrain">🌲 困难地形 - 移动受阻</option>
+                                <option value="darkness">🌑 黑暗 - 视线遮蔽</option>
+                                <option value="fog">🌫️ 迷雾 - 浓雾遮蔽</option>
+                                <option value="slippery">💧 滑溜 - 地面湿滑</option>
+                                <option value="high_ground">⛰️ 高地 - 有利地形</option>
+                            </optgroup>
+                            <optgroup label="其他状态">
+                                <option value="hidden">👁️‍🗨️ 隐藏 - 成功隐匿</option>
+                                <option value="readied">⏳ 准备动作 - 等待触发</option>
+                                <option value="custom">📝 自定义 - DM决定</option>
                             </optgroup>
                         </select>
                     </div>
-                    <div class="form-group" id="customConditionGroup" style="display: none;">
-                        <label for="customConditionName">自定义状态名称</label>
-                        <input type="text" id="customConditionName" placeholder="输入状态名称">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="conditionDuration">持续轮数</label>
-                            <input type="number" id="conditionDuration" value="1" min="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="conditionSource">来源</label>
-                            <input type="text" id="conditionSource" placeholder="例如：法术、特性">
-                        </div>
-                    </div>
                     <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="conditionSave">
-                            需要豁免检定
-                        </label>
+                        <label class="form-label">持续轮数</label>
+                        <input type="number" class="form-input" id="conditionDuration" value="1" min="1">
                     </div>
-                    <button type="submit" class="btn btn-primary">添加状态</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- 伤害/治疗模态框 -->
-    <div id="hpModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="hpModalTitle">调整生命值</h3>
-                <button class="close-btn" onclick="app.closeHpModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form onsubmit="app.applyHPChange(event)">
-                    <input type="hidden" id="hpTargetId">
-                    <input type="hidden" id="hpAction">
-                    <div class="form-group">
-                        <label for="hpAmount">数值</label>
-                        <input type="number" id="hpAmount" placeholder="输入数值" min="0" required autofocus>
-                    </div>
-                    <div class="hp-actions">
-                        <button type="button" class="btn btn-danger" onclick="app.setHPAction('damage')">⚔️ 伤害</button>
-                        <button type="button" class="btn btn-success" onclick="app.setHPAction('heal')">💚 治疗</button>
-                        <button type="button" class="btn btn-primary" onclick="app.setHPAction('set')">📝 设为</button>
-                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">添加状态</button>
                 </form>
             </div>
         </div>
     </div>
 
     <!-- 怪物数据库模态框 -->
-    <div id="monsterDatabaseModal" class="modal">
-        <div class="modal-content large-modal">
+    <div class="modal-overlay" id="monsterModal">
+        <div class="modal-content large">
             <div class="modal-header">
-                <h3>📚 怪物数据库</h3>
-                <button class="close-btn" onclick="app.closeMonsterDatabase()">&times;</button>
+                <h3 class="modal-title">📚 怪物数据库</h3>
+                <button class="modal-close" onclick="closeModal('monsterModal')">×</button>
             </div>
             <div class="modal-body">
-                <div class="monster-database-tabs">
-                    <button class="tab-btn active" onclick="app.switchMonsterTab('basics')">基础规则</button>
-                    <button class="tab-btn" onclick="app.switchMonsterTab('phandelver')">凡达林的地精矿坑</button>
-                    <button class="tab-btn" onclick="app.switchMonsterTab('expanded')">扩展规则</button>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab(event, 'basic')">基础规则</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'phandelver')">凡达林</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'expanded')">官方扩展</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'extended')">扩展规则</button>
+                    <button class="tab-btn" onclick="switchTab(event, 'dragons')">龙类</button>
                 </div>
-                <div class="monster-search">
-                    <input type="text" id="monsterSearchInput" placeholder="搜索怪物..." oninput="app.searchMonsters()">
+                <div class="monster-toolbar">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" id="monsterSearch" placeholder="搜索怪物、攻击方式或来源..." oninput="searchMonsters()">
+                    </div>
+                    <label class="monster-quantity-control" for="monsterQuantity">
+                        <span class="monster-quantity-label">添加数量</span>
+                        <input type="number" class="form-input" id="monsterQuantity" value="1" min="1" max="20">
+                    </label>
                 </div>
-                <div class="monster-list" id="monsterList">
-                    <!-- 怪物列表将在这里动态生成 -->
+                <div class="monster-grid" id="monsterList">
+                    <!-- 动态生成 -->
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 预设战斗模态框 -->
-    <div id="presetEncountersModal" class="modal">
-        <div class="modal-content large-modal">
+    <div class="modal-overlay" id="presetModal">
+        <div class="modal-content large">
             <div class="modal-header">
-                <h3>⚔️ 预设战斗</h3>
-                <button class="close-btn" onclick="app.closePresetEncounters()">&times;</button>
+                <h3 class="modal-title">⚔️ 预设战斗</h3>
+                <button class="modal-close" onclick="closeModal('presetModal')">×</button>
             </div>
             <div class="modal-body">
-                <div class="encounter-campaigns" id="encounterCampaigns">
-                    <!-- 战役列表将在这里动态生成 -->
+                <div id="presetList">
+                    <!-- 动态生成 -->
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="/AZ-s-Cyber-Toolbox/combat-tracker/monsters_data.js"></script>
-    <script src="/AZ-s-Cyber-Toolbox/combat-tracker/app.js"></script>
+    <!-- 玩家先攻填写弹窗 -->
+    <div class="modal-overlay player-initiative-modal" id="playerInitiativeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">填写玩家先攻</h3>
+                <button class="modal-close" onclick="closePlayerInitiativeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="encounter-info" id="encounterInfo">
+                    <h4>⚔️ <span id="encounterName">遭遇战</span></h4>
+                    <p>敌人先攻已自动骰定，请为每位玩家角色填写先攻值</p>
+                </div>
+                <div class="player-initiative-list" id="playerInitiativeList">
+                    <!-- 动态生成玩家列表 -->
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closePlayerInitiativeModal()">取消</button>
+                <button class="btn btn-primary" id="confirmInitiativeBtn" onclick="confirmPlayerInitiatives()">
+                    确认开始战斗
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入怪物数据库 -->
+    <script src="monsters_data.js"></script>
+    <script src="monsters_data_extended.js"></script>
+
+    <script>
+        // 数据存储
+        let combatants = [];
+        let currentTurn = 0;
+        let currentRound = 1;
+        let hpAction = 'damage';
+        const DM_TRANSFER_KEY = 'dmToCombatTransfer';
+        let combatantIdSeed = Date.now();
+
+        // 辅助函数：HTML转义
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 状态效果定义（汉化 + 详细描述）
+        const CONDITION_DEFINITIONS = {
+            // 控制状态 (Debuffs)
+            blinded: {
+                name: '目盲',
+                type: 'debuff',
+                icon: '👁️',
+                desc: '无法视物，所有视觉感知自动失败',
+                effect: '攻击检定劣势，防御者攻击你有优势'
+            },
+            charmed: {
+                name: '魅惑',
+                type: 'debuff',
+                icon: '💕',
+                desc: '被施法者魅惑，将其视为友善盟友',
+                effect: '无法攻击魅惑者，其法术可指定你为目标'
+            },
+            deafened: {
+                name: '耳聋',
+                type: 'debuff',
+                icon: '👂',
+                desc: '无法听到声音',
+                effect: '所有依赖听觉的感知检定自动失败'
+            },
+            frightened: {
+                name: '恐慌',
+                type: 'debuff',
+                icon: '😱',
+                desc: '陷入极度恐惧',
+                effect: '检定和攻击劣势，无法接近恐惧源'
+            },
+            grappled: {
+                name: '被擒抱',
+                type: 'debuff',
+                icon: '🤼',
+                desc: '被敌人抓住',
+                effect: '速度降为0，攻击者可用动作维持擒抱'
+            },
+            incapacitated: {
+                name: '失能',
+                type: 'debuff',
+                icon: '😵',
+                desc: '无法行动或反应',
+                effect: '无法执行动作、反应或附赠动作'
+            },
+            invisible: {
+                name: '隐形',
+                type: 'buff',
+                icon: '👤',
+                desc: '肉眼无法看见',
+                effect: '攻击有优势，被攻击有劣势，需隐匿检定'
+            },
+            paralyzed: {
+                name: '麻痹',
+                type: 'debuff',
+                icon: '⚡',
+                desc: '全身无法动弹',
+                effect: '失能+无法移动，攻击你有优势且自动暴击'
+            },
+            petrified: {
+                name: '石化',
+                type: 'debuff',
+                icon: '🗿',
+                desc: '变成石头',
+                effect: '重量×10，免疫毒素/疾病，抗性全伤害'
+            },
+            poisoned: {
+                name: '中毒',
+                type: 'debuff',
+                icon: '☠️',
+                desc: '毒素在体内蔓延',
+                effect: '攻击检定和属性检定劣势'
+            },
+            prone: {
+                name: '倒地',
+                type: 'debuff',
+                icon: '🛌',
+                desc: '趴在地上',
+                effect: '近战攻击你有优势，远程劣势，需半移动力起身'
+            },
+            restrained: {
+                name: '被束缚',
+                type: 'debuff',
+                icon: '⛓️',
+                desc: '被限制移动',
+                effect: '速度为0，攻击劣势，防御者攻击你有优势'
+            },
+            stunned: {
+                name: '震慑',
+                type: 'debuff',
+                icon: '💫',
+                desc: '暂时失去意识',
+                effect: '失能+无法移动，攻击你有优势且自动失败'
+            },
+            unconscious: {
+                name: '昏迷',
+                type: 'debuff',
+                icon: '😴',
+                desc: '失去意识',
+                effect: '失能+倒地，攻击你有优势且自动暴击'
+            },
+
+            // 增益状态 (Buffs)
+            blessed: {
+                name: '祝福',
+                type: 'buff',
+                icon: '✨',
+                desc: '受到神圣祝福',
+                effect: '攻击检定或豁免可额外掷d4加值'
+            },
+            hasted: {
+                name: '加速',
+                type: 'buff',
+                icon: '⚡',
+                desc: '速度大幅提升',
+                effect: '速度翻倍，AC+2，反射豁免优势，额外动作'
+            },
+            shield: {
+                name: '护盾术',
+                type: 'buff',
+                icon: '🛡️',
+                desc: '魔法护盾环绕',
+                effect: 'AC+5，免疫魔法飞弹，持续1轮'
+            },
+            inspired: {
+                name: '受激励',
+                type: 'buff',
+                icon: '🌟',
+                desc: '获得吟游诗人激励',
+                effect: '可在检定中获得d6-d12加值（取决于诗人等级）'
+            },
+            concentration: {
+                name: '专注中',
+                type: 'buff',
+                icon: '🔮',
+                desc: '维持法术专注',
+                effect: '受到伤害需进行体质豁免维持法术'
+            },
+            resistance: {
+                name: '抗性',
+                type: 'buff',
+                icon: '🛡️',
+                desc: '对某伤害有抗性',
+                effect: '该类型伤害减半'
+            },
+            immunity: {
+                name: '免疫',
+                type: 'buff',
+                icon: '💎',
+                desc: '对某伤害/状态免疫',
+                effect: '完全不受该类型伤害或状态影响'
+            },
+            advantage: {
+                name: '优势',
+                type: 'buff',
+                icon: '👍',
+                desc: '检定获得优势',
+                effect: '掷两次骰子取较高值'
+            },
+
+            // 环境效果
+            difficult_terrain: {
+                name: '困难地形',
+                type: 'environmental',
+                icon: '🌲',
+                desc: '地形阻碍移动',
+                effect: '每移动1尺需额外消耗1尺移动力'
+            },
+            darkness: {
+                name: '黑暗',
+                type: 'environmental',
+                icon: '🌑',
+                desc: '魔法或自然黑暗',
+                effect: '非黑暗视觉生物视为目盲'
+            },
+            fog: {
+                name: '迷雾',
+                type: 'environmental',
+                icon: '🌫️',
+                desc: '浓雾遮蔽视线',
+                effect: '重度遮蔽，5尺外视为轻度遮蔽'
+            },
+            slippery: {
+                name: '滑溜',
+                type: 'environmental',
+                icon: '💧',
+                desc: '地面湿滑',
+                effect: '需进行敏捷豁免避免倒地'
+            },
+            high_ground: {
+                name: '高地',
+                type: 'environmental',
+                icon: '⛰️',
+                desc: '占据有利地形',
+                effect: '近战攻击低地目标有优势'
+            },
+
+            // 其他状态
+            hidden: {
+                name: '隐藏',
+                type: 'neutral',
+                icon: '👁️‍🗨️',
+                desc: '成功隐匿',
+                effect: '攻击有优势，被攻击无劣势，需保持隐蔽'
+            },
+            dodging: {
+                name: '闪避',
+                type: 'buff',
+                icon: '🏃',
+                desc: '采取闪避动作',
+                effect: '攻击你有劣势，敏捷豁免有优势'
+            },
+            dashing: {
+                name: '疾跑',
+                type: 'buff',
+                icon: '💨',
+                desc: '采取疾跑动作',
+                effect: '本轮移动力翻倍'
+            },
+            readied: {
+                name: '准备动作',
+                type: 'neutral',
+                icon: '⏳',
+                desc: '已准备反应动作',
+                effect: '触发条件时可用反应执行动作'
+            },
+            custom: {
+                name: '自定义',
+                type: 'neutral',
+                icon: '📝',
+                desc: '自定义状态',
+                effect: '由DM决定具体效果'
+            }
+        };
+        let currentMonsterCategory = 'basic';
+
+        function nextCombatantId() {
+            combatantIdSeed += 1;
+            return combatantIdSeed;
+        }
+
+        function getMonsterQuantity() {
+            const quantityInput = document.getElementById('monsterQuantity');
+            const parsedValue = Number.parseInt(quantityInput?.value, 10);
+            const safeValue = Math.min(20, Math.max(1, Number.isFinite(parsedValue) ? parsedValue : 1));
+
+            if (quantityInput) {
+                quantityInput.value = safeValue;
+            }
+
+            return safeValue;
+        }
+
+        function summarizeMonsterAttacks(monster, limit = 2) {
+            if (!monster || !Array.isArray(monster.actions)) {
+                return [];
+            }
+
+            return monster.actions
+                .filter(action => action && (action.attack || action.damage || action.hit || action.description))
+                .slice(0, limit)
+                .map(action => {
+                    const parts = [action.name].filter(Boolean);
+
+                    if (action.attack) {
+                        parts.push(action.attack);
+                    }
+
+                    if (action.damage) {
+                        parts.push(action.damage);
+                    } else if (action.hit) {
+                        parts.push(action.hit);
+                    } else if (action.description) {
+                        parts.push(action.description);
+                    }
+
+                    return parts.join(' · ');
+                });
+        }
+
+        function getMonsterAttackSummary(monster) {
+            const attacks = summarizeMonsterAttacks(monster);
+            return attacks.length > 0 ? attacks.join(' / ') : '暂无攻击信息';
+        }
+
+        function normalizeMonsterRecord(id, monster, sourceLabel) {
+            return {
+                id,
+                name: monster.name,
+                hp: monster.hp,
+                maxHp: monster.maxHp,
+                ac: monster.ac,
+                initiative: monster.initiative || 0,
+                cr: monster.cr,
+                type: monster.type,
+                sourceLabel,
+                attackSummary: getMonsterAttackSummary(monster)
+            };
+        }
+
+        function mergeUniqueMonsters(target, additions) {
+            const seenIds = new Set(target.map(monster => monster.id));
+
+            additions.forEach(monster => {
+                if (seenIds.has(monster.id)) {
+                    return;
+                }
+
+                seenIds.add(monster.id);
+                target.push(monster);
+            });
+
+            return target;
+        }
+
+        function mapMonsterSet(monsterSet, sourceLabel) {
+            return Object.entries(monsterSet || {}).map(([id, monster]) => normalizeMonsterRecord(id, monster, sourceLabel));
+        }
+
+        function createMonsterCombatant(monsterData, sequence = 0, total = 1) {
+            const attackSummary = getMonsterAttackSummary(monsterData);
+
+            return {
+                id: nextCombatantId(),
+                name: total > 1 ? `${monsterData.name} ${sequence + 1}` : monsterData.name,
+                type: 'enemy',
+                initiative: rollInitiative(monsterData.initiative || 0),
+                hp: monsterData.hp,
+                maxHp: monsterData.maxHp ?? monsterData.hp,
+                ac: monsterData.ac ?? 10,
+                notes: monsterData.notes || '',
+                attackSummary,
+                conditions: []
+            };
+        }
+
+        function rollInitiative(modifier = 0) {
+            return Math.floor(Math.random() * 20) + 1 + (Number(modifier) || 0);
+        }
+
+        function trackToolUsage(toolId, toolName) {
+            const usageMap = JSON.parse(localStorage.getItem('toolUsageStats') || '{}');
+            usageMap[toolId] = (usageMap[toolId] || 0) + 1;
+            localStorage.setItem('toolUsageStats', JSON.stringify(usageMap));
+
+            const recentTools = JSON.parse(localStorage.getItem('recentTools') || '[]')
+                .filter(item => item.id !== toolId);
+
+            recentTools.unshift({ id: toolId, name: toolName, href: 'combat-tracker/index.html', timestamp: Date.now() });
+            localStorage.setItem('recentTools', JSON.stringify(recentTools.slice(0, 5)));
+        }
+
+        function checkForDMAssistantTransfer() {
+            const rawTransfer = localStorage.getItem(DM_TRANSFER_KEY);
+            if (!rawTransfer) return;
+
+            try {
+                const transfer = JSON.parse(rawTransfer);
+                const isFresh = transfer.timestamp && (Date.now() - transfer.timestamp < 60000);
+                if (!isFresh || transfer.source !== 'dm-assistant' || !transfer.encounter) {
+                    localStorage.removeItem(DM_TRANSFER_KEY);
+                    return;
+                }
+
+                if (combatants.length > 0 && !confirm('检测到来自 DM Assistant 的遭遇数据。导入将清空当前战斗列表，是否继续？')) {
+                    return;
+                }
+
+                importEncounterFromDMAssistant(transfer.encounter);
+                localStorage.removeItem(DM_TRANSFER_KEY);
+            } catch (error) {
+                console.error('Failed to import DM Assistant transfer:', error);
+                localStorage.removeItem(DM_TRANSFER_KEY);
+            }
+        }
+
+        // 存储待处理的遭遇数据
+        let pendingEncounter = null;
+        let pendingPlayers = [];
+
+        function importEncounterFromDMAssistant(encounter) {
+            const players = Array.isArray(encounter.players) ? encounter.players : [];
+            const enemies = Array.isArray(encounter.combatants) ? encounter.combatants : [];
+
+            // 解析攻击信息从 notes
+            function parseAttackSummary(notes) {
+                if (!notes) return '';
+                const attackMatch = notes.match(/攻击：(.+?)(?:\n|$)/);
+                return attackMatch ? attackMatch[1].trim() : '';
+            }
+
+            // 解析特性信息
+            function parseFeatures(notes) {
+                if (!notes) return '';
+                const featureMatch = notes.match(/特性：(.+?)(?:\n|$)/);
+                return featureMatch ? featureMatch[1].trim() : '';
+            }
+
+            // 处理敌人数据
+            const processedEnemies = enemies.map((combatant, index) => {
+                const notes = combatant.notes || '';
+                const attackSummary = parseAttackSummary(notes);
+                const features = parseFeatures(notes);
+
+                let enhancedAttackSummary = attackSummary;
+                if (features && !attackSummary.includes(features)) {
+                    enhancedAttackSummary = attackSummary
+                        ? `${attackSummary} | ${features}`
+                        : features;
+                }
+
+                return {
+                    id: nextCombatantId(),
+                    name: combatant.name || `敌人 ${index + 1}`,
+                    type: 'enemy',
+                    initiative: Number(combatant.initiative) || 0,
+                    hp: Number(combatant.hp) || 0,
+                    maxHp: Number(combatant.maxHp) || Number(combatant.hp) || 0,
+                    ac: Number(combatant.ac) || 10,
+                    notes: notes,
+                    attackSummary: enhancedAttackSummary,
+                    conditions: combatant.conditions || []
+                };
+            });
+
+            // 处理玩家数据
+            const processedPlayers = players.map((player, index) => {
+                const notes = player.notes || '';
+                return {
+                    id: nextCombatantId(),
+                    name: player.name || `玩家 ${index + 1}`,
+                    type: 'player',
+                    initiative: Number(player.initiative) || 0,
+                    hp: Number(player.hp) || 0,
+                    maxHp: Number(player.maxHp) || Number(player.hp) || 0,
+                    ac: Number(player.ac) || 10,
+                    notes: notes,
+                    attackSummary: '',
+                    conditions: player.conditions || [],
+                    needsPlayerInput: player.needsPlayerInput || false
+                };
+            });
+
+            // 检查是否需要弹窗填写玩家先攻
+            const needsPlayerInput = encounter.options?.autoInitiative && 
+                processedPlayers.some(p => p.needsPlayerInput && p.initiative === 0);
+
+            if (needsPlayerInput) {
+                // 保存数据，等待玩家填写先攻
+                pendingEncounter = {
+                    ...encounter,
+                    processedEnemies,
+                    processedPlayers
+                };
+                pendingPlayers = processedPlayers.filter(p => p.needsPlayerInput && p.initiative === 0);
+                
+                // 先导入敌人
+                combatants = [...processedEnemies];
+                currentTurn = 0;
+                currentRound = 1;
+                
+                // 显示玩家先攻填写弹窗
+                openPlayerInitiativeModal(encounter.name || '未命名遭遇', pendingPlayers);
+            } else {
+                // 不需要弹窗，直接导入所有单位
+                combatants = [...processedPlayers, ...processedEnemies];
+                currentTurn = 0;
+                currentRound = 1;
+
+                if (encounter.options?.autoInitiative) {
+                    sortByInitiative();
+                } else {
+                    renderCombatants();
+                }
+
+                showNotification(`已导入 DM 遭遇：${encounter.name || '未命名遭遇'}`);
+            }
+        }
+
+        // 打开玩家先攻填写弹窗
+        function openPlayerInitiativeModal(encounterName, players) {
+            document.getElementById('encounterName').textContent = encounterName;
+            const listContainer = document.getElementById('playerInitiativeList');
+            
+            listContainer.innerHTML = players.map((player, index) => `
+                <div class="player-initiative-item" data-player-id="${player.id}" data-index="${index}">
+                    <div class="player-info">
+                        <div class="player-name">
+                            <span class="player-icon">🧙</span>
+                            ${escapeHtml(player.name)}
+                        </div>
+                        <div class="player-meta">
+                            <span>❤️ HP: ${player.hp || '?'}</span>
+                            <span>🛡️ AC: ${player.ac || '?'}</span>
+                        </div>
+                    </div>
+                    <div class="initiative-input-group">
+                        <div class="initiative-input-wrapper">
+                            <input type="number" 
+                                   class="initiative-input" 
+                                   id="initiative-${player.id}"
+                                   placeholder="?"
+                                   min="1"
+                                   max="40"
+                                   onfocus="focusPlayerItem(${player.id})"
+                                   onblur="blurPlayerItem(${player.id})"
+                                   onkeydown="handleInitiativeKeydown(event, ${index}, ${players.length})">
+                        </div>
+                        <button class="roll-btn" onclick="rollPlayerInitiative(${player.id})" title="随机骰先攻 (d20)">
+                            🎲
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            // 显示弹窗
+            document.getElementById('playerInitiativeModal').classList.add('show');
+            
+            // 聚焦第一个输入框
+            setTimeout(() => {
+                const firstInput = document.querySelector('.player-initiative-item input');
+                if (firstInput) firstInput.focus();
+            }, 100);
+        }
+
+        // 关闭玩家先攻弹窗
+        function closePlayerInitiativeModal() {
+            document.getElementById('playerInitiativeModal').classList.remove('show');
+            pendingEncounter = null;
+            pendingPlayers = [];
+        }
+
+        // 聚焦玩家项
+        function focusPlayerItem(playerId) {
+            const item = document.querySelector(`.player-initiative-item[data-player-id="${playerId}"]`);
+            if (item) item.classList.add('focused');
+        }
+
+        // 失焦玩家项
+        function blurPlayerItem(playerId) {
+            const item = document.querySelector(`.player-initiative-item[data-player-id="${playerId}"]`);
+            if (item) item.classList.remove('focused');
+        }
+
+        // 随机骰玩家先攻
+        function rollPlayerInitiative(playerId) {
+            const input = document.getElementById(`initiative-${playerId}`);
+            const btn = input.closest('.initiative-input-group').querySelector('.roll-btn');
+            
+            // 添加旋转动画
+            btn.classList.add('spinning');
+            
+            // 模拟骰子滚动效果
+            let rolls = 0;
+            const maxRolls = 8;
+            const interval = setInterval(() => {
+                input.value = Math.floor(Math.random() * 20) + 1;
+                rolls++;
+                
+                if (rolls >= maxRolls) {
+                    clearInterval(interval);
+                    const finalValue = Math.floor(Math.random() * 20) + 1;
+                    input.value = finalValue;
+                    btn.classList.remove('spinning');
+                    
+                    // 自动聚焦下一个输入框
+                    const currentItem = input.closest('.player-initiative-item');
+                    const nextItem = currentItem.nextElementSibling;
+                    if (nextItem) {
+                        const nextInput = nextItem.querySelector('input');
+                        if (nextInput) nextInput.focus();
+                    }
+                }
+            }, 80);
+        }
+
+        // 处理键盘导航
+        function handleInitiativeKeydown(event, currentIndex, totalCount) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                if (currentIndex < totalCount - 1) {
+                    // 聚焦下一个
+                    const nextInput = document.querySelector(`.player-initiative-item[data-index="${currentIndex + 1}"] input`);
+                    if (nextInput) nextInput.focus();
+                } else {
+                    // 最后一个，确认
+                    confirmPlayerInitiatives();
+                }
+            } else if (event.key === 'ArrowUp' && currentIndex > 0) {
+                event.preventDefault();
+                const prevInput = document.querySelector(`.player-initiative-item[data-index="${currentIndex - 1}"] input`);
+                if (prevInput) prevInput.focus();
+            } else if (event.key === 'ArrowDown' && currentIndex < totalCount - 1) {
+                event.preventDefault();
+                const nextInput = document.querySelector(`.player-initiative-item[data-index="${currentIndex + 1}"] input`);
+                if (nextInput) nextInput.focus();
+            }
+        }
+
+        // 确认玩家先攻
+        function confirmPlayerInitiatives() {
+            if (!pendingEncounter) return;
+            
+            // 收集所有玩家先攻值
+            const playerInitiatives = {};
+            let hasEmpty = false;
+            
+            pendingPlayers.forEach(player => {
+                const input = document.getElementById(`initiative-${player.id}`);
+                const value = parseInt(input.value);
+                
+                if (isNaN(value) || value < 1) {
+                    hasEmpty = true;
+                    input.style.borderColor = '#ff4757';
+                    setTimeout(() => {
+                        input.style.borderColor = '';
+                    }, 1000);
+                } else {
+                    playerInitiatives[player.id] = value;
+                }
+            });
+            
+            if (hasEmpty) {
+                showNotification('请为所有玩家填写先攻值', 'error');
+                return;
+            }
+            
+            // 更新玩家数据
+            const finalPlayers = pendingEncounter.processedPlayers.map(player => ({
+                ...player,
+                initiative: playerInitiatives[player.id] || player.initiative
+            }));
+            
+            // 合并所有战斗单位
+            combatants = [...finalPlayers, ...pendingEncounter.processedEnemies];
+            
+            // 关闭弹窗
+            closePlayerInitiativeModal();
+            
+            // 按先攻排序
+            sortByInitiative();
+            
+            showNotification('战斗开始！已按先攻排序', 'success');
+        }
+
+        // 从 monsters_data.js 转换怪物数据
+        function convertMonsterData() {
+            const converted = { basic: [], phandelver: [], expanded: [], extended: [], dragons: [] };
+
+            if (typeof MONSTERS_DATA !== 'undefined') {
+                mergeUniqueMonsters(converted.basic, mapMonsterSet(MONSTERS_DATA.basics?.monsters, '官方基础规则'));
+                mergeUniqueMonsters(converted.phandelver, mapMonsterSet(MONSTERS_DATA.phandelver?.monsters, '凡达林官方模组'));
+                mergeUniqueMonsters(converted.expanded, mapMonsterSet(MONSTERS_DATA.expanded?.monsters, '官方扩展规则'));
+            }
+
+            if (typeof MONSTERS_DATA_EXTENDED !== 'undefined') {
+                mergeUniqueMonsters(converted.extended, mapMonsterSet(MONSTERS_DATA_EXTENDED.basics?.monsters, '扩展基础规则'));
+                mergeUniqueMonsters(converted.extended, mapMonsterSet(MONSTERS_DATA_EXTENDED.phandelver?.monsters, '凡达林扩展'));
+                mergeUniqueMonsters(converted.dragons, mapMonsterSet(MONSTERS_DATA_EXTENDED.dragons?.monsters, '龙类扩展'));
+            }
+
+            return converted;
+        }
+
+        let monsters = convertMonsterData();
+
+        if (monsters.basic.length === 0) {
+            monsters = {
+                basic: [
+                    { id: 'goblin_fallback', name: '地精', hp: 7, maxHp: 7, ac: 15, initiative: 2, attackSummary: '弯刀 · +4 · 1d6+2 挥砍', sourceLabel: '示例数据' },
+                    { id: 'orc_fallback', name: '兽人', hp: 15, maxHp: 15, ac: 13, initiative: 1, attackSummary: '巨斧 · +5 · 1d12+3 挥砍', sourceLabel: '示例数据' },
+                    { id: 'skeleton_fallback', name: '骷髅', hp: 13, maxHp: 13, ac: 13, initiative: 2, attackSummary: '短剑 · +4 · 1d6+2 穿刺', sourceLabel: '示例数据' }
+                ],
+                phandelver: [
+                    { id: 'klarg_fallback', name: '克拉格', hp: 27, maxHp: 27, ac: 15, initiative: 1, attackSummary: '巨棒 · +6 · 2d8+4 钝击', sourceLabel: '示例数据' }
+                ],
+                expanded: [],
+                extended: [],
+                dragons: []
+            };
+        }
+
+        // 添加战斗单位
+        function addCombatant(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('unitName').value;
+            const type = document.getElementById('unitType').value;
+            const initiative = parseInt(document.getElementById('unitInitiative').value) || 0;
+            const hp = parseInt(document.getElementById('unitHP').value) || 0;
+            const maxHp = parseInt(document.getElementById('unitMaxHP').value) || hp;
+            const ac = parseInt(document.getElementById('unitAC').value) || 10;
+
+            const combatant = {
+                id: nextCombatantId(),
+                name,
+                type,
+                initiative,
+                hp,
+                maxHp,
+                ac,
+                conditions: []
+            };
+
+            combatants.push(combatant);
+            renderCombatants();
+            
+            document.getElementById('unitName').value = '';
+            document.getElementById('unitInitiative').value = '';
+            document.getElementById('unitHP').value = '';
+            document.getElementById('unitMaxHP').value = '';
+            document.getElementById('unitAC').value = '';
+        }
+
+        // 渲染战斗单位列表
+        function renderCombatants() {
+            const list = document.getElementById('combatantList');
+            
+            if (combatants.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚔️</div>
+                        <p>暂无战斗单位</p>
+                        <p style="font-size: var(--text-sm);">添加单位开始战斗追踪</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = combatants.map((c, index) => {
+                const isActive = index === currentTurn;
+                const hpPercent = c.maxHp > 0 ? (c.hp / c.maxHp) * 100 : 0;
+                let hpClass = 'high';
+                if (hpPercent <= 25) hpClass = 'low';
+                else if (hpPercent <= 50) hpClass = 'medium';
+
+                const typeLabels = { player: '玩家', enemy: '敌人', npc: 'NPC' };
+                const attackSummary = c.attackSummary ? `
+                    <div class="combatant-attack-summary">
+                        <span class="combatant-attack-label">攻击</span>
+                        <span>${c.attackSummary}</span>
+                    </div>
+                ` : '';
+                const conditions = Array.isArray(c.conditions) ? c.conditions : [];
+
+                const isHighInitiative = c.initiative >= 15;
+                const isLowInitiative = c.initiative <= 5;
+                const dataAttrs = isHighInitiative ? 'data-value-high="true"' : isLowInitiative ? 'data-value-low="true"' : '';
+
+                return `
+                    <div class="combatant-card ${isActive ? 'active-turn' : ''}" data-id="${c.id}">
+                        <div class="initiative-badge">
+                            <span class="label">INIT</span>
+                            <div class="initiative-editor">
+                                <button class="initiative-btn" onclick="adjustInitiative(${c.id}, -1)" title="减少先攻">−</button>
+                                <input type="number" class="initiative-input" value="${c.initiative}"
+                                       ${dataAttrs}
+                                       onchange="updateInitiative(${c.id}, this.value)"
+                                       onkeydown="handleInitiativeKeydown(event, ${c.id})"
+                                       title="点击修改先攻值">
+                                <button class="initiative-btn" onclick="adjustInitiative(${c.id}, 1)" title="增加先攻">+</button>
+                            </div>
+                        </div>
+                        <div class="combatant-info">
+                            <div class="combatant-name">${c.name}</div>
+                            <div class="combatant-type ${c.type}">${typeLabels[c.type] || '单位'}</div>
+                            ${attackSummary}
+                            ${conditions.length > 0 ? `
+                                <div class="conditions-list">
+                                    ${conditions.map(cond => {
+                                        const def = CONDITION_DEFINITIONS[cond] || { name: cond, type: 'neutral', icon: '⚪', desc: '未知状态', effect: '效果未知' };
+                                        return `
+                                            <span class="condition-tag ${def.type}" onclick="removeCondition(${c.id}, '${cond}')">
+                                                <span class="icon">${def.icon}</span>
+                                                <span>${def.name}</span>
+                                                <div class="condition-tooltip">
+                                                    <div class="tooltip-title">
+                                                        <span>${def.icon}</span>
+                                                        <span>${def.name}</span>
+                                                        <span class="tooltip-type ${def.type}">${def.type}</span>
+                                                    </div>
+                                                    <div class="tooltip-desc">${def.desc}</div>
+                                                    <div class="tooltip-effect">效果: ${def.effect}</div>
+                                                </div>
+                                            </span>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="combatant-stats">
+                            <div class="stat-box">
+                                <span class="label">AC</span>
+                                <span class="value">${c.ac}</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="label">HP</span>
+                                <span class="value">${c.hp}/${c.maxHp}</span>
+                                <div class="hp-bar-container">
+                                    <div class="hp-bar ${hpClass}" style="width: ${Math.max(0, Math.min(100, hpPercent))}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="combatant-actions">
+                            <button class="action-btn damage" onclick="openHPModal(${c.id}, 'damage')" title="伤害">⚔️</button>
+                            <button class="action-btn heal" onclick="openHPModal(${c.id}, 'heal')" title="治疗">💚</button>
+                            <button class="action-btn condition" onclick="openConditionModal(${c.id})" title="状态">✨</button>
+                            <button class="action-btn delete" onclick="deleteCombatant(${c.id})" title="删除">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 下一回合
+        function nextTurn() {
+            if (combatants.length === 0) return;
+            
+            currentTurn++;
+            if (currentTurn >= combatants.length) {
+                currentTurn = 0;
+                currentRound++;
+                document.getElementById('roundNumber').textContent = currentRound;
+            }
+            renderCombatants();
+        }
+
+        // 上一回合
+        function prevTurn() {
+            if (combatants.length === 0) return;
+            
+            currentTurn--;
+            if (currentTurn < 0) {
+                if (currentRound > 1) {
+                    currentRound--;
+                    document.getElementById('roundNumber').textContent = currentRound;
+                    currentTurn = combatants.length - 1;
+                } else {
+                    currentTurn = 0;
+                }
+            }
+            renderCombatants();
+        }
+
+        // 重置战斗
+        function resetCombat() {
+            if (!confirm('确定要重置战斗吗？所有数据将被清空。')) return;
+            combatants = [];
+            currentTurn = 0;
+            currentRound = 1;
+            document.getElementById('roundNumber').textContent = currentRound;
+            renderCombatants();
+        }
+
+        // 清空全部
+        function clearAll() {
+            if (!confirm('确定要清空所有战斗单位吗？')) return;
+            combatants = [];
+            currentTurn = 0;
+            renderCombatants();
+        }
+
+        // 删除单位
+        function deleteCombatant(id) {
+            combatants = combatants.filter(c => c.id !== id);
+            if (currentTurn >= combatants.length) {
+                currentTurn = Math.max(0, combatants.length - 1);
+            }
+            renderCombatants();
+        }
+
+        // 按先攻排序
+        function sortByInitiative() {
+            combatants.sort((a, b) => b.initiative - a.initiative);
+            currentTurn = 0;
+            renderCombatants();
+        }
+
+        // 调整先攻值（+/- 按钮）
+        function adjustInitiative(id, delta) {
+            const combatant = combatants.find(c => c.id === id);
+            if (!combatant) return;
+
+            combatant.initiative += delta;
+
+            // 添加闪光动画效果
+            const input = document.querySelector(`.combatant-card[data-id="${id}"] .initiative-input`);
+            if (input) {
+                input.classList.add('changed');
+                setTimeout(() => input.classList.remove('changed'), 500);
+            }
+
+            // 重新排序并渲染
+            sortByInitiative();
+        }
+
+        // 处理先攻输入框键盘事件
+        function handleInitiativeKeydown(event, id) {
+            if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                adjustInitiative(id, 1);
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                adjustInitiative(id, -1);
+            } else if (event.key === 'Enter') {
+                event.target.blur();
+            }
+        }
+
+        // 更新先攻值（直接输入）
+        function updateInitiative(id, value) {
+            const combatant = combatants.find(c => c.id === id);
+            if (!combatant) return;
+
+            const newInitiative = parseInt(value) || 0;
+            combatant.initiative = newInitiative;
+
+            // 添加闪光动画效果
+            const input = document.querySelector(`.combatant-card[data-id="${id}"] .initiative-input`);
+            if (input) {
+                input.classList.add('changed');
+                setTimeout(() => input.classList.remove('changed'), 500);
+            }
+
+            // 重新排序并渲染
+            sortByInitiative();
+        }
+
+        // 打开HP模态框
+        function openHPModal(id, action) {
+            hpAction = action;
+            document.getElementById('hpTargetId').value = id;
+            document.getElementById('hpAmount').value = '';
+            openModal('hpModal');
+            document.getElementById('hpAmount').focus();
+        }
+
+        // 设置HP操作
+        function setHPAction(action) {
+            hpAction = action;
+        }
+
+        // 应用HP变化
+        function applyHPChange(event) {
+            event.preventDefault();
+            const id = parseInt(document.getElementById('hpTargetId').value);
+            const amount = parseInt(document.getElementById('hpAmount').value) || 0;
+            
+            const combatant = combatants.find(c => c.id === id);
+            if (!combatant) return;
+
+            if (hpAction === 'damage') {
+                combatant.hp = Math.max(0, combatant.hp - amount);
+            } else if (hpAction === 'heal') {
+                combatant.hp = Math.min(combatant.maxHp, combatant.hp + amount);
+            }
+
+            renderCombatants();
+            closeModal('hpModal');
+        }
+
+        // 打开状态模态框
+        function openConditionModal(id) {
+            document.getElementById('conditionTargetId').value = id;
+            document.getElementById('conditionType').value = '';
+            openModal('conditionModal');
+        }
+
+        // 添加状态
+        function addCondition(event) {
+            event.preventDefault();
+            const id = parseInt(document.getElementById('conditionTargetId').value);
+            const type = document.getElementById('conditionType').value;
+
+            if (!type) return;
+
+            const combatant = combatants.find(c => c.id === id);
+            if (combatant && !combatant.conditions.includes(type)) {
+                combatant.conditions.push(type);
+            }
+
+            renderCombatants();
+            closeModal('conditionModal');
+        }
+
+        // 移除状态
+        function removeCondition(combatantId, conditionType) {
+            const combatant = combatants.find(c => c.id === combatantId);
+            if (!combatant) return;
+
+            combatant.conditions = combatant.conditions.filter(c => c !== conditionType);
+            renderCombatants();
+        }
+
+        // 打开怪物数据库
+        function openMonsterDB() {
+            renderMonsters(currentMonsterCategory);
+            openModal('monsterModal');
+        }
+
+        function switchTab(evt, tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            evt.currentTarget.classList.add('active');
+            renderMonsters(tab);
+        }
+
+        function renderMonsters(category) {
+            currentMonsterCategory = category;
+            const list = document.getElementById('monsterList');
+            const monsterList = monsters[category] || [];
+
+            if (monsterList.length === 0) {
+                list.innerHTML = '<p class="empty-text">当前分类暂无怪物数据</p>';
+                return;
+            }
+            
+            list.innerHTML = monsterList.map(m => `
+                <div class="monster-card" onclick="addMonster('${category}', '${m.id}')">
+                    <div class="monster-card-header">
+                        <div class="monster-name-row">
+                            <div class="monster-name">${m.name}</div>
+                            <span class="monster-source-tag">${m.sourceLabel || '规则数据'}</span>
+                        </div>
+                        <span class="monster-cr">CR ${m.cr || '-'}</span>
+                    </div>
+                    <div class="monster-stats">HP: ${m.hp} | AC: ${m.ac} | 先攻: ${m.initiative >= 0 ? '+' : ''}${m.initiative}</div>
+                    <div class="monster-attacks">${m.attackSummary || '暂无攻击信息'}</div>
+                    <div class="monster-card-hint">点击卡片按上方数量添加</div>
+                </div>
+            `).join('');
+
+            searchMonsters();
+        }
+
+        function searchMonsters() {
+            const search = document.getElementById('monsterSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.monster-card');
+            
+            cards.forEach(card => {
+                const haystack = card.textContent.toLowerCase();
+                card.style.display = haystack.includes(search) ? 'flex' : 'none';
+            });
+        }
+
+        function addMonster(category, monsterId) {
+            const monster = (monsters[category] || []).find(item => item.id === monsterId);
+            const monsterData = findMonsterById(monsterId) || monster;
+            if (!monsterData) return;
+
+            const quantity = getMonsterQuantity();
+
+            for (let i = 0; i < quantity; i++) {
+                combatants.push(createMonsterCombatant({ ...monsterData, id: monsterId }, i, quantity));
+            }
+
+            closeModal('monsterModal');
+            sortByInitiative();
+            showNotification(`已添加 ${quantity} 个 ${monsterData.name}`);
+        }
+
+        // 打开预设
+        function openPresets() {
+            renderPresets();
+            openModal('presetModal');
+        }
+
+        // 渲染预设战斗列表
+        function renderPresets() {
+            const container = document.getElementById('presetList');
+            if (!container) return;
+
+            const presetCampaigns = getAllPresetCampaigns();
+            if (Object.keys(presetCampaigns).length === 0) {
+                container.innerHTML = '<p class="empty-text">暂无预设战斗</p>';
+                return;
+            }
+            
+            let html = '';
+            
+            Object.entries(presetCampaigns).forEach(([campaignKey, campaign]) => {
+                html += `
+                    <div class="preset-campaign">
+                        <h4 class="preset-campaign-title">${campaign.name}</h4>
+                        <p class="preset-campaign-desc">${campaign.description}</p>
+                `;
+                
+                if (campaign.chapters) {
+                    Object.entries(campaign.chapters).forEach(([chapterKey, chapter]) => {
+                        html += `
+                            <div class="preset-chapter">
+                                <h5 class="preset-chapter-title">${chapter.name}</h5>
+                                <p class="preset-chapter-desc">${chapter.description}</p>
+                                <div class="preset-encounters">
+                        `;
+                        
+                        if (chapter.encounters) {
+                            Object.entries(chapter.encounters).forEach(([encounterKey, encounter]) => {
+                                const encounterMonsters = Array.isArray(encounter.monsters) ? encounter.monsters : [];
+                                const monsterList = encounterMonsters.map(m => {
+                                    const monsterData = findMonsterById(m.id);
+                                    return monsterData ? `${monsterData.name} x${m.count}` : `${m.id} x${m.count}`;
+                                }).join(', ');
+                                const totalCount = encounterMonsters.reduce((sum, item) => sum + (Number(item.count) || 0), 0);
+                                const ruleLabel = campaignKey === 'extended_rules' ? '扩展规则' : '官方规则';
+                                const difficultyLabel = encounter.difficulty ? formatEncounterDifficulty(encounter.difficulty) : '';
+                                const tacticsHtml = encounter.tactics ? `<div class="preset-encounter-tactics">战术：${encounter.tactics}</div>` : '';
+                                
+                                html += `
+                                    <div class="preset-encounter-card" onclick="loadPresetEncounter('${campaignKey}', '${chapterKey}', '${encounterKey}')">
+                                        <div class="preset-encounter-name">${encounter.name}</div>
+                                        <div class="preset-encounter-desc">${encounter.description}</div>
+                                        <div class="preset-encounter-meta">
+                                            <span class="preset-pill">${ruleLabel}</span>
+                                            ${difficultyLabel ? `<span class="preset-pill">${difficultyLabel}</span>` : ''}
+                                            <span class="preset-pill">共 ${totalCount} 个怪物</span>
+                                        </div>
+                                        <div class="preset-encounter-monsters">${monsterList}</div>
+                                        ${tacticsHtml}
+                                    </div>
+                                `;
+                            });
+                        }
+                        
+                        html += '</div></div>';
+                    });
+                }
+                
+                html += '</div>';
+            });
+            
+            container.innerHTML = html || '<p class="empty-text">暂无预设战斗</p>';
+        }
+
+        function buildExtendedPresetCampaign() {
+            const encounters = MONSTERS_DATA_EXTENDED?.encounters?.encounters;
+            if (!Array.isArray(encounters) || encounters.length === 0) {
+                return null;
+            }
+
+            return {
+                name: MONSTERS_DATA_EXTENDED.encounters.name || '扩展规则遭遇',
+                description: MONSTERS_DATA_EXTENDED.encounters.description || '扩展规则中的常用遭遇组合',
+                chapters: {
+                    extension: {
+                        name: '扩展规则遭遇',
+                        description: '按扩展规则预置好怪物数量与战术',
+                        encounters: Object.fromEntries(
+                            encounters.map((encounter, index) => [
+                                `extended_${index}`,
+                                {
+                                    name: encounter.name,
+                                    description: encounter.description,
+                                    difficulty: encounter.difficulty,
+                                    tactics: encounter.tactics,
+                                    monsters: (encounter.enemies || []).map(enemy => ({
+                                        id: enemy.monster,
+                                        count: enemy.count
+                                    }))
+                                }
+                            ])
+                        )
+                    }
+                }
+            };
+        }
+
+        function getAllPresetCampaigns() {
+            const campaigns = typeof PRESET_ENCOUNTERS !== 'undefined' && PRESET_ENCOUNTERS ? { ...PRESET_ENCOUNTERS } : {};
+            const extendedCampaign = buildExtendedPresetCampaign();
+
+            if (extendedCampaign) {
+                campaigns.extended_rules = extendedCampaign;
+            }
+
+            return campaigns;
+        }
+
+        function formatEncounterDifficulty(difficulty) {
+            const labels = {
+                easy: '简单',
+                medium: '中等',
+                hard: '困难',
+                deadly: '致命'
+            };
+
+            return labels[difficulty] || difficulty;
+        }
+
+        function findMonsterById(id) {
+            const dataSources = [
+                typeof MONSTERS_DATA !== 'undefined' ? MONSTERS_DATA : null,
+                typeof MONSTERS_DATA_EXTENDED !== 'undefined' ? MONSTERS_DATA_EXTENDED : null
+            ].filter(Boolean);
+            
+            for (const dataSource of dataSources) {
+                for (const moduleKey in dataSource) {
+                    const module = dataSource[moduleKey];
+                    if (module && module.monsters && module.monsters[id]) {
+                        return module.monsters[id];
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        function loadPresetEncounter(campaignKey, chapterKey, encounterKey) {
+            const presetCampaigns = getAllPresetCampaigns();
+            const encounter = presetCampaigns[campaignKey]?.chapters?.[chapterKey]?.encounters?.[encounterKey];
+            if (!encounter) return;
+            
+            if (combatants.length > 0) {
+                if (!confirm('加载预设战斗将清空当前战斗列表，是否继续？')) {
+                    return;
+                }
+                combatants = [];
+            }
+
+            currentTurn = 0;
+            currentRound = 1;
+            document.getElementById('roundNumber').textContent = currentRound;
+            
+            (encounter.monsters || []).forEach(monsterRef => {
+                const monsterData = findMonsterById(monsterRef.id);
+                if (!monsterData) return;
+
+                const count = Math.max(1, Number(monsterRef.count) || 1);
+                for (let i = 0; i < count; i++) {
+                    combatants.push(createMonsterCombatant({ ...monsterData, id: monsterRef.id }, i, count));
+                }
+            });
+            
+            closeModal('presetModal');
+            sortByInitiative();
+            showNotification(`已加载预设战斗：${encounter.name}`);
+        }
+
+        // 显示通知
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan));
+                color: var(--bg-primary);
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                font-weight: 600;
+                box-shadow: 0 4px 20px rgba(57, 255, 20, 0.3);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        checkForDMAssistantTransfer();
+        trackToolUsage('combat-tracker', '战斗追踪器');
+
+        // 模态框控制
+        function openModal(id) {
+            document.getElementById(id).classList.add('show');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        // 点击模态框外部关闭
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        });
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('show'));
+            }
+            if (e.key === ' ' && document.querySelectorAll('.modal-overlay.show').length === 0) {
+                e.preventDefault();
+                nextTurn();
+            }
+        });
+    </script>
 </body>
 </html>
+
+

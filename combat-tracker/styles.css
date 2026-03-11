@@ -1,1764 +1,247 @@
-/* CSS Variables - Light Theme (Default) */
-:root {
-    --primary-color: #8b4513;
-    --primary-dark: #5d2e0c;
-    --primary-light: #d4a574;
-    --secondary-color: #2c3e50;
-    --accent-color: #c9a227;
-    --success-color: #27ae60;
-    --warning-color: #f39c12;
-    --danger-color: #e74c3c;
-    --info-color: #3498db;
-    
-    --bg-color: #f5f5dc;
-    --card-bg: #fffef0;
-    --header-bg: linear-gradient(135deg, #8b4513 0%, #5d2e0c 100%);
-    --text-color: #2c1810;
-    --text-light: #5a4a3a;
-    --text-muted: #8b7355;
-    --border-color: #d4c5b5;
-    --input-bg: #fff;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.2);
-    --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.1);
-    
-    --player-color: #3498db;
-    --enemy-color: #e74c3c;
-    --npc-color: #9b59b6;
-    --active-turn: rgba(201, 162, 39, 0.2);
-    
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-    
-    --transition: all 0.3s ease;
+.combat-tracker-page {
+    --combat-header-glow: rgba(255, 107, 53, 0.24);
 }
 
-/* Dark Theme */
-[data-theme="dark"] {
-    --primary-color: #c9a227;
-    --primary-dark: #a08220;
-    --primary-light: #e6c86e;
-    --secondary-color: #34495e;
-    --accent-color: #f1c40f;
-    --success-color: #2ecc71;
-    --warning-color: #f39c12;
-    --danger-color: #e74c3c;
-    --info-color: #5dade2;
-    
-    --bg-color: #1a1a2e;
-    --card-bg: #16213e;
-    --header-bg: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-    --text-color: #eaeaea;
-    --text-light: #b8b8b8;
-    --text-muted: #7f8c8d;
-    --border-color: #2d3748;
-    --input-bg: #2d3748;
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.5);
-    --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.3);
-    
-    --player-color: #5dade2;
-    --enemy-color: #ec7063;
-    --npc-color: #af7ac5;
-    --active-turn: rgba(241, 196, 15, 0.15);
+.combat-tracker-page .page-header {
+    padding: var(--space-8) 0 var(--space-6);
 }
 
-/* Reset & Base */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', 'Microsoft YaHei', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--bg-color);
-    color: var(--text-color);
-    min-height: 100vh;
-    line-height: 1.6;
-    transition: var(--transition);
-}
-
-/* Header */
-.header {
-    background: var(--header-bg);
-    color: white;
-    padding: 1rem 2rem;
-    box-shadow: var(--shadow);
-}
-
-.header-content {
-    max-width: 1400px;
+.combat-tracker-page .page-header-shell {
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 0 var(--space-6);
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    align-items: flex-start;
+    gap: var(--space-4);
 }
 
-.back-link {
-    color: white;
-    text-decoration: none;
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-md);
-    transition: var(--transition);
-    white-space: nowrap;
-}
-
-.back-link:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.header h1 {
-    font-size: 1.8rem;
-    text-align: center;
-    flex: 1;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.theme-toggle {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    padding: 0.5rem;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.theme-toggle:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1);
-}
-
-/* Main Content */
-.main-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 1.5rem;
-}
-
-/* Control Panel */
-.control-panel {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--card-bg);
-    padding: 1rem 1.5rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.round-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.2rem;
-}
-
-.round-number {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--primary-color);
-    min-width: 50px;
-    text-align: center;
-}
-
-.combat-controls {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-/* Buttons */
-.btn {
-    padding: 0.6rem 1.2rem;
-    border: none;
-    border-radius: var(--radius-md);
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    white-space: nowrap;
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
-}
-
-.btn:active {
-    transform: translateY(0);
-}
-
-.btn-primary {
-    background: var(--primary-color);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: var(--primary-dark);
-}
-
-.btn-secondary {
-    background: var(--secondary-color);
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #34495e;
-}
-
-.btn-success {
-    background: var(--success-color);
-    color: white;
-}
-
-.btn-success:hover {
-    background: #229954;
-}
-
-.btn-warning {
-    background: var(--warning-color);
-    color: white;
-}
-
-.btn-warning:hover {
-    background: #e67e22;
-}
-
-.btn-danger {
-    background: var(--danger-color);
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #c0392b;
-}
-
-.btn-small {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
-}
-
-/* Add Combatant Section */
-.add-combatant-section {
-    background: var(--card-bg);
-    padding: 1.5rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    margin-bottom: 1.5rem;
-}
-
-.section-title {
-    font-size: 1.3rem;
-    margin-bottom: 1rem;
-    color: var(--text-color);
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 0.5rem;
-}
-
-/* Forms */
-.add-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.form-row {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    align-items: flex-end;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    flex: 1;
-    min-width: 120px;
-}
-
-.form-group.small {
-    flex: 0 0 100px;
-    min-width: 80px;
-}
-
-.form-group.full {
-    flex: 2;
-    min-width: 200px;
-}
-
-.form-group label {
-    font-size: 0.85rem;
-    color: var(--text-light);
-    font-weight: 500;
-}
-
-.form-group input,
-.form-group select {
-    padding: 0.6rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    background: var(--input-bg);
-    color: var(--text-color);
-    font-size: 0.95rem;
-    transition: var(--transition);
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-}
-
-.checkbox-label input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
-
-.add-btn {
-    height: fit-content;
-    padding: 0.7rem 1.5rem;
-}
-
-/* Initiative List Section */
-.initiative-list-section {
-    background: var(--card-bg);
-    padding: 1.5rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.section-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-/* Initiative List */
-.initiative-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-/* Combatant Card */
-.combatant-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    border-radius: var(--radius-md);
-    background: var(--input-bg);
-    border: 2px solid transparent;
-    box-shadow: var(--shadow-card);
-    transition: var(--transition);
-    position: relative;
-}
-
-.combatant-card:hover {
-    transform: translateX(4px);
-    box-shadow: var(--shadow-hover);
-}
-
-.combatant-card.active-turn {
-    border-color: var(--accent-color);
-    background: var(--active-turn);
-    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.3);
-}
-
-.combatant-card.player {
-    border-left: 4px solid var(--player-color);
-}
-
-.combatant-card.enemy {
-    border-left: 4px solid var(--enemy-color);
-}
-
-.combatant-card.npc {
-    border-left: 4px solid var(--npc-color);
-}
-
-.combatant-card.defeated {
-    opacity: 0.5;
-    filter: grayscale(0.5);
-}
-
-.combatant-card.critical {
-    animation: pulse-red 1.5s infinite;
-}
-
-@keyframes pulse-red {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
-    50% { box-shadow: 0 0 0 8px rgba(231, 76, 60, 0); }
-}
-
-/* Card Sections */
-.card-initiative {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 60px;
-}
-
-.initiative-value {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: var(--primary-color);
-    line-height: 1;
-}
-
-.initiative-input {
-    width: 60px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--primary-color);
-    text-align: center;
-    background: var(--card-bg);
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    padding: 0.25rem;
-    transition: var(--transition);
-}
-
-.initiative-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.3);
-}
-
-.initiative-label {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    margin-top: 0.25rem;
-}
-
-.card-info {
+.combat-tracker-page .page-header-content {
     flex: 1;
     min-width: 0;
-}
-
-.combatant-name {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.combatant-meta {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.85rem;
-    color: var(--text-light);
-    flex-wrap: wrap;
-}
-
-.meta-item {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.meta-item.ac {
-    color: var(--info-color);
-}
-
-.combatant-notes {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-top: 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* HP Bar */
-.card-hp {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    min-width: 150px;
+    gap: var(--space-2);
+    text-align: left;
 }
 
-.hp-bar-container {
-    height: 20px;
-    background: var(--border-color);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    position: relative;
-}
-
-.hp-bar {
-    height: 100%;
-    border-radius: var(--radius-sm);
-    transition: width 0.3s ease, background-color 0.3s ease;
-}
-
-.hp-bar.high { background: linear-gradient(90deg, #27ae60, #2ecc71); }
-.hp-bar.medium { background: linear-gradient(90deg, #f39c12, #f1c40f); }
-.hp-bar.low { background: linear-gradient(90deg, #e74c3c, #c0392b); }
-
-.hp-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-    white-space: nowrap;
-}
-
-.hp-controls {
-    display: flex;
-    gap: 0.3rem;
-}
-
-.hp-btn {
-    flex: 1;
-    padding: 0.3rem;
-    font-size: 0.75rem;
-    border-radius: var(--radius-sm);
-}
-
-/* Conditions */
-.card-conditions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    max-width: 200px;
-}
-
-.condition-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.condition-tag:hover {
-    transform: scale(1.05);
-}
-
-.condition-tag.debuff {
-    background: rgba(231, 76, 60, 0.15);
-    color: #c0392b;
-    border: 1px solid rgba(231, 76, 60, 0.3);
-}
-
-[data-theme="dark"] .condition-tag.debuff {
-    background: rgba(231, 76, 60, 0.25);
-    color: #ec7063;
-}
-
-.condition-tag.buff {
-    background: rgba(39, 174, 96, 0.15);
-    color: #27ae60;
-    border: 1px solid rgba(39, 174, 96, 0.3);
-}
-
-[data-theme="dark"] .condition-tag.buff {
-    background: rgba(46, 204, 113, 0.25);
-    color: #2ecc71;
-}
-
-.condition-tag.neutral {
-    background: rgba(155, 89, 182, 0.15);
-    color: #8e44ad;
-    border: 1px solid rgba(155, 89, 182, 0.3);
-}
-
-.condition-duration {
-    font-size: 0.65rem;
-    opacity: 0.8;
-}
-
-.add-condition-btn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-    background: transparent;
-    border: 1px dashed var(--border-color);
-    color: var(--text-muted);
-}
-
-.add-condition-btn:hover {
-    border-style: solid;
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-}
-
-/* Card Actions */
-.card-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.card-actions .btn {
-    padding: 0.4rem;
-    font-size: 0.8rem;
-}
-
-/* Turn Indicator */
-.turn-indicator {
-    position: absolute;
-    left: -12px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
-    border-left: 12px solid var(--accent-color);
-    display: none;
-}
-
-.combatant-card.active-turn .turn-indicator {
-    display: block;
-}
-
-/* Empty State */
-.empty-state {
-    text-align: center;
-    padding: 3rem;
-    color: var(--text-muted);
-}
-
-.empty-state-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-
-.empty-state-text {
-    font-size: 1.1rem;
-}
-
-/* Modal */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-}
-
-.modal.show {
-    display: flex;
-}
-
-.modal-content {
-    background: var(--card-bg);
-    border-radius: var(--radius-lg);
-    max-width: 500px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-hover);
-    animation: modal-in 0.3s ease;
-}
-
-@keyframes modal-in {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.modal-header h3 {
-    font-size: 1.2rem;
+.combat-tracker-page .page-eyebrow {
     margin: 0;
+    color: var(--neon-orange);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: var(--text-muted);
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
+.combat-tracker-page .page-title {
+    margin: 0;
+    background: linear-gradient(135deg, var(--neon-orange), var(--neon-red));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.combat-tracker-page .page-subtitle {
+    margin: 0;
+    max-width: 720px;
+    color: var(--text-secondary);
+}
+
+.combat-tracker-page .page-header-actions {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-sm);
-    transition: var(--transition);
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    flex-wrap: wrap;
 }
 
-.close-btn:hover {
-    background: var(--border-color);
-    color: var(--text-color);
+.combat-tracker-page .back-link {
+    position: static;
+    transform: none;
+    margin-top: var(--space-2);
+    flex-shrink: 0;
 }
 
-.modal-body {
-    padding: 1.5rem;
+.combat-tracker-page .back-link:hover {
+    transform: translateX(-4px);
+    box-shadow: 0 0 24px var(--combat-header-glow);
 }
 
-.modal-body .form-group {
-    margin-bottom: 1rem;
-}
-
-.hp-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.hp-actions .btn {
-    flex: 1;
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .combatant-card {
-        flex-wrap: wrap;
-    }
-    
-    .card-hp {
-        width: 100%;
-        min-width: auto;
-    }
-    
-    .card-conditions {
-        max-width: none;
-        width: 100%;
-    }
+.combat-tracker-page .back-link:active {
+    transform: translateX(-2px);
 }
 
 @media (max-width: 768px) {
-    .header h1 {
-        font-size: 1.3rem;
-    }
-    
-    .control-panel {
+    .combat-tracker-page .page-header-shell,
+    .combat-tracker-page .page-header-content {
         flex-direction: column;
-        text-align: center;
+        align-items: stretch;
     }
-    
-    .combat-controls {
-        width: 100%;
+
+    .combat-tracker-page .page-title,
+    .combat-tracker-page .page-subtitle {
+        text-align: left;
+    }
+
+    .combat-tracker-page .back-link {
         justify-content: center;
-    }
-    
-    .form-row {
-        flex-direction: column;
-    }
-    
-    .form-group.small {
-        flex: 1;
-        min-width: auto;
-    }
-    
-    .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .combatant-card {
-        padding: 0.75rem;
-    }
-    
-    .card-actions {
-        flex-direction: row;
-        width: 100%;
-        justify-content: flex-end;
+        width: fit-content;
+        margin-bottom: 0;
     }
 }
 
 @media (max-width: 480px) {
-    .main-content {
-        padding: 1rem;
+    .combat-tracker-page .page-header-shell {
+        padding: 0 var(--space-4);
     }
-    
-    .header {
-        padding: 1rem;
-    }
-    
-    .header h1 {
-        font-size: 1.1rem;
-    }
-    
-    .btn {
-        padding: 0.5rem 0.8rem;
-        font-size: 0.85rem;
-    }
-    
-    .initiative-value {
-        font-size: 1.4rem;
-    }
-    
-    .combatant-name {
-        font-size: 1rem;
+
+    .combat-tracker-page .back-link {
+        width: 100%;
     }
 }
-
-/* Print Styles */
-@media print {
-    .header,
-    .control-panel,
-    .add-combatant-section,
-    .section-actions,
-    .card-actions,
-    .hp-controls,
-    .add-condition-btn {
-        display: none !important;
-    }
-    
-    .combatant-card {
-        break-inside: avoid;
-        border: 1px solid #ccc;
-    }
-}
-
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg-color);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
-}
-
-/* Drag and Drop */
-.combatant-card.dragging {
-    opacity: 0.5;
-    cursor: move;
-}
-
-.combatant-card.drag-over {
-    border: 2px dashed var(--primary-color);
-}
-
-.drag-handle {
-    cursor: grab;
-    padding: 0.5rem;
-    color: var(--text-muted);
-    user-select: none;
-}
-
-.drag-handle:active {
-    cursor: grabbing;
-}
-
-/* Quick Actions */
-.quick-actions {
+.combat-tracker-page .monster-toolbar {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    align-items: stretch;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
     flex-wrap: wrap;
 }
 
-.quick-actions .btn {
-    flex: 1;
-    min-width: 150px;
-    padding: 1rem;
-    font-size: 1.1rem;
-}
-
-/* Large Modal */
-.modal-content.large-modal {
-    max-width: 900px;
-    width: 95%;
-}
-
-/* Monster Database Tabs */
-.monster-database-tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    border-bottom: 2px solid var(--border-color);
-    padding-bottom: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.tab-btn {
-    padding: 0.6rem 1.2rem;
-    border: none;
-    background: transparent;
-    color: var(--text-light);
-    font-size: 0.95rem;
-    cursor: pointer;
-    border-radius: var(--radius-md);
-    transition: var(--transition);
-    white-space: nowrap;
-}
-
-.tab-btn:hover {
-    background: var(--border-color);
-    color: var(--text-color);
-}
-
-.tab-btn.active {
-    background: var(--primary-color);
-    color: white;
-}
-
-/* Monster Search */
-.monster-search {
-    margin-bottom: 1rem;
-}
-
-.monster-search input {
-    width: 100%;
-    padding: 0.8rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    background: var(--input-bg);
-    color: var(--text-color);
-    font-size: 1rem;
-}
-
-.monster-search input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
-}
-
-/* Monster List */
-.monster-list {
-    max-height: 500px;
-    overflow-y: auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
-}
-
-.monster-card {
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 1rem;
-    transition: var(--transition);
-    cursor: pointer;
-}
-
-.monster-card:hover {
-    border-color: var(--primary-color);
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-2px);
-}
-
-.monster-card.selected {
-    border-color: var(--success-color);
-    background: rgba(39, 174, 96, 0.1);
-}
-
-.monster-name {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: var(--text-color);
-}
-
-.monster-stats {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.85rem;
-    color: var(--text-light);
-    margin-bottom: 0.5rem;
-}
-
-.monster-stat {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.monster-cr {
-    background: var(--primary-color);
-    color: white;
-    padding: 0.2rem 0.5rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.monster-notes {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    line-height: 1.4;
-    margin-top: 0.5rem;
-}
-
-.monster-source {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: 0.5rem;
-    font-style: italic;
-}
-
-.monster-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-}
-
-.monster-actions .btn {
-    flex: 1;
-    padding: 0.4rem;
-    font-size: 0.85rem;
-}
-
-/* Encounter Campaigns */
-.encounter-campaigns {
-    max-height: 600px;
-    overflow-y: auto;
-}
-
-.campaign-section {
-    margin-bottom: 1.5rem;
-}
-
-.campaign-header {
-    background: var(--primary-color);
-    color: white;
-    padding: 1rem;
-    border-radius: var(--radius-md);
-    margin-bottom: 1rem;
-}
-
-.campaign-title {
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-}
-
-.campaign-description {
-    font-size: 0.9rem;
-    opacity: 0.9;
-}
-
-.chapter-section {
-    margin-bottom: 1.5rem;
-    padding-left: 1rem;
-    border-left: 3px solid var(--border-color);
-}
-
-.chapter-header {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: 0.3rem;
-}
-
-.chapter-description {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-bottom: 0.75rem;
-}
-
-.encounter-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
-}
-
-.encounter-card {
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 1rem;
-    transition: var(--transition);
-    cursor: pointer;
-}
-
-.encounter-card:hover {
-    border-color: var(--success-color);
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-2px);
-}
-
-.encounter-name {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-    color: var(--text-color);
-}
-
-.encounter-description {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-bottom: 0.75rem;
-}
-
-.encounter-monsters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-}
-
-.encounter-monster-tag {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    padding: 0.2rem 0.5rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    color: var(--text-light);
-}
-
-.encounter-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-}
-
-.encounter-actions .btn {
-    flex: 1;
-    padding: 0.5rem;
-    font-size: 0.9rem;
-}
-
-/* Selected Monsters Panel */
-.selected-monsters-panel {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 1rem;
-    margin-top: 1rem;
-}
-
-.selected-monsters-title {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-    color: var(--text-color);
-}
-
-.selected-monsters-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.selected-monster-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--primary-color);
-    color: white;
-    padding: 0.4rem 0.8rem;
-    border-radius: var(--radius-md);
-    font-size: 0.9rem;
-}
-
-.selected-monster-tag button {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 0;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Monster Card Enhancements */
-.monster-card {
-    position: relative;
-}
-
-.monster-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0.5rem;
-}
-
-.monster-header .monster-name {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-color);
-    flex: 1;
-    margin-right: 0.5rem;
-}
-
-.monster-traits-preview {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.3rem;
-    margin: 0.5rem 0;
-}
-
-.trait-tag {
-    background: var(--primary-color);
-    color: white;
-    padding: 0.2rem 0.5rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    cursor: help;
-}
-
-.trait-more {
-    background: var(--border-color);
-    color: var(--text-muted);
-    padding: 0.2rem 0.5rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-}
-
-.monster-attacks-preview {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    padding: 0.5rem;
-    margin: 0.5rem 0;
-}
-
-.attacks-title {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: 0.3rem;
-}
-
-.attacks-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-}
-
-.attack-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-    padding: 0.2rem 0;
-    border-bottom: 1px dashed var(--border-color);
-}
-
-.attack-item:last-child {
-    border-bottom: none;
-}
-
-.attack-name {
-    flex: 1;
-    color: var(--text-color);
-    font-weight: 500;
-}
-
-.attack-bonus {
-    color: var(--success-color);
-    font-weight: 600;
-    min-width: 2rem;
-    text-align: center;
-}
-
-.attack-damage {
-    color: var(--danger-color);
-    font-size: 0.75rem;
-}
-
-.attack-more {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-style: italic;
-    text-align: center;
-    padding-top: 0.2rem;
-}
-
-/* Monster Details Modal */
-.monster-details-body {
-    max-height: 70vh;
-    overflow-y: auto;
-    padding: 1rem;
-}
-
-.monster-details-section {
-    margin-bottom: 1.5rem;
-}
-
-.monster-details-section:last-child {
+.combat-tracker-page .monster-toolbar .search-box {
+    flex: 1 1 280px;
     margin-bottom: 0;
 }
 
-.monster-details-header {
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
+.combat-tracker-page .monster-quantity-control {
+    min-width: 148px;
+    padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-md);
-    padding: 1rem;
-}
-
-.monster-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.meta-tag {
-    padding: 0.3rem 0.6rem;
-    border-radius: var(--radius-sm);
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
-.meta-tag.size {
-    background: var(--primary-color);
-    color: white;
-}
-
-.meta-tag.alignment {
-    background: var(--secondary-color);
-    color: white;
-}
-
-.meta-tag.cr {
-    background: var(--success-color);
-    color: white;
-}
-
-.meta-tag.xp {
-    background: var(--warning-color);
-    color: white;
-}
-
-.monster-basic-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-}
-
-.basic-stat {
-    text-align: center;
-}
-
-.basic-stat .stat-label {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-bottom: 0.2rem;
-}
-
-.basic-stat .stat-value {
-    display: block;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-.abilities-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 0.5rem;
-}
-
-.ability-box {
-    background: var(--input-bg);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 0.5rem;
-    text-align: center;
-}
-
-.ability-name {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-bottom: 0.2rem;
-}
-
-.ability-value {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-.ability-mod {
-    font-size: 0.85rem;
-    color: var(--text-light);
-}
-
-.traits-list {
+    background: rgba(255, 107, 53, 0.08);
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--space-2);
 }
 
-.trait-detail {
-    background: var(--input-bg);
-    border-left: 3px solid var(--primary-color);
-    padding: 0.75rem;
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+.combat-tracker-page .monster-quantity-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--neon-orange);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
-.trait-detail .trait-name {
-    font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: 0.3rem;
+.combat-tracker-page #monsterQuantity {
+    min-height: 42px;
 }
 
-.trait-detail .trait-description {
-    font-size: 0.9rem;
-    color: var(--text-light);
-    line-height: 1.4;
-}
-
-.actions-list {
+.combat-tracker-page .monster-card {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--space-2);
 }
 
-.action-detail {
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 0.75rem;
-}
-
-.action-detail.bonus-action {
-    border-left: 3px solid var(--success-color);
-}
-
-.action-detail.reaction {
-    border-left: 3px solid var(--warning-color);
-}
-
-.action-header {
+.combat-tracker-page .monster-card-header,
+.combat-tracker-page .monster-name-row,
+.combat-tracker-page .preset-encounter-meta {
     display: flex;
+}
+
+.combat-tracker-page .monster-card-header {
     justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-3);
+}
+
+.combat-tracker-page .monster-name-row {
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.combat-tracker-page .monster-source-tag,
+.combat-tracker-page .preset-pill {
+    display: inline-flex;
     align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.action-name {
+    width: fit-content;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
     font-weight: 600;
-    color: var(--text-color);
-    font-size: 1rem;
 }
 
-.action-type {
-    font-size: 0.8rem;
+.combat-tracker-page .monster-cr {
+    color: var(--neon-orange);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.combat-tracker-page .monster-attacks,
+.combat-tracker-page .preset-encounter-tactics,
+.combat-tracker-page .combatant-attack-summary {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.combat-tracker-page .monster-attacks,
+.combat-tracker-page .preset-encounter-tactics {
+    font-size: var(--text-xs);
+    padding-top: var(--space-2);
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.combat-tracker-page .monster-card-hint {
+    margin-top: auto;
     color: var(--text-muted);
-    background: var(--card-bg);
-    padding: 0.2rem 0.5rem;
-    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
 }
 
-.action-attack, .action-reach, .action-range, .action-target {
-    font-size: 0.85rem;
-    color: var(--text-light);
-    margin: 0.2rem 0;
+.combat-tracker-page .combatant-card {
+    grid-template-columns: auto minmax(0, 1.25fr) auto auto;
 }
 
-.action-hit {
-    font-size: 0.9rem;
-    color: var(--text-color);
-    margin: 0.5rem 0;
-    padding: 0.5rem;
-    background: var(--card-bg);
-    border-radius: var(--radius-sm);
+.combat-tracker-page .combatant-info {
+    min-width: 0;
 }
 
-.action-damage {
-    font-size: 0.9rem;
-    color: var(--danger-color);
-    font-weight: 600;
-    margin: 0.3rem 0;
+.combat-tracker-page .combatant-attack-summary {
+    display: grid;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
 }
 
-.action-description {
-    font-size: 0.85rem;
-    color: var(--text-light);
-    line-height: 1.4;
-    margin-top: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: 1px dashed var(--border-color);
+.combat-tracker-page .combatant-attack-label {
+    color: var(--neon-orange);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
-.section-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-color);
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.3rem;
-    border-bottom: 2px solid var(--primary-color);
-}
-
-.modal-footer {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-    padding: 1rem;
-    border-top: 1px solid var(--border-color);
-}
-
-/* Combat Attacks Display */
-.combat-attacks {
-    margin-top: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: 1px dashed var(--border-color);
-}
-
-.combat-attacks-list {
-    display: flex;
+.combat-tracker-page .preset-encounter-meta {
+    gap: var(--space-2);
     flex-wrap: wrap;
-    gap: 0.3rem;
+    margin-bottom: var(--space-2);
 }
 
-.combat-attack-item {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    padding: 0.2rem 0.4rem;
-    font-size: 0.75rem;
+.combat-tracker-page .preset-encounter-tactics {
+    margin-top: var(--space-2);
 }
 
-.attack-name-small {
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.attack-bonus-small {
-    color: var(--success-color);
-    font-weight: 600;
-}
-
-.attack-damage-small {
-    color: var(--danger-color);
-    font-family: monospace;
-}
-
-.attacks-more {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    font-style: italic;
-    margin-left: 0.3rem;
-}
-
-/* Responsive adjustments for monster database */
 @media (max-width: 768px) {
-    .monster-list {
-        grid-template-columns: 1fr;
-    }
-    
-    .encounter-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .monster-database-tabs {
+    .combat-tracker-page .monster-toolbar {
         flex-direction: column;
     }
-    
-    .tab-btn {
+
+    .combat-tracker-page .monster-quantity-control {
         width: 100%;
-        text-align: left;
     }
-    
-    .monster-basic-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .abilities-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .combat-attacks-list {
-        flex-direction: column;
-    }
-}
 
-/* Password Protection */
-.password-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-}
-
-.password-overlay.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-.password-modal {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: var(--radius-lg);
-    padding: 3rem;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    max-width: 400px;
-    width: 90%;
-    animation: passwordSlideIn 0.5s ease;
-}
-
-@keyframes passwordSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.password-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    animation: passwordPulse 2s infinite;
-}
-
-@keyframes passwordPulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-}
-
-.password-title {
-    font-size: 1.5rem;
-    color: var(--text-color);
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-}
-
-.password-hint {
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-}
-
-.password-input-group {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.password-input {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    font-size: 1.2rem;
-    border: 2px solid var(--border-color);
-    border-radius: var(--radius-md);
-    text-align: center;
-    letter-spacing: 0.2rem;
-    transition: var(--transition);
-}
-
-.password-input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.2);
-}
-
-.password-btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    white-space: nowrap;
-}
-
-.password-error {
-    color: var(--danger-color);
-    font-size: 0.85rem;
-    min-height: 1.5rem;
-    margin: 0;
-}
-
-.password-shake {
-    animation: passwordShake 0.5s ease;
-}
-
-@keyframes passwordShake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
-
-/* Responsive for password modal */
-@media (max-width: 480px) {
-    .password-modal {
-        padding: 2rem;
-    }
-    
-    .password-input-group {
-        flex-direction: column;
-    }
-    
-    .password-btn {
-        width: 100%;
+    .combat-tracker-page .combatant-card {
+        grid-template-columns: 1fr;
     }
 }

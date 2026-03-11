@@ -604,7 +604,7 @@ class CharacterApp {
         if (!container) return;
         
         if (!this.character.languages || this.character.languages.length === 0) {
-            container.innerHTML = '<span style="color: #999; font-size: 0.9rem;">暂无语言</span>';
+            container.innerHTML = '';
             return;
         }
         
@@ -612,26 +612,9 @@ class CharacterApp {
             const lang = LANGUAGES[langKey];
             const langName = lang ? lang.name : langKey;
             return `
-                <span class="language-tag" style="
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.25rem;
-                    padding: 0.25rem 0.5rem;
-                    background: rgba(139, 69, 19, 0.1);
-                    border: 1px solid var(--primary-color);
-                    border-radius: 4px;
-                    font-size: 0.85rem;
-                ">
+                <span class="language-tag">
                     ${langName}
-                    <button type="button" onclick="characterApp.removeLanguage('${langKey}')" style="
-                        background: none;
-                        border: none;
-                        cursor: pointer;
-                        padding: 0;
-                        color: #c0392b;
-                        font-size: 1rem;
-                        line-height: 1;
-                    " title="移除">×</button>
+                    <button type="button" class="remove-lang" onclick="characterApp.removeLanguage('${langKey}')" title="移除">×</button>
                 </span>
             `;
         }).join('');
@@ -1830,14 +1813,11 @@ class CharacterApp {
         // 处理特性给予的法术
         this.processFeatureSpells();
         
-        // 法术列表（左侧表单）
-        this.renderSpells();
+        // 法术列表（左侧表单）- 合并后的统一模块
+        this.renderUnifiedSpells();
         
         // 专长列表（左侧表单）
         this.renderFeats();
-        
-        // 准备法术列表（左侧表单）
-        this.renderPreparedSpells();
         
         // 角色卡预览（右侧）
         this.renderSheetSkills();
@@ -2013,59 +1993,319 @@ class CharacterApp {
         return duration.includes('至多') || duration.includes('专注');
     }
 
-    // 渲染法术列表
-    renderSpells() {
+    // 渲染统一的法术管理模块（合并法术列表和准备法术列表）
+    renderUnifiedSpells() {
+        // 渲染法术环位信息
+        this.renderSpellSlotsInfo();
+        
+        // 渲染法术列表（按等级分组）
+        this.renderSpellsByLevel();
+    }
+    
+    // 渲染法术环位信息
+    renderSpellSlotsInfo() {
+        const slotsContainer = document.getElementById('spellSlotsInfo');
+        if (!slotsContainer) return;
+        
+        // 计算总等级
+        const totalLevel = this.character.level + (this.character.multiclass || []).reduce((sum, mc) => sum + mc.level, 0);
+        
+        // 检查是否是施法职业
+        const isSpellcaster = this.character.class && CLASSES[this.character.class]?.spellcasting;
+        const hasMulticlassSpellcaster = this.character.multiclass?.some(mc => CLASSES[mc.class]?.spellcasting);
+        
+        if (!isSpellcaster && !hasMulticlassSpellcaster) {
+            // 非施法职业，只显示特性法术
+            slotsContainer.innerHTML = '<span class="spell-slots-text">非施法职业，仅显示特性给予的法术</span>';
+        } else {
+            // 显示法术环位
+            slotsContainer.innerHTML = this.renderSpellSlots();
+        }
+    }
+    
+    // 渲染法术环位
+    renderSpellSlots() {
+        const totalLevel = this.character.level + (this.character.multiclass || []).reduce((sum, mc) => sum + mc.level, 0);
+        
+        // 获取法术位（简化版本，根据5e规则）
+        const spellSlots = this.calculateSpellSlots();
+        
+        if (!spellSlots) {
+            return '<span class="spell-slots-text">无法术位</span>';
+        }
+        
+        let html = '<span class="spell-slots-text">法术环位：</span>';
+        html += '<div class="spell-slots-grid">';
+        
+        for (let level = 1; level <= 9; level++) {
+            const slots = spellSlots[level] || 0;
+            const availableClass = slots > 0 ? 'available' : 'unavailable';
+            
+            html += `
+                <div class="spell-slot-item ${availableClass}">
+                    <span class="slot-level">${level}环</span>
+                    <span class="slot-count">${slots}</span>
+                </div>
+            `;
+        }
+        
+        html += '</div>';
+        return html;
+    }
+    
+    // 计算法术位 - 支持全施法者、半施法者、三分之一施法者和邪术师
+    calculateSpellSlots() {
+        if (!this.character.class) return null;
+        
+        const classId = this.character.class;
+        const level = this.character.level;
+        
+        // 邪术师使用契约魔法，单独处理
+        if (classId === 'warlock') {
+            return this.getWarlockSpellSlots();
+        }
+        
+        // 计算多职业施法等级
+        let casterLevel = this.calculateMulticlassCasterLevel();
+        
+        // 如果没有施法等级，返回空
+        if (casterLevel === 0) {
+            return {};
+        }
+        
+        // 使用标准法术位表（基于施法等级）
+        return this.getStandardSpellSlots(Math.min(casterLevel, 20));
+    }
+    
+    // 计算多职业施法等级
+    calculateMulticlassCasterLevel() {
+        let casterLevel = 0;
+        
+        // 全施法职业：等级直接相加
+        const fullCasters = ['bard', 'cleric', 'druid', 'sorcerer', 'wizard'];
+        // 半施法职业：等级除以2（向上取整）
+        const halfCasters = ['paladin', 'ranger'];
+        // 三分之一施法职业：等级除以3（向上取整）
+        const thirdCasters = ['fighter', 'rogue'];
+        
+        // 检查主职业
+        if (fullCasters.includes(this.character.class)) {
+            casterLevel += this.character.level;
+        } else if (halfCasters.includes(this.character.class)) {
+            casterLevel += Math.ceil(this.character.level / 2);
+        } else if (thirdCasters.includes(this.character.class)) {
+            // 检查是否是施法子职业
+            if (this.isSpellcastingSubclass(this.character.class, this.character.subclass)) {
+                casterLevel += Math.ceil(this.character.level / 3);
+            }
+        }
+        
+        // 检查多职业
+        if (this.character.multiclass) {
+            this.character.multiclass.forEach(mc => {
+                if (fullCasters.includes(mc.class)) {
+                    casterLevel += mc.level;
+                } else if (halfCasters.includes(mc.class)) {
+                    casterLevel += Math.ceil(mc.level / 2);
+                } else if (thirdCasters.includes(mc.class)) {
+                    if (this.isSpellcastingSubclass(mc.class, mc.subclass)) {
+                        casterLevel += Math.ceil(mc.level / 3);
+                    }
+                }
+            });
+        }
+        
+        return casterLevel;
+    }
+    
+    // 检查是否是施法子职业
+    isSpellcastingSubclass(classId, subclassId) {
+        if (!classId || !subclassId) return false;
+        
+        // 战士 - 奥法骑士
+        if (classId === 'fighter' && subclassId === 'eldritch_knight') return true;
+        // 游荡者 - 诡术师
+        if (classId === 'rogue' && subclassId === 'arcane_trickster') return true;
+        
+        return false;
+    }
+    
+    // 获取标准法术位表
+    getStandardSpellSlots(casterLevel) {
+        const slotTable = {
+            1: {1: 2}, 2: {1: 3}, 3: {1: 4, 2: 2}, 4: {1: 4, 2: 3},
+            5: {1: 4, 2: 3, 3: 2}, 6: {1: 4, 2: 3, 3: 3}, 7: {1: 4, 2: 3, 3: 3, 4: 1},
+            8: {1: 4, 2: 3, 3: 3, 4: 2}, 9: {1: 4, 2: 3, 3: 3, 4: 3, 5: 1},
+            10: {1: 4, 2: 3, 3: 3, 4: 3, 5: 2}, 11: {1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1},
+            12: {1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1}, 13: {1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1},
+            14: {1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1}, 15: {1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1},
+            16: {1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1}, 17: {1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1},
+            18: {1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 1, 8: 1, 9: 1},
+            19: {1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1},
+            20: {1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 2, 8: 1, 9: 1}
+        };
+        
+        return slotTable[casterLevel] || {};
+    }
+    
+    // 按等级渲染法术列表（统一的法术管理）
+    renderSpellsByLevel() {
         const container = document.getElementById('spellsList');
         if (!container) return;
         
         if (this.character.spells.length === 0) {
-            container.innerHTML = '<p>尚未选择法术</p>';
+            container.innerHTML = '<p class="empty-text">尚未选择法术，请从上方添加</p>';
             return;
         }
         
-        // 按来源分类法术
-        const playerSpells = [];      // 玩家自行添加的
-        const classSpells = [];       // 职业技能给予的
-        const raceSpells = [];        // 种族技能给予的
-        
+        // 按等级分组
+        const spellsByLevel = {};
         this.character.spells.forEach(spell => {
-            if (spell.fromFeature && spell.source) {
-                // 检查是职业还是种族
-                const source = spell.source.toLowerCase();
-                const isRace = this.character.race && (
-                    source.includes(RACES[this.character.race]?.name?.toLowerCase() || '') ||
-                    source.includes('种族') || source.includes('龙裔') || source.includes('精灵') || 
-                    source.includes('矮人') || source.includes('半身人') || source.includes('人类')
-                );
-                if (isRace) {
-                    raceSpells.push(spell);
-                } else {
-                    classSpells.push(spell);
-                }
-            } else {
-                playerSpells.push(spell);
-            }
+            const level = spell.level || 0;
+            if (!spellsByLevel[level]) spellsByLevel[level] = [];
+            spellsByLevel[level].push(spell);
         });
         
-        // 渲染单个分类的法术
-        const renderSpellCategory = (spells, categoryClass, title) => {
-            if (spells.length === 0) return '';
+        let html = '';
+        const sortedLevels = Object.keys(spellsByLevel).sort((a, b) => a - b);
+        
+        sortedLevels.forEach(level => {
+            const levelNum = parseInt(level);
+            const levelName = levelNum === 0 ? '戏法' : `${levelNum}环法术`;
+            const spellCount = spellsByLevel[level].length;
             
-            return `
-                <div class="spell-category ${categoryClass}">
-                    <div class="spell-category-title">${title} (${spells.length})</div>
-                    ${spells.map(spell => this.renderSpellItem(spell)).join('')}
+            html += `
+                <div class="spell-level-group">
+                    <h4 class="spell-level-title">${levelName} <span class="spell-count">(${spellCount})</span></h4>
+                    <div class="spell-level-items">
+                        ${spellsByLevel[level].map(spell => this.renderUnifiedSpellItem(spell)).join('')}
+                    </div>
                 </div>
             `;
-        };
+        });
         
-        container.innerHTML = 
-            renderSpellCategory(playerSpells, 'player-spells', '玩家法术') +
-            renderSpellCategory(classSpells, 'class-spells', '职业技能') +
-            renderSpellCategory(raceSpells, 'race-spells', '种族技能');
+        container.innerHTML = html;
         
         // 添加tooltip事件监听
-        this.setupSpellTooltips(container);
+        this.setupUnifiedSpellTooltips(container);
+    }
+    
+    // 渲染统一的法术项
+    renderUnifiedSpellItem(spell) {
+        // 确定法术类型样式
+        let itemClass = '';
+        let typeBadge = '';
+        
+        if (spell.alwaysPrepared) {
+            itemClass = 'always-prepared';
+            typeBadge = '<span class="spell-type-badge always-prepared">始终准备</span>';
+        } else if (spell.fromFeature) {
+            itemClass = 'feature-spell';
+            typeBadge = '<span class="spell-type-badge feature">特性</span>';
+        } else {
+            itemClass = 'player-spell';
+            typeBadge = '<span class="spell-type-badge player">玩家</span>';
+        }
+        
+        // 构建法术信息
+        let extraInfo = '';
+        
+        // 显示来源
+        if (spell.source) {
+            extraInfo += `<span class="spell-source">${spell.source}</span>`;
+        }
+        
+        // 显示施法属性
+        if (spell.ability) {
+            extraInfo += `<span class="spell-ability">${spell.ability}</span>`;
+        }
+        
+        // 显示次数限制
+        if (spell.freeCast) {
+            if (spell.freeCast.count === Infinity) {
+                extraInfo += `<span class="spell-limit">随意施展</span>`;
+            } else if (spell.freeCast.count === 1) {
+                extraInfo += `<span class="spell-limit">1次/${spell.freeCast.reset === 'long' ? '长休' : '短休'}</span>`;
+            } else {
+                extraInfo += `<span class="spell-limit">${spell.freeCast.count}次/${spell.freeCast.reset === 'long' ? '长休' : '短休'}</span>`;
+            }
+        }
+        
+        // 显示专注状态
+        const needsConcentration = this.checkSpellConcentration(spell.name, spell.level);
+        if (needsConcentration) {
+            extraInfo += '<span class="spell-concentration">专注</span>';
+        }
+        
+        // 移除按钮（仅玩家添加的法术可移除）
+        const removeButton = spell.fromFeature ? '' : 
+            `<button onclick="characterApp.removeSpell('${spell.name}')" class="btn-remove" title="移除法术">×</button>`;
+        
+        // 获取法术描述用于tooltip
+        const description = this.getSpellDescription(spell.name, spell.level);
+        const tooltipAttr = description ? `data-tooltip="${description}"` : '';
+        
+        return `
+            <div class="unified-spell-item ${itemClass}" ${tooltipAttr}>
+                <div class="spell-main-row">
+                    <span class="spell-name" title="${description || ''}">${spell.name}</span>
+                    <div class="spell-badges">
+                        ${typeBadge}
+                        ${removeButton}
+                    </div>
+                </div>
+                ${extraInfo ? `<div class="spell-extra-row">${extraInfo}</div>` : ''}
+            </div>
+        `;
+    }
+    
+    // 设置统一法术tooltip事件
+    setupUnifiedSpellTooltips(container) {
+        const spellItems = container.querySelectorAll('.unified-spell-item[data-tooltip]');
+        spellItems.forEach(item => {
+            const spellName = item.querySelector('.spell-name');
+            if (spellName) {
+                spellName.addEventListener('mouseenter', (e) => {
+                    this.showTooltip(e, item.dataset.tooltip);
+                });
+                spellName.addEventListener('mouseleave', () => {
+                    this.hideTooltip();
+                });
+                spellName.addEventListener('mousemove', (e) => {
+                    this.moveTooltip(e);
+                });
+            }
+        });
+    }
+    
+    // 渲染法术列表（旧方法，保留用于兼容性）
+    renderSpells() {
+        this.renderUnifiedSpells();
+    }
+    
+    // 获取邪术师契约法术位
+    getWarlockSpellSlots() {
+        const level = this.character.level;
+        const slots = {};
+        
+        // 邪术师契约魔法：所有法术位为最高环阶
+        if (level >= 1 && level <= 2) {
+            slots[1] = 1;
+        } else if (level >= 3 && level <= 4) {
+            slots[2] = 2;
+        } else if (level >= 5 && level <= 6) {
+            slots[3] = 2;
+        } else if (level >= 7 && level <= 8) {
+            slots[4] = 2;
+        } else if (level >= 9 && level <= 10) {
+            slots[5] = 2;
+        } else if (level >= 11 && level <= 16) {
+            slots[5] = 3;
+        } else if (level >= 17) {
+            slots[5] = 4;
+        }
+        
+        return slots;
     }
     
     // 渲染单个法术项
@@ -2783,19 +3023,23 @@ class CharacterApp {
         const sortedLevels = Object.keys(spellsByLevel).sort((a, b) => a - b);
         
         sortedLevels.forEach(level => {
-            const levelName = level === '0' ? '戏法' : `${level}环`;
-            html += `
-                <div class="sheet-spell-level-group">
-                    <span class="sheet-spell-level">${levelName}</span>
-                    <div class="sheet-spell-names">
-                        ${spellsByLevel[level].map(spell => {
-                            const description = this.getSpellDescription(spell.name, spell.level);
-                            const tooltipAttr = description ? `data-tooltip="${description}"` : '';
-                            return `<span class="sheet-spell-name" ${tooltipAttr}>${spell.name}</span>`;
-                        }).join(', ')}
+            const levelNum = parseInt(level);
+            const levelName = levelNum === 0 ? '戏法' : `${levelNum}环`;
+            const levelClass = levelNum === 0 ? 'cantrip' : `level-${levelNum}`;
+            
+            spellsByLevel[level].forEach(spell => {
+                const description = this.getSpellDescription(spell.name, spell.level);
+                const tooltipAttr = description ? `data-tooltip="${description}"` : '';
+                const needsConcentration = this.checkSpellConcentration(spell.name, spell.level);
+                const concentrationTag = needsConcentration ? '<span class="spell-concentration">需专注</span>' : '';
+                
+                html += `
+                    <div class="sheet-spell-item" ${tooltipAttr}>
+                        <span class="spell-name">${spell.name}${concentrationTag}</span>
+                        <span class="sheet-spell-level ${levelClass}">${levelName}</span>
                     </div>
-                </div>
-            `;
+                `;
+            });
         });
         
         container.innerHTML = html;
@@ -2998,9 +3242,343 @@ class CharacterApp {
                 this.selectSubclass(randomSubclass);
             }
         }
+    }
+
+    // 生成背景故事
+    generateBackstory() {
+        // 背景故事模板
+        const backstoryTemplates = [
+            {
+                // 冒险者出身
+                condition: (char) => true,
+                template: "{name}出生于{home}, 从小就对外面的世界充满好奇。{childhood}。在{event}, {name}决定踏上冒险之路, 希望{goal}。"
+            },
+            {
+                // 战士背景
+                condition: (char) => char.class && (char.class.includes('战士') || char.class.includes(' Fighter')),
+                template: "{name}是一名训练有素的战士, 曾在{organization}服役{years}年。在一次{battle}, {name} {experience}。这段经历让{name}决定离开军队, 寻找自己的道路。"
+            },
+            {
+                // 法师背景
+                condition: (char) => char.class && (char.class.includes('法师') || char.class.includes(' Wizard')),
+                template: "{name}是一名天赋异禀的法师, 从小就展现出对魔法的亲和力。在{academy}学习期间, {name} {discovery}。然而, {incident}让{name}不得不离开学院, 开始了自己的冒险。"
+            },
+            {
+                // 盗贼背景
+                condition: (char) => char.class && (char.class.includes('盗贼') || char.class.includes(' Rogue')),
+                template: "{name}在{city}的街头长大, 学会了生存的必备技能。{past}。一次{heist}改变了{name}的命运, 现在{name}希望{redemption}。"
+            },
+            {
+                // 牧师背景
+                condition: (char) => char.class && (char.class.includes('牧师') || char.class.includes(' Cleric')),
+                template: "{name}是{deity}的虔诚信徒, 从小就在{temple}接受训练。{calling}。当{prophecy}降临时, {name}被赋予了{mission}, 踏上了神圣的使命。"
+            },
+            {
+                // 游侠背景
+                condition: (char) => char.class && (char.class.includes('游侠') || char.class.includes(' Ranger')),
+                template: "{name}在{wilderness}长大, 与自然建立了深厚的联系。{tragedy}让{name}成为了一名游侠, 发誓要{vengeance}。现在, {name}在{region}巡逻, 保护无辜的生命。"
+            },
+            {
+                // 吟游诗人背景
+                condition: (char) => char.class && (char.class.includes('吟游诗人') || char.class.includes(' Bard')),
+                template: "{name}是一名四处漂泊的吟游诗人, 收集各地的故事和传说。{journey}。在一次{performance}, {name} {inspiration}。现在, {name}希望通过自己的音乐和故事改变世界。"
+            },
+            {
+                // 德鲁伊背景
+                condition: (char) => char.class && (char.class.includes('德鲁伊') || char.class.includes(' Druid')),
+                template: "{name}是{circle}的德鲁伊, 致力于保护自然平衡。{connection}。当{threat}出现时, {name}离开自己的领地, 踏上了保护自然的征程。"
+            },
+            {
+                // 圣骑士背景
+                condition: (char) => char.class && (char.class.includes('圣骑士') || char.class.includes(' Paladin')),
+                template: "{name}是{oath}的圣骑士, 发誓要{code}。{test}让{name}证明了自己的忠诚。现在, {name} {quest}。"
+            },
+            {
+                // 武僧背景
+                condition: (char) => char.class && (char.class.includes('武僧') || char.class.includes(' Monk')),
+                template: "{name}在{monastery}接受严格的训练, 掌握了{martial}的技艺。{enlightenment}。当{call}到来时, {name}离开 monastery, 寻找更高的境界。"
+            }
+        ];
+
+        // 随机元素
+        const homes = ["一个小村庄", "繁华的城市", "偏远的部落", "海边的渔村", "山区的堡垒"];
+        const childhoods = ["在父母的呵护下快乐成长", "经历了许多艰难困苦", "跟着一位导师学习技能", "与兄弟姐妹一起玩耍", "独自探索周围的世界"];
+        const events = ["一次偶然的机会", "遭遇了人生的重大变故", "收到了一封神秘的信件", "遇见了一位传奇冒险者", "梦到了一个指引"];
+        const goals = ["寻找传说中的宝藏", "保护自己的家人和朋友", "揭开一个古老的秘密", "成为一名伟大的英雄", "寻找自己的身世之谜"];
+        const organizations = ["国王的军队", "地方民兵", "雇佣兵组织", "骑士团", "私人卫队"];
+        const years = ["几", "十几", "二十几", "三十几"];
+        const battles = ["激烈的战斗", "决定性的战役", "被围困的城堡", "边境冲突", "与怪物的遭遇战"];
+        const experiences = ["展现了非凡的勇气", "失去了亲密的战友", "获得了宝贵的经验", "被授予了荣誉", "发现了自己的潜力"];
+        const academies = ["魔法学院", "古老的图书馆", "神秘的塔楼", "大师的隐居处", "精灵的学院"];
+        const discoveries = ["发现了一个强大的魔法秘密", "掌握了一种稀有的法术", "解开了一个古老的咒语", "与元素建立了联系", "学会了与魔法生物沟通"];
+        const incidents = ["一场意外的魔法事故", "学院的政治斗争", "被诬陷为叛徒", "导师的突然离世", "发现了学院的黑暗秘密"];
+        const cities = ["盗贼横行的城市", "繁华的贸易都市", "港口城市", "边境城市", "地下城市"];
+        const pasts = ["靠偷窃为生", "是一名技艺精湛的锁匠", "为黑帮工作", "做过各种杂活", "是街头表演的艺人"];
+        const heists = ["成功的盗窃", "失败的抢劫", "意外的发现", "与同伙的背叛", "被追捕的经历"];
+        const redemptions = ["洗心革面, 开始新的生活", "寻找被盗的物品归还失主", "揭露犯罪组织的阴谋", "保护无辜的人", "证明自己的价值"];
+        const deities = ["光明之神", "自然之神", "战争之神", "知识之神", "死亡之神"];
+        const temples = ["宏伟的神庙", "偏远的神殿", "地下的祭坛", "山顶的圣地", "海边的教堂"];
+        const callings = ["从小就听到神的召唤", "在一次危机中得到神的帮助", "被选为神的代言人", "继承了神圣的使命", "经历了一次神圣的启示"];
+        const prophecies = ["古老的预言", "神的旨意", "不祥的预兆", "神秘的梦境", "圣物的指引"];
+        const missions = ["神圣的使命", "寻找失落的圣物", "消灭邪恶的存在", "保护信仰的追随者", "传播神的教义"];
+        const wildernesses = ["茂密的森林", "广阔的草原", "崎岖的山脉", "神秘的沼泽", "寒冷的北方"];
+        const tragedies = ["家人被怪物杀害", "家园被摧毁", "导师的离世", "朋友的背叛", "自己被诅咒"];
+        const vengeances = ["为家人报仇", "保护其他受害者", "消灭作恶的生物", "揭露幕后的黑手", "阻止类似的悲剧发生"];
+        const regions = ["自己的家乡", "危险的边境", "被遗忘的角落", "充满怪物的区域", "神秘的森林"];
+        const journeys = ["穿越了许多国家", "见过各种奇特的文化", "经历了无数的冒险", "收集了许多珍贵的故事", "遇到了各种各样的人"];
+        const performances = ["在国王的宫廷", "在偏远的村庄", "在危险的酒馆", "在神圣的节日", "在战场上"];
+        const inspirations = ["感动了无数人", "获得了珍贵的友谊", "发现了自己的使命", "激发了他人的勇气", "得到了神秘的礼物"];
+        const circles = ["月亮德鲁伊", "大地德鲁伊", "火焰德鲁伊", "海洋德鲁伊", "暴风德鲁伊"];
+        const connections = ["与动物心灵相通", "能够感知自然的变化", "可以变身成各种生物", "了解植物的秘密", "与元素精灵交流"];
+        const threats = ["森林被砍伐", "河流被污染", "怪物的入侵", "黑暗力量的觉醒", "自然平衡的破坏"];
+        const oaths = ["正义的圣骑士", "保护的圣骑士", "复仇的圣骑士", "奉献的圣骑士", "自由的圣骑士"];
+        const codes = ["保护无辜的人", "消灭邪恶的存在", "维护法律和秩序", "帮助有需要的人", "坚守自己的信仰"];
+        const tests = ["一次生死考验", "一个艰难的选择", "面对强大的敌人", "抵抗诱惑", "牺牲自己的利益"];
+        const quests = ["寻找失踪的公主", "消灭作恶多端的巨龙", "保护神圣的 relic", "拯救被围困的城市", "寻找传说中的圣物"];
+        const monasteries = ["高山上的寺庙", "森林中的隐居处", "海边的修道院", "沙漠中的修行地", "洞穴中的圣地"];
+        const martial = ["古老的武术", "神秘的格斗技巧", "武器精通", "徒手格斗", "气的运用"];
+        const enlightenments = ["达到了身心合一的境界", "理解了生命的真谛", "掌握了内在的力量", "获得了平静的心态", "看透了世俗的纷争"];
+        const calls = ["内心的声音", "导师的嘱托", "朋友的求助", "正义的召唤", "命运的安排"];
+
+        // 获取角色信息
+        const char = this.character;
+        const name = char.name || "冒险者";
+        const race = char.race || "人类";
+        const charClass = char.class || "冒险者";
+        const background = char.background || "普通出身";
+
+        // 选择合适的模板
+        const availableTemplates = backstoryTemplates.filter(template => template.condition(char));
+        const selectedTemplate = availableTemplates[Math.floor(Math.random() * availableTemplates.length)] || backstoryTemplates[0];
+
+        // 生成背景故事
+        let backstory = selectedTemplate.template
+            .replace('{name}', name)
+            .replace('{race}', race)
+            .replace('{class}', charClass)
+            .replace('{background}', background)
+            .replace('{home}', homes[Math.floor(Math.random() * homes.length)])
+            .replace('{childhood}', childhoods[Math.floor(Math.random() * childhoods.length)])
+            .replace('{event}', events[Math.floor(Math.random() * events.length)])
+            .replace('{goal}', goals[Math.floor(Math.random() * goals.length)])
+            .replace('{organization}', organizations[Math.floor(Math.random() * organizations.length)])
+            .replace('{years}', years[Math.floor(Math.random() * years.length)])
+            .replace('{battle}', battles[Math.floor(Math.random() * battles.length)])
+            .replace('{experience}', experiences[Math.floor(Math.random() * experiences.length)])
+            .replace('{academy}', academies[Math.floor(Math.random() * academies.length)])
+            .replace('{discovery}', discoveries[Math.floor(Math.random() * discoveries.length)])
+            .replace('{incident}', incidents[Math.floor(Math.random() * incidents.length)])
+            .replace('{city}', cities[Math.floor(Math.random() * cities.length)])
+            .replace('{past}', pasts[Math.floor(Math.random() * pasts.length)])
+            .replace('{heist}', heists[Math.floor(Math.random() * heists.length)])
+            .replace('{redemption}', redemptions[Math.floor(Math.random() * redemptions.length)])
+            .replace('{deity}', deities[Math.floor(Math.random() * deities.length)])
+            .replace('{temple}', temples[Math.floor(Math.random() * temples.length)])
+            .replace('{calling}', callings[Math.floor(Math.random() * callings.length)])
+            .replace('{prophecy}', prophecies[Math.floor(Math.random() * prophecies.length)])
+            .replace('{mission}', missions[Math.floor(Math.random() * missions.length)])
+            .replace('{wilderness}', wildernesses[Math.floor(Math.random() * wildernesses.length)])
+            .replace('{tragedy}', tragedies[Math.floor(Math.random() * tragedies.length)])
+            .replace('{vengeance}', vengeances[Math.floor(Math.random() * vengeances.length)])
+            .replace('{region}', regions[Math.floor(Math.random() * regions.length)])
+            .replace('{journey}', journeys[Math.floor(Math.random() * journeys.length)])
+            .replace('{performance}', performances[Math.floor(Math.random() * performances.length)])
+            .replace('{inspiration}', inspirations[Math.floor(Math.random() * inspirations.length)])
+            .replace('{circle}', circles[Math.floor(Math.random() * circles.length)])
+            .replace('{connection}', connections[Math.floor(Math.random() * connections.length)])
+            .replace('{threat}', threats[Math.floor(Math.random() * threats.length)])
+            .replace('{oath}', oaths[Math.floor(Math.random() * oaths.length)])
+            .replace('{code}', codes[Math.floor(Math.random() * codes.length)])
+            .replace('{test}', tests[Math.floor(Math.random() * tests.length)])
+            .replace('{quest}', quests[Math.floor(Math.random() * quests.length)])
+            .replace('{monastery}', monasteries[Math.floor(Math.random() * monasteries.length)])
+            .replace('{martial}', martial[Math.floor(Math.random() * martial.length)])
+            .replace('{enlightenment}', enlightenments[Math.floor(Math.random() * enlightenments.length)])
+            .replace('{call}', calls[Math.floor(Math.random() * calls.length)]);
+
+        // 添加一些额外的细节
+        const details = [
+            "现在, {name}带着{item}开始了新的冒险。",
+            "{name}相信, 每一次挑战都是成长的机会。",
+            "在旅途中, {name}希望找到{something}。",
+            "{name}的故事才刚刚开始...",
+            "未来充满了无限可能, {name}准备好面对一切挑战。"
+        ];
+
+        const detail = details[Math.floor(Math.random() * details.length)]
+            .replace('{name}', name)
+            .replace('{item}', ["一把生锈的剑", "一本古老的书", "一个神秘的护身符", "一封未完成的信", "一个破碎的地图"][Math.floor(Math.random() * 5)])
+            .replace('{something}', ["自己的归宿", "真正的友谊", "强大的力量", "内心的平静", "生命的意义"][Math.floor(Math.random() * 5)]);
+
+        backstory += " " + detail;
+
+        // 更新背景故事输入框
+        document.getElementById('backstory').value = backstory;
+        this.character.backstory = backstory;
+
+        // 显示成功消息
+        this.showNotification("背景故事生成成功！", 'success');
+    }
+
+    // 装备管理功能
+    openEquipmentManager() {
+        // 解析当前装备
+        const equipmentItems = this.parseEquipment();
         
-        // 生成随机语言
-        this.generateRandomLanguages(randomRace, randomBackground, randomClass);
+        // 渲染装备列表
+        this.renderEquipmentList(equipmentItems);
+        
+        // 显示对话框
+        document.getElementById('equipmentManagerDialog').style.display = 'flex';
+    }
+    
+    // 渲染装备列表
+    renderEquipmentList(equipmentItems) {
+        const equipmentList = document.getElementById('equipmentList');
+        if (!equipmentList) return;
+        
+        equipmentList.innerHTML = '';
+        
+        if (equipmentItems.length === 0) {
+            equipmentList.innerHTML = '';
+            return;
+        }
+        
+        equipmentItems.forEach((item, index) => {
+            const itemElement = document.createElement('div');
+            itemElement.className = 'equipment-item';
+            
+            itemElement.innerHTML = `
+                <div class="equipment-item-name">
+                    <span class="equipment-item-quantity">${item.quantity}</span>
+                    ${item.name}
+                </div>
+                <button type="button" class="btn-remove-equipment" onclick="characterApp.removeEquipment(${index})">
+                    删除
+                </button>
+            `;
+            
+            equipmentList.appendChild(itemElement);
+        });
+    }
+
+    closeEquipmentManager() {
+        document.getElementById('equipmentManagerDialog').style.display = 'none';
+        // 清空输入
+        document.getElementById('newEquipmentName').value = '';
+        document.getElementById('newEquipmentQuantity').value = 1;
+    }
+
+    addEquipment() {
+        const name = document.getElementById('newEquipmentName').value.trim();
+        const quantity = parseInt(document.getElementById('newEquipmentQuantity').value);
+        
+        if (!name) {
+            this.showNotification('请输入装备名称', 'error');
+            return;
+        }
+        
+        if (isNaN(quantity) || quantity < 1) {
+            this.showNotification('请输入有效的数量', 'error');
+            return;
+        }
+        
+        // 解析当前装备
+        const equipmentItems = this.parseEquipment();
+        
+        // 检查是否已存在同名装备
+        const existingIndex = equipmentItems.findIndex(item => item.name.toLowerCase() === name.toLowerCase());
+        if (existingIndex > -1) {
+            // 更新数量
+            equipmentItems[existingIndex].quantity += quantity;
+        } else {
+            // 添加新装备
+            equipmentItems.push({ name, quantity });
+        }
+        
+        // 渲染更新后的装备列表
+        this.renderEquipmentList(equipmentItems);
+        
+        // 清空输入
+        document.getElementById('newEquipmentName').value = '';
+        document.getElementById('newEquipmentQuantity').value = 1;
+    }
+
+    removeEquipment(index) {
+        // 解析当前装备
+        const equipmentItems = this.parseEquipment();
+        
+        // 移除指定装备
+        equipmentItems.splice(index, 1);
+        
+        // 渲染更新后的装备列表
+        this.renderEquipmentList(equipmentItems);
+    }
+
+    saveEquipment() {
+        // 解析当前装备
+        const equipmentItems = this.parseEquipment();
+        
+        // 从装备管理对话框中获取当前装备
+        const equipmentList = document.getElementById('equipmentList');
+        const equipmentElements = equipmentList.querySelectorAll('div');
+        
+        const updatedEquipmentItems = [];
+        equipmentElements.forEach(element => {
+            const text = element.querySelector('span')?.textContent;
+            if (text) {
+                const match = text.match(/(\d+) x (.+)/);
+                if (match) {
+                    updatedEquipmentItems.push({
+                        quantity: parseInt(match[1]),
+                        name: match[2].trim()
+                    });
+                }
+            }
+        });
+        
+        // 格式化装备为文本
+        const equipmentText = this.formatEquipment(updatedEquipmentItems);
+        
+        // 更新装备
+        document.getElementById('equipment').value = equipmentText;
+        this.character.equipment = equipmentText;
+        
+        // 关闭对话框
+        this.closeEquipmentManager();
+        
+        // 显示成功消息
+        this.showNotification('装备保存成功！', 'success');
+    }
+
+    // 解析装备文本为数组
+    parseEquipment() {
+        const equipmentText = this.character.equipment || '';
+        const lines = equipmentText.split('\n').filter(line => line.trim() !== '');
+        
+        return lines.map(line => {
+            const match = line.match(/(\d+) x (.+)/);
+            if (match) {
+                return {
+                    quantity: parseInt(match[1]),
+                    name: match[2].trim()
+                };
+            } else {
+                return {
+                    quantity: 1,
+                    name: line.trim()
+                };
+            }
+        });
+    }
+
+    // 将装备数组格式化为文本
+    formatEquipment(equipmentItems) {
+        return equipmentItems.map(item => `${item.quantity} x ${item.name}`).join('\n');
+    }
+
+    // 生成随机语言
+    generateRandomLanguages(randomRace, randomBackground, randomClass) {
         
         // 生成背景故事
         this.generateBackstory(randomRace, randomClass, randomBackground);
@@ -3442,6 +4020,82 @@ class CharacterApp {
 
     // ========== 新的属性掷骰和分配系统 ==========
 
+    // 带动画的掷骰生成
+    async rollAbilityScoresWithAnimation() {
+        const btn = document.getElementById('rollScoresBtn');
+        const diceStage = document.getElementById('diceStage');
+        const rolledScoresContainer = document.getElementById('rolledScores');
+        
+        // 禁用按钮
+        btn.disabled = true;
+        btn.textContent = '生成中...';
+        
+        // 清空之前的显示
+        diceStage.classList.remove('empty');
+        diceStage.innerHTML = '';
+        rolledScoresContainer.style.display = 'none';
+        
+        // 创建掷骰动画容器
+        const animationContainer = document.createElement('div');
+        animationContainer.className = 'rolling-animation';
+        diceStage.appendChild(animationContainer);
+        
+        // 创建6个骰子动画
+        const dice = [];
+        for (let i = 0; i < 6; i++) {
+            const die = document.createElement('div');
+            die.className = 'rolling-die rolling';
+            die.textContent = '?';
+            animationContainer.appendChild(die);
+            dice.push(die);
+        }
+        
+        // 动画持续1.5秒
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // 停止动画并显示最终结果
+        const scoreSets = [];
+        for (let setIndex = 0; setIndex < 5; setIndex++) {
+            const scores = [];
+            for (let i = 0; i < 6; i++) {
+                scores.push(this.rollAbilityScore());
+            }
+            scores.sort((a, b) => b - a);
+            scoreSets.push({
+                id: setIndex,
+                scores: scores,
+                total: scores.reduce((a, b) => a + b, 0),
+                modifierSum: scores.reduce((sum, score) => sum + this.calculateModifier(score), 0)
+            });
+        }
+        
+        scoreSets.sort((a, b) => b.total - a.total);
+        
+        this.character.scoreSets = scoreSets;
+        this.character.selectedScoreSet = null;
+        this.character.rolledScores = [];
+        this.character.usedScores = [];
+        
+        // 重置所有属性值
+        for (const ability of Object.keys(this.character.abilities)) {
+            this.character.abilities[ability].base = 10;
+            this.character.abilities[ability].assigned = false;
+        }
+        
+        // 移除动画，显示结果
+        diceStage.innerHTML = '';
+        rolledScoresContainer.style.display = 'block';
+        
+        this.displayScoreSets();
+        this.updateAbilitySelects();
+        this.updateAbilityScores();
+        this.updateCharacterSheet();
+        
+        // 恢复按钮
+        btn.disabled = false;
+        btn.textContent = '重新生成';
+    }
+
     // 掷骰生成5组属性值，每组6个值（4d6去最低）
     rollAbilityScores() {
         const scoreSets = [];
@@ -3502,32 +4156,44 @@ class CharacterApp {
         this.updateCharacterSheet();
     }
 
-    // 显示5组属性值供选择
+    // 显示5组属性值供选择 - 新设计
     displayScoreSets() {
         const container = document.getElementById('rolledScores');
         if (!this.character.scoreSets || this.character.scoreSets.length === 0) {
-            container.innerHTML = '<p>点击"掷骰生成属性"来获得5组属性值，选择你最喜欢的一组分配到各项属性上</p>';
+            container.innerHTML = '';
             return;
         }
         
         let html = '<div class="score-sets-container">';
-        html += '<h4>选择一组属性值：</h4>';
+        html += '<div class="score-sets-header">';
+        html += '<h4>选择一组属性值</h4>';
+        html += '</div>';
         html += '<div class="score-sets-grid">';
         
         this.character.scoreSets.forEach((set) => {
             const isSelected = this.character.selectedScoreSet === set.id;
             html += `
-                <div class="score-set ${isSelected ? 'selected' : ''}" onclick="characterApp.selectScoreSet(${set.id})">
+                <div class="score-set-card ${isSelected ? 'selected' : ''}" onclick="characterApp.selectScoreSet(${set.id})">
                     <div class="score-set-header">
-                        <span class="score-set-label">第${set.id + 1}组</span>
-                        ${isSelected ? '<span class="selected-badge">✓ 已选择</span>' : ''}
+                        <span class="score-set-index">Set ${set.id + 1}</span>
+                        <span class="score-set-selected">已选择</span>
                     </div>
                     <div class="score-set-values">
-                        ${set.scores.map(score => `<span class="score-value">${score}</span>`).join('')}
+                        ${set.scores.map(score => {
+                            const mod = this.calculateModifier(score);
+                            const isHigh = score >= 16;
+                            const isLow = score <= 8;
+                            return `
+                                <div class="score-value-pill ${isHigh ? 'high' : ''} ${isLow ? 'low' : ''}">
+                                    <span class="value">${score}</span>
+                                    <span class="mod">${mod >= 0 ? '+' : ''}${mod}</span>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                     <div class="score-set-stats">
-                        <span>总和: ${set.total}</span>
-                        <span>调整值总和: ${set.modifierSum >= 0 ? '+' : ''}${set.modifierSum}</span>
+                        <span><span class="label">总和</span> <span class="number">${set.total}</span></span>
+                        <span><span class="label">调整值</span> <span class="number">${set.modifierSum >= 0 ? '+' : ''}${set.modifierSum}</span></span>
                     </div>
                 </div>
             `;
@@ -3535,25 +4201,6 @@ class CharacterApp {
         
         html += '</div>';
         html += '</div>';
-        
-        // 如果已选择一组，显示可分配的属性值
-        if (this.character.selectedScoreSet !== null && this.character.rolledScores.length > 0) {
-            html += '<div class="selected-scores-section">';
-            html += '<h4>将选中的属性值分配到各属性上：</h4>';
-            html += '<div class="rolled-scores-grid">';
-            this.character.rolledScores.forEach((score, index) => {
-                const isUsed = this.character.usedScores.includes(index);
-                html += `
-                    <div class="rolled-score ${isUsed ? 'used' : ''}" data-index="${index}">
-                        <span class="score-value">${score}</span>
-                        <span class="score-mod">(${this.calculateModifier(score) >= 0 ? '+' : ''}${this.calculateModifier(score)})</span>
-                        ${isUsed ? '<span class="score-used">已使用</span>' : ''}
-                    </div>
-                `;
-            });
-            html += '</div>';
-            html += '</div>';
-        }
         
         container.innerHTML = html;
     }
@@ -3812,8 +4459,8 @@ class CharacterApp {
         const dialog = document.createElement('div');
         dialog.className = 'character-list-dialog';
         dialog.innerHTML = `
-            <div class="dialog-overlay" onclick="this.parentElement.remove()"></div>
-            <div class="dialog-content">
+            <div class="dialog-overlay"></div>
+            <div class="dialog-content" onclick="event.stopPropagation()">
                 <div class="dialog-header">
                     <h3>选择要加载的角色</h3>
                     <button class="btn-close" onclick="this.closest('.character-list-dialog').remove()">&times;</button>
@@ -3828,8 +4475,8 @@ class CharacterApp {
                                     <div class="character-saved">保存于: ${char.savedAt}</div>
                                 </div>
                                 <div class="character-actions">
-                                    <button class="btn btn-primary btn-sm" onclick="characterApp.loadCharacterById('${char.id}'); this.closest('.character-list-dialog').remove()">加载</button>
-                                    <button class="btn btn-danger btn-sm" onclick="characterApp.deleteCharacter('${char.id}')">删除</button>
+                                    <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); characterApp.loadCharacterById('${char.id}'); this.closest('.character-list-dialog').remove()">加载</button>
+                                    <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); characterApp.deleteCharacter('${char.id}')">删除</button>
                                 </div>
                             </div>
                         `).join('')}
@@ -3837,6 +4484,12 @@ class CharacterApp {
                 </div>
             </div>
         `;
+        
+        // 点击遮罩层关闭对话框
+        const overlay = dialog.querySelector('.dialog-overlay');
+        overlay.addEventListener('click', () => {
+            dialog.remove();
+        });
         
         document.body.appendChild(dialog);
     }
@@ -4816,7 +5469,7 @@ class CharacterApp {
         if (!container) return;
         
         if (this.character.multiclass.length === 0) {
-            container.innerHTML = '<p class="empty-text">暂无兼职</p>';
+            container.innerHTML = '';
             return;
         }
         
@@ -4825,12 +5478,18 @@ class CharacterApp {
         
         container.innerHTML = `
             <div class="multiclass-summary">
-                <strong>总等级: ${totalLevel}/20</strong>
+                总等级: <strong>${totalLevel}/20</strong>
             </div>
             ${this.character.multiclass.map((mc, index) => `
                 <div class="multiclass-item">
-                    <span>${mc.name}${mc.subclassName ? ` (${mc.subclassName})` : ''} ${mc.level}级</span>
-                    <button onclick="characterApp.removeMulticlass(${index})" class="btn-remove">移除</button>
+                    <div class="multiclass-info">
+                        <span class="multiclass-class">${mc.name}</span>
+                        ${mc.subclassName ? `<span class="multiclass-subclass">${mc.subclassName}</span>` : ''}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: var(--space-3);">
+                        <span class="multiclass-level">${mc.level}级</span>
+                        <button class="btn-remove-multiclass" onclick="characterApp.removeMulticlass(${index})">移除</button>
+                    </div>
                 </div>
             `).join('')}
         `;
@@ -5337,214 +5996,6 @@ class CharacterApp {
         if (dialog) {
             dialog.style.display = 'none';
         }
-    }
-
-    // 渲染准备法术列表
-    renderPreparedSpells() {
-        const slotsContainer = document.getElementById('spellSlotsInfo');
-        const spellsContainer = document.getElementById('preparedSpellsList');
-        
-        if (!slotsContainer || !spellsContainer) return;
-        
-        // 计算总等级
-        const totalLevel = this.character.level + (this.character.multiclass || []).reduce((sum, mc) => sum + mc.level, 0);
-        
-        // 检查是否是施法职业
-        const isSpellcaster = this.character.class && CLASSES[this.character.class]?.spellcasting;
-        const hasMulticlassSpellcaster = this.character.multiclass?.some(mc => CLASSES[mc.class]?.spellcasting);
-        
-        if (!isSpellcaster && !hasMulticlassSpellcaster) {
-            // 非施法职业，只显示特性法术
-            slotsContainer.innerHTML = '<span class="spell-slots-text">非施法职业，仅显示特性给予的法术</span>';
-        } else {
-            // 显示法术环位
-            slotsContainer.innerHTML = this.renderSpellSlots();
-        }
-        
-        // 显示准备法术列表
-        if (this.character.spells.length === 0) {
-            spellsContainer.innerHTML = '<p class="empty-text">暂无准备法术</p>';
-            return;
-        }
-        
-        // 按等级分组显示法术
-        const spellsByLevel = {};
-        this.character.spells.forEach(spell => {
-            const level = spell.level || 0;
-            if (!spellsByLevel[level]) spellsByLevel[level] = [];
-            spellsByLevel[level].push(spell);
-        });
-        
-        let html = '';
-        const sortedLevels = Object.keys(spellsByLevel).sort((a, b) => a - b);
-        
-        sortedLevels.forEach(level => {
-            const levelName = level === '0' ? '戏法' : `${level}环`;
-            html += `<div class="prepared-spell-level-group"><h4>${levelName}</h4>`;
-            
-            spellsByLevel[level].forEach(spell => {
-                const itemClass = spell.alwaysPrepared ? 'always-prepared' : (spell.fromFeature ? 'feature-spell' : '');
-                const sourceText = spell.source ? `<span class="prepared-spell-source">${spell.source}</span>` : '';
-                const abilityText = spell.ability ? `<span class="prepared-spell-source">${spell.ability}</span>` : '';
-                
-                // 获取法术描述用于 tooltip
-                const description = this.getSpellDescription(spell.name, spell.level);
-                const tooltipAttr = description ? `data-tooltip="${description}"` : '';
-                
-                // 检查专注
-                const needsConcentration = this.checkSpellConcentration(spell.name, spell.level);
-                const concentrationTag = needsConcentration ? '<span class="spell-concentration">需专注</span>' : '';
-                
-                html += `
-                    <div class="prepared-spell-item ${itemClass}" ${tooltipAttr}>
-                        <div>
-                            <span class="prepared-spell-name" title="${description}">${spell.name}${concentrationTag}</span>
-                            ${sourceText}
-                            ${abilityText}
-                        </div>
-                        <span class="prepared-spell-level">${level === 0 ? '戏法' : level + '环'}</span>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-        });
-        
-        spellsContainer.innerHTML = html;
-        
-        // 添加 tooltip 事件监听
-        this.setupPreparedSpellTooltips(spellsContainer);
-    }
-
-    // 渲染法术环位
-    renderSpellSlots() {
-        const totalLevel = this.character.level + (this.character.multiclass || []).reduce((sum, mc) => sum + mc.level, 0);
-        
-        // 获取法术位（简化版本，根据5e规则）
-        const spellSlots = this.calculateSpellSlots();
-        
-        if (!spellSlots) {
-            return '<span class="spell-slots-text">无法术位</span>';
-        }
-        
-        let html = '<span class="spell-slots-text">法术环位：</span>';
-        html += '<div class="spell-slots-grid">';
-        
-        for (let level = 1; level <= 9; level++) {
-            const slots = spellSlots[level] || 0;
-            const availableClass = slots > 0 ? 'available' : 'unavailable';
-            
-            html += `
-                <div class="spell-slot-box ${availableClass}">
-                    <span class="spell-slot-level">${level}环</span>
-                    <span class="spell-slot-count">${slots}</span>
-                </div>
-            `;
-        }
-        
-        html += '</div>';
-        return html;
-    }
-
-    // 计算法术位
-    calculateSpellSlots() {
-        if (!this.character.class) return null;
-        
-        const cls = CLASSES[this.character.class];
-        if (!cls) return null;
-        
-        // 如果是邪术师，使用契约魔法
-        if (this.character.class === 'warlock') {
-            return this.getWarlockSpellSlots();
-        }
-        
-        // 获取职业等级
-        const level = this.character.level;
-        
-        // 根据职业类型选择法术位表
-        // 全施法者：吟游诗人、牧师、德鲁伊、术士、法师
-        // 半施法者（等级/2）：圣武士、游侠
-        // 三分之一施法者（等级/3）：拳斗士（某些子职业）、战士（奥法骑士）、游荡者（诡术师）
-        const fullCasters = ['bard', 'cleric', 'druid', 'sorcerer', 'wizard'];
-        const halfCasters = ['paladin', 'ranger'];
-        const thirdCasters = ['fighter', 'rogue']; // 需要检查子职业
-        
-        let effectiveLevel = level;
-        
-        if (halfCasters.includes(this.character.class)) {
-            // 半施法者：等级除以2，向上取整
-            effectiveLevel = Math.ceil(level / 2);
-        } else if (thirdCasters.includes(this.character.class)) {
-            // 三分之一施法者：需要检查子职业
-            if (this.character.subclass === 'eldritch_knight' || this.character.subclass === 'arcane_trickster') {
-                effectiveLevel = Math.ceil(level / 3);
-            } else {
-                return {}; // 不是施法子职业
-            }
-        } else if (!fullCasters.includes(this.character.class)) {
-            return {}; // 非施法职业
-        }
-        
-        // 标准法术位表（根据有效施法等级）
-        const slotTable = {
-            1: { 1: 2 },
-            2: { 1: 3 },
-            3: { 1: 4, 2: 2 },
-            4: { 1: 4, 2: 3 },
-            5: { 1: 4, 2: 3, 3: 2 },
-            6: { 1: 4, 2: 3, 3: 3 },
-            7: { 1: 4, 2: 3, 3: 3, 4: 1 },
-            8: { 1: 4, 2: 3, 3: 3, 4: 2 },
-            9: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 1 },
-            10: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2 },
-            11: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
-            12: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1 },
-            13: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
-            14: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1 },
-            15: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
-            16: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1 },
-            17: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1 },
-            18: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 1, 7: 1, 8: 1, 9: 1 },
-            19: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 1, 8: 1, 9: 1 },
-            20: { 1: 4, 2: 3, 3: 3, 4: 3, 5: 3, 6: 2, 7: 2, 8: 1, 9: 1 }
-        };
-        
-        // 限制有效等级最大为20
-        const cappedLevel = Math.min(effectiveLevel, 20);
-        return slotTable[cappedLevel] || {};
-    }
-
-    // 获取邪术师契约法术位
-    getWarlockSpellSlots() {
-        const level = this.character.level;
-        const slots = {};
-        
-        // 邪术师契约魔法：所有法术位为最高环阶
-        // 1-2级：1个1环
-        // 3-4级：2个2环
-        // 5-6级：2个3环
-        // 7-8级：2个4环
-        // 9-20级：2个5环
-        // 11级：+1个5环（共3个）
-        // 17级：+1个5环（共4个）
-        
-        if (level >= 1 && level <= 2) {
-            slots[1] = 1;
-        } else if (level >= 3 && level <= 4) {
-            slots[2] = 2;
-        } else if (level >= 5 && level <= 6) {
-            slots[3] = 2;
-        } else if (level >= 7 && level <= 8) {
-            slots[4] = 2;
-        } else if (level >= 9 && level <= 10) {
-            slots[5] = 2;
-        } else if (level >= 11 && level <= 16) {
-            slots[5] = 3;
-        } else if (level >= 17) {
-            slots[5] = 4;
-        }
-        
-        return slots;
     }
 
     // 选择护甲

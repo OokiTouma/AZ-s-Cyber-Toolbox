@@ -41,6 +41,16 @@ class CombatTracker {
             shield: { name: '护盾术', type: 'buff', icon: '🛡️' },
             inspired: { name: '受激励', type: 'buff', icon: '🌟' },
             concentration: { name: '专注中', type: 'buff', icon: '🔮' },
+            resistance: { name: '抗性', type: 'buff', icon: '🛡️' },
+            immunity: { name: '免疫', type: 'buff', icon: '💎' },
+            advantage: { name: '优势', type: 'buff', icon: '👍' },
+            
+            // 环境效果
+            difficult_terrain: { name: '困难地形', type: 'environmental', icon: '🌲' },
+            darkness: { name: '黑暗', type: 'environmental', icon: '🌑' },
+            fog: { name: '迷雾', type: 'environmental', icon: '🌫️' },
+            slippery: { name: '滑溜', type: 'environmental', icon: '💧' },
+            high_ground: { name: '高地', type: 'environmental', icon: '⛰️' },
             
             // 其他状态
             hidden: { name: '隐藏', type: 'neutral', icon: '👁️‍🗨️' },
@@ -66,6 +76,7 @@ class CombatTracker {
         }
         
         this.loadFromStorage();
+        this.checkForDMAssistantTransfer();
         this.setupEventListeners();
         this.render();
         this.applyTheme();
@@ -408,19 +419,25 @@ class CombatTracker {
      * 重置战斗
      */
     resetCombat() {
-        if (!confirm('确定要重置战斗吗？这将重置回合数和当前回合位置。')) return;
+        if (!confirm('确定要重置战斗吗？这将重置回合数、当前回合位置、所有状态效果，并将所有单位的生命值恢复至满值。')) return;
         
         this.currentTurn = 0;
         this.currentRound = 1;
         
-        // 清除所有状态效果
+        // 重置所有战斗单位状态
         this.combatants.forEach(c => {
+            // 清除所有状态效果
             c.conditions = [];
+            // 重置战败状态
             c.isDefeated = false;
+            // 恢复生命值至最大值
+            c.hp = c.maxHp;
         });
         
         this.saveToStorage();
         this.render();
+        
+        this.showToast('战斗已重置，所有单位生命值已恢复');
     }
     
     /**
@@ -447,6 +464,10 @@ class CombatTracker {
         document.getElementById('conditionDuration').value = '1';
         document.getElementById('conditionSource').value = '';
         document.getElementById('conditionSave').checked = false;
+        document.getElementById('conditionSaveType').value = '';
+        document.getElementById('conditionSaveDC').value = '';
+        document.getElementById('conditionDescription').value = '';
+        document.getElementById('conditionVisible').checked = true;
         document.getElementById('customConditionGroup').style.display = 'none';
         
         document.getElementById('conditionModal').classList.add('show');
@@ -471,9 +492,18 @@ class CombatTracker {
         const duration = parseInt(document.getElementById('conditionDuration').value) || 1;
         const source = document.getElementById('conditionSource').value.trim();
         const needsSave = document.getElementById('conditionSave').checked;
+        const saveType = document.getElementById('conditionSaveType').value;
+        const saveDC = document.getElementById('conditionSaveDC').value;
+        const description = document.getElementById('conditionDescription').value.trim();
+        const visible = document.getElementById('conditionVisible').checked;
         
         if (!type) {
             alert('请选择状态类型');
+            return;
+        }
+        
+        if (type === 'custom' && !customName) {
+            alert('请输入自定义状态名称');
             return;
         }
         
@@ -490,6 +520,10 @@ class CombatTracker {
             duration,
             source,
             needsSave,
+            saveType,
+            saveDC: saveDC ? parseInt(saveDC) : null,
+            description,
+            visible: visible !== undefined ? visible : true,
             decrementOn: 'round' // 默认每轮减少
         };
         
@@ -645,6 +679,84 @@ class CombatTracker {
                 console.error('Failed to load combat data:', e);
             }
         }
+    }
+
+    /**
+     * 检查是否有来自 DM Assistant 的遭遇传输
+     */
+    checkForDMAssistantTransfer() {
+        const rawTransfer = localStorage.getItem('dmToCombatTransfer');
+        if (!rawTransfer) return;
+
+        try {
+            const transfer = JSON.parse(rawTransfer);
+            const isFresh = transfer.timestamp && (Date.now() - transfer.timestamp < 60000);
+            if (!isFresh || transfer.source !== 'dm-assistant' || !transfer.encounter) {
+                localStorage.removeItem('dmToCombatTransfer');
+                return;
+            }
+
+            if (this.combatants.length > 0) {
+                const shouldImport = confirm('检测到来自 DM Assistant 的遭遇数据。导入将覆盖当前战斗列表，是否继续？');
+                if (!shouldImport) {
+                    return;
+                }
+            }
+
+            this.importEncounterFromDMAssistant(transfer.encounter);
+            localStorage.removeItem('dmToCombatTransfer');
+        } catch (error) {
+            console.error('Failed to parse DM Assistant transfer:', error);
+            localStorage.removeItem('dmToCombatTransfer');
+        }
+    }
+
+    /**
+     * 导入 DM Assistant 推送的遭遇
+     */
+    importEncounterFromDMAssistant(encounter) {
+        const enemyCombatants = Array.isArray(encounter.combatants) ? encounter.combatants : [];
+        const playerCombatants = Array.isArray(encounter.players) ? encounter.players : [];
+        const imported = [...playerCombatants, ...enemyCombatants].map((combatant, index) => ({
+            id: combatant.id || this.generateId(),
+            name: combatant.name || `单位 ${index + 1}`,
+            type: combatant.type || 'enemy',
+            initiative: Number(combatant.initiative) || 0,
+            hp: Number(combatant.hp) || 0,
+            maxHp: Number(combatant.maxHp) || Number(combatant.hp) || 0,
+            ac: Number(combatant.ac) || 10,
+            notes: combatant.notes || '',
+            conditions: Array.isArray(combatant.conditions) ? combatant.conditions : [],
+            isDefeated: false
+        }));
+
+        this.combatants = imported;
+        this.currentTurn = 0;
+        this.currentRound = 1;
+
+        if (encounter.options?.autoInitiative) {
+            this.combatants.sort((a, b) => b.initiative - a.initiative);
+        }
+
+        this.saveToStorage();
+        if (typeof this.showNotification === 'function') {
+            this.showNotification(`已导入 DM 遭遇：${encounter.name || '未命名遭遇'}`);
+        }
+    }
+
+    /**
+     * 显示轻量通知
+     */
+    showNotification(message, type = 'success') {
+        if (typeof NotificationManager !== 'undefined') {
+            if (!this.notificationManager) {
+                this.notificationManager = new NotificationManager();
+            }
+            this.notificationManager.show(message, type, 2500);
+            return;
+        }
+
+        console.log(message);
     }
     
     /**

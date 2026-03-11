@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>城主辅助工具 | 阿正的赛博工具箱</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/AZ-s-Cyber-Toolbox/design-system.css">
+    <link rel="stylesheet" href="/AZ-s-Cyber-Toolbox/dm-assistant/styles.css">
+    <script src="/AZ-s-Cyber-Toolbox/common.js" defer></script>
+    <script src="data.js" defer></script>
+    <script src="adventures/lost-mine-of-phandelver.js" defer></script>
+    <script src="adventures/phandelver-below-expansion.js" defer></script>
+    <script src="app.js" defer></script>
+</head>
+<body class="dm-assistant-page">
+    <header class="page-header">
+        <div class="page-header-shell">
+            <a href="/AZ-s-Cyber-Toolbox/index.html" class="back-link">返回首页</a>
+            <div class="page-header-content">
+                <div class="page-header-copy">
+                    <div class="page-title-cluster">
+                        <p class="page-eyebrow">📖 剧本推进 · 🎭 扮演提示 · ⚔️ 战斗辅助</p>
+                        <h1 class="page-title">👑 D&D 城主辅助工具</h1>
+                    </div>
+                    <p class="page-subtitle">把剧本、提示、笔记、速查和战斗建议集中到一页，让 DM 在桌边更从容。</p>
+                </div>
+                <div class="header-actions">
+                    <span class="auto-save-status" id="autoSaveStatus">等待自动保存</span>
+                    <button class="btn btn-secondary btn-sm" id="resetProgressButton" type="button">重置进度</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="dm-layout">
+        <aside class="left-rail">
+            <section class="card panel-card">
+                <div class="panel-title-row">
+                    <h2 class="panel-title">DM 笔记</h2>
+                    <span class="panel-subtitle">按场景本地保存</span>
+                </div>
+                <p class="notes-scene-label" id="dmNotesSceneLabel">当前场景</p>
+                <textarea class="form-input notes-textarea" id="dmNotesTextarea" placeholder="记录临场改动、NPC 状态、玩家决定与伏笔回收点……"></textarea>
+            </section>
+
+            <section class="card panel-card">
+                <div class="panel-title-row">
+                    <h2 class="panel-title">剧本档案</h2>
+                    <span class="badge badge-primary" id="adventureLevelBadge">1-12 级</span>
+                </div>
+                <div class="form-group compact-group">
+                    <label class="form-label" for="adventureSelect">选择剧本</label>
+                    <select class="form-select" id="adventureSelect"></select>
+                </div>
+                <p class="adventure-description" id="adventureDescription"></p>
+
+                <div class="progress-overview">
+                    <div class="metric-card">
+                        <span class="metric-value" id="completedScenesCount">0</span>
+                        <span class="metric-label">已完成场景</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-value" id="chapterProgressText">0 / 0</span>
+                        <span class="metric-label">当前章节</span>
+                    </div>
+                    <div class="metric-card accent-card">
+                        <span class="metric-value" id="progressPercent">0%</span>
+                        <span class="metric-label">总进度</span>
+                    </div>
+                </div>
+
+                <div class="form-group compact-group">
+                    <label class="form-label" for="sceneJumpSelect">快速跳转</label>
+                    <select class="form-select" id="sceneJumpSelect"></select>
+                </div>
+
+                <div class="keyboard-hints">
+                    <span>空格：继续</span>
+                    <span>← / →：切场景</span>
+                    <span>↑ / ↓：切章节</span>
+                </div>
+            </section>
+
+            <section class="card panel-card chapter-panel">
+                <div class="panel-title-row">
+                    <h2 class="panel-title">章节导航</h2>
+                    <span class="panel-subtitle">当前章节与已完成进度</span>
+                </div>
+                <div class="chapter-list" id="chapterList"></div>
+            </section>
+        </aside>
+
+        <section class="center-stage">
+            <section class="card panel-card scene-hero">
+                <div class="scene-hero-top">
+                    <div>
+                        <p class="scene-breadcrumb" id="sceneBreadcrumb"></p>
+                        <h2 class="scene-title" id="sceneTitle"></h2>
+                        <p class="scene-summary-lead" id="sceneSummaryLead"></p>
+                    </div>
+                    <div class="scene-nav-actions">
+                        <button class="btn btn-ghost btn-sm" id="prevSceneButton" type="button">← 上一场景</button>
+                        <button class="btn btn-success btn-sm" id="markCompleteButton" type="button">✔ 标记完成</button>
+                        <button class="btn btn-primary btn-sm" id="nextSceneButton" type="button">下一场景 →</button>
+                    </div>
+                </div>
+                <div class="scene-meta" id="sceneMeta"></div>
+            </section>
+
+            <section class="card panel-card tabs-panel">
+                <div class="tabs" id="contentTabs">
+                    <button class="tab-btn active" data-tab="story" type="button">🎭 剧本提示</button>
+                    <button class="tab-btn" data-tab="dm" type="button">👑 城主提示</button>
+                    <button class="tab-btn" data-tab="combat" type="button">⚔️ 战斗提示</button>
+                </div>
+                <div class="tab-content" id="tabContent"></div>
+            </section>
+        </section>
+
+        <aside class="right-rail">
+            <section class="card panel-card">
+                <div class="panel-title-row">
+                    <h2 class="panel-title">战局速览</h2>
+                    <span class="panel-subtitle">当前场景摘要</span>
+                </div>
+                <div class="encounter-summary" id="encounterSummary"></div>
+                <div class="quick-tool-actions">
+                    <button class="btn btn-secondary btn-sm" id="copyNarrationButton" type="button">复制朗读文本</button>
+                    <button class="btn btn-secondary btn-sm" id="speakNarrationButton" type="button">🔊 语音朗读</button>
+                    <button class="btn btn-primary btn-sm" id="pushEncounterButton" type="button">📤 推送到战斗追踪器</button>
+                    <a class="btn btn-primary btn-sm" href="/AZ-s-Cyber-Toolbox/combat-tracker/index.html">打开战斗追踪器</a>
+                </div>
+            </section>
+
+            <section class="card panel-card">
+                <div class="panel-title-row">
+                    <h2 class="panel-title">氛围营造</h2>
+                    <span class="panel-subtitle">音乐 / 光线 / 口吻</span>
+                </div>
+                <div id="atmosphereContent"></div>
+            </section>
+
+            <section class="card panel-card">
+                <div class="panel-title-row">
+                    <h2 class="panel-title">随机生成器</h2>
+                    <span class="panel-subtitle">即兴补场景</span>
+                </div>
+                <div class="generator-form">
+                    <select class="form-select" id="generatorType">
+                        <option value="npc">随机 NPC</option>
+                        <option value="encounter">随机遭遇</option>
+                        <option value="shop">随机商店货物</option>
+                    </select>
+                    <button class="btn btn-secondary btn-sm" id="generateButton" type="button">生成内容</button>
+                </div>
+                <div class="generator-output empty" id="generatorOutput">点击按钮生成可直接上桌的即兴素材。</div>
+            </section>
+
+            <section class="card panel-card">
+                <div class="panel-title-row">
+                    <h2 class="panel-title">规则速查</h2>
+                    <span class="panel-subtitle">桌边高频规则</span>
+                </div>
+                <div class="rule-list" id="rulesReference"></div>
+            </section>
+
+            <section class="card panel-card">
+                <div class="panel-title-row">
+                    <h2 class="panel-title">计时器</h2>
+                    <span class="panel-subtitle">法术 / 环境 / 节奏控制</span>
+                </div>
+                <div class="timer-display" id="timerDisplay">05:00</div>
+                <div class="timer-presets" id="timerPresets"></div>
+                <div class="timer-actions">
+                    <button class="btn btn-primary btn-sm" id="startTimerButton" type="button">开始</button>
+                    <button class="btn btn-secondary btn-sm" id="pauseTimerButton" type="button">暂停</button>
+                    <button class="btn btn-ghost btn-sm" id="resetTimerButton" type="button">重置</button>
+                </div>
+            </section>
+
+            <section class="card panel-card">
+                <div class="panel-title-row">
+                    <h2 class="panel-title">玩家追踪</h2>
+                    <span class="panel-subtitle">轻量记录关键面板</span>
+                </div>
+                <form class="player-form" id="playerForm">
+                    <input class="form-input" id="playerName" type="text" placeholder="角色名" required>
+                    <input class="form-input" id="playerHP" type="number" placeholder="HP" min="0">
+                    <input class="form-input" id="playerAC" type="number" placeholder="AC" min="0">
+                    <input class="form-input" id="playerPassive" type="number" placeholder="被动察觉" min="0">
+                    <button class="btn btn-secondary btn-sm player-submit" type="submit">添加玩家</button>
+                </form>
+                <div class="player-list" id="playerList"></div>
+            </section>
+        </aside>
+    </main>
+
+    <div class="modal-overlay" id="transferModal">
+        <div class="modal-card">
+            <div class="modal-header-row">
+                <div>
+                    <p class="modal-eyebrow">Combat Tracker 联动</p>
+                    <h2 class="modal-title">推送当前遭遇</h2>
+                </div>
+                <button class="modal-close-btn" id="closeTransferModalButton" type="button">×</button>
+            </div>
+            <p class="modal-description" id="transferSceneTitle">当前场景没有可推送的遭遇。</p>
+            <div class="modal-options">
+                <label class="option-row">
+                    <input type="checkbox" id="transferAutoInitiative" checked>
+                    <span>
+                        <strong>自动骰先攻</strong>
+                        <small>按敌人敏捷调整值直接生成先攻并排序</small>
+                    </span>
+                </label>
+                <label class="option-row">
+                    <input type="checkbox" id="transferPlayerSlots" checked>
+                    <span>
+                        <strong>添加玩家角色槽位</strong>
+                        <small>优先带入右侧“玩家追踪”中的角色信息</small>
+                    </span>
+                </label>
+                <label class="option-row">
+                    <input type="checkbox" id="transferNewTab" checked>
+                    <span>
+                        <strong>在新标签页打开战斗追踪器</strong>
+                        <small>关闭后仍会保留这边的场景状态</small>
+                    </span>
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" id="cancelTransferButton" type="button">取消</button>
+                <button class="btn btn-primary" id="confirmTransferButton" type="button">确认推送</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="password-overlay hidden" id="passwordOverlay">
+        <div class="password-modal">
+            <div class="password-icon">👑</div>
+            <h2 class="password-title">城主权限验证</h2>
+            <p class="password-hint">输入访问密码以解锁 DM 专属内容</p>
+            <div class="password-input-group">
+                <input class="password-input" id="passwordInput" type="password" placeholder="请输入密码" autocomplete="off">
+                <button class="btn btn-primary" id="unlockButton" type="button">解锁工具</button>
+            </div>
+            <p class="password-error" id="passwordError"></p>
+        </div>
+    </div>
+</body>
+</html>

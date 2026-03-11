@@ -3,311 +3,993 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>骰子模拟器 - 阿正的赛博工具箱</title>
+    <title>骰子模拟器 | 阿正的赛博工具箱</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/AZ-s-Cyber-Toolbox/design-system.css">
+    <script src="/AZ-s-Cyber-Toolbox/common.js"></script>
     <style>
-        :root {
-            --primary-color: #8b4513;
-            --primary-dark: #5d2e0c;
-            --primary-light: #d4a574;
-            --secondary-color: #2c3e50;
-            --accent-color: #c9a227;
-            --bg-color: #f5f5dc;
-            --card-bg: #fffef0;
-            --text-color: #2c1810;
-            --text-light: #5a4a3a;
-            --border-color: #d4c5b5;
-            --success-color: #27ae60;
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
+        /* 骰子模拟器赛博朋克风格 */
+        .dice-simulator-page {
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            padding-bottom: var(--space-16);
         }
 
-        .header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: space-between;
+        /* 页面头部 */
+        .page-header {
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 100%);
+            padding: calc(var(--space-8) + 60px) 0 var(--space-8) 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+        }
+
+        .page-title {
+            font-size: var(--text-4xl);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-2);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: var(--text-lg);
+        }
+
+        .back-link {
+            position: fixed;
+            left: var(--space-6);
+            top: 24px;
+            z-index: 101;
+            display: inline-flex;
             align-items: center;
-        }
-
-        .header h1 {
-            font-size: 1.8rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            background: linear-gradient(135deg, rgba(30, 30, 45, 0.95) 0%, rgba(20, 20, 35, 0.98) 100%);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: var(--text-sm);
             text-decoration: none;
-            display: inline-block;
+            transition: all var(--transition-normal);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
         }
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
+        .back-link::before {
+            content: '←';
+            font-size: 1.2em;
+            transition: transform var(--transition-fast);
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .back-link:hover {
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+            transform: translateX(-4px);
         }
 
-        .main-content {
-            flex: 1;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem;
-            width: 100%;
+        .back-link:hover::before {
+            transform: translateX(-4px);
         }
 
-        .dice-container {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            border: 2px solid var(--border-color);
+        .back-link:active {
+            transform: translateX(-2px);
         }
 
-        .dice-title {
-            text-align: center;
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            margin-bottom: 2rem;
+        /* 主控制面板 */
+        .control-panel {
+            max-width: 900px;
+            margin: var(--space-8) auto;
+            padding: 0 var(--space-6);
         }
 
-        .dice-types {
+        .panel-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+        }
+
+        /* 骰子类型选择 */
+        .dice-section {
+            margin-bottom: var(--space-8);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-5);
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(176, 38, 255, 0.1));
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .section-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .dice-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: var(--space-4);
         }
 
-        .dice-type {
-            background: white;
+        .dice-option {
+            background: var(--bg-secondary);
             border: 2px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
+            border-radius: var(--radius-lg);
+            padding: var(--space-5) var(--space-4);
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
         }
 
-        .dice-type:hover {
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
+        .dice-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(176, 38, 255, 0.1));
+            opacity: 0;
+            transition: opacity var(--transition-fast);
         }
 
-        .dice-type.selected {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            color: white;
-            border-color: var(--primary-color);
+        .dice-option:hover {
+            border-color: var(--neon-cyan);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 217, 255, 0.15);
+        }
+
+        .dice-option:hover::before {
+            opacity: 1;
+        }
+
+        .dice-option.selected {
+            border-color: var(--neon-cyan);
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.15), rgba(176, 38, 255, 0.15));
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.3), inset 0 0 20px rgba(0, 217, 255, 0.1);
+        }
+
+        .dice-option.selected .dice-icon {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 10px var(--neon-cyan));
         }
 
         .dice-icon {
             font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .dice-name {
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .dice-count-section {
-            margin-bottom: 2rem;
-        }
-
-        .section-label {
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
+            margin-bottom: var(--space-2);
+            transition: all var(--transition-normal);
             display: block;
         }
 
-        .count-buttons {
+        .dice-label {
+            font-weight: 700;
+            font-size: var(--text-lg);
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .dice-sides {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* 数量选择 */
+        .count-grid {
             display: flex;
-            gap: 0.5rem;
+            gap: var(--space-3);
             flex-wrap: wrap;
             justify-content: center;
         }
 
-        .count-btn {
-            width: 50px;
-            height: 50px;
-            border: 2px solid var(--border-color);
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.2rem;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-
-        .count-btn:hover {
-            border-color: var(--primary-color);
-            background: rgba(139, 69, 19, 0.1);
-        }
-
-        .count-btn.selected {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .roll-button {
-            width: 100%;
-            padding: 1rem;
-            font-size: 1.3rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, var(--success-color) 0%, #1e8449 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 2rem;
-        }
-
-        .roll-button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .roll-button:active {
-            transform: translateY(0);
-        }
-
-        .results-section {
-            background: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            border: 2px solid var(--border-color);
-            min-height: 150px;
-        }
-
-        .results-title {
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .dice-results {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 1rem;
-        }
-
-        .dice-result {
+        .count-option {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
-            border-radius: 12px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--text-primary);
+            transition: all var(--transition-fast);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
+        }
+
+        .count-option:hover {
+            border-color: var(--neon-purple);
+            background: rgba(176, 38, 255, 0.1);
+        }
+
+        .count-option.selected {
+            background: linear-gradient(135deg, var(--neon-purple), #8b00ff);
+            border-color: var(--neon-purple);
             color: white;
-            box-shadow: var(--shadow);
-            animation: rollDice 0.5s ease-out;
+            box-shadow: 0 0 20px rgba(176, 38, 255, 0.4);
         }
 
-        @keyframes rollDice {
-            0% { transform: rotate(0deg) scale(0.5); opacity: 0; }
-            50% { transform: rotate(180deg) scale(1.2); }
-            100% { transform: rotate(360deg) scale(1); opacity: 1; }
-        }
-
-        .total-result {
+        /* 投掷按钮 */
+        .roll-section {
+            margin-top: var(--space-8);
             text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--success-color);
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px dashed var(--border-color);
         }
 
-        .history-section {
-            margin-top: 2rem;
-            background: white;
-            border-radius: 8px;
-            padding: 1rem;
-            border: 2px solid var(--border-color);
+        .roll-button {
+            padding: var(--space-5) var(--space-12);
+            font-size: var(--text-xl);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-blue) 100%);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 217, 255, 0.4);
         }
 
-        .history-title {
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
+        .roll-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .roll-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 217, 255, 0.6);
+        }
+
+        .roll-button:hover::before {
+            left: 100%;
+        }
+
+        .roll-button:active {
+            transform: translateY(-1px);
+        }
+
+        .roll-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ========== 骰子结果展示 - 赛博朋克3D风格 ========== */
+        .result-panel {
+            margin-top: var(--space-8);
+            padding: var(--space-8);
+            background: linear-gradient(145deg, 
+                rgba(15, 15, 25, 0.95) 0%, 
+                rgba(25, 20, 40, 0.95) 50%,
+                rgba(15, 25, 35, 0.95) 100%);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: var(--radius-xl);
+            display: none;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 60px rgba(0, 212, 255, 0.1),
+                inset 0 0 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                var(--neon-cyan), 
+                var(--neon-purple), 
+                var(--neon-cyan), 
+                transparent);
+            animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .result-panel.show {
+            display: block;
+            animation: resultPulse 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes resultPulse {
+            0% {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            60% {
+                transform: scale(1.02) translateY(-5px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* 骰子容器 */
+        .dice-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--space-4);
+            margin-bottom: var(--space-8);
+            padding: var(--space-6);
+            min-height: 120px;
+        }
+
+        /* 3D骰子样式 */
+        .dice-3d {
+            width: 70px;
+            height: 70px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        .dice-3d:hover {
+            transform: scale(1.1) rotateY(10deg);
+        }
+
+        /* 骰子面 */
+        .dice-face {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(145deg, 
+                rgba(30, 30, 45, 0.95) 0%, 
+                rgba(20, 20, 35, 0.98) 100%);
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 0 20px rgba(0, 212, 255, 0.15);
+            backface-visibility: hidden;
+        }
+
+        /* 骰子点数高亮 */
+        .dice-face.max-value {
+            border-color: rgba(0, 255, 157, 0.6);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(0, 255, 157, 0.3),
+                inset 0 0 20px rgba(0, 255, 157, 0.1);
+            text-shadow: 0 0 20px rgba(0, 255, 157, 0.9);
+            color: #00ff9d;
+        }
+
+        .dice-face.min-value {
+            border-color: rgba(255, 71, 87, 0.6);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(255, 71, 87, 0.3),
+                inset 0 0 20px rgba(255, 71, 87, 0.1);
+            text-shadow: 0 0 20px rgba(255, 71, 87, 0.9);
+            color: #ff6b81;
+        }
+
+        /* 骰子滚动动画 */
+        @keyframes diceRoll3D {
+            0% {
+                transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(0.8);
+                opacity: 0;
+            }
+            20% {
+                transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg) scale(1.1);
+            }
+            40% {
+                transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg) scale(0.95);
+            }
+            60% {
+                transform: rotateX(900deg) rotateY(540deg) rotateZ(270deg) scale(1.05);
+            }
+            80% {
+                transform: rotateX(1080deg) rotateY(720deg) rotateZ(360deg) scale(0.98);
+            }
+            100% {
+                transform: rotateX(1080deg) rotateY(720deg) rotateZ(360deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes diceBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .dice-3d.rolling {
+            animation: diceRoll3D 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .dice-3d.landed {
+            animation: diceBounce 0.4s ease-out;
+        }
+
+        /* 骰子序号 */
+        .dice-index {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 2px 10px rgba(176, 38, 255, 0.4);
+            z-index: 10;
+        }
+
+        /* 总计区域 */
+        .total-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--space-6);
+            background: linear-gradient(135deg, 
+                rgba(0, 212, 255, 0.08) 0%, 
+                rgba(176, 38, 255, 0.05) 100%);
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .total-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(0, 212, 255, 0.1), 
+                transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .total-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            margin-bottom: var(--space-2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .total-value {
+            font-size: clamp(3.5rem, 10vw, 5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            position: relative;
+            z-index: 1;
+            animation: gradientShift 3s ease infinite;
+            text-shadow: 0 0 60px rgba(0, 212, 255, 0.3);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* 统计信息 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--space-4);
+            margin-top: var(--space-6);
+            padding-top: var(--space-6);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: var(--space-3);
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-value {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--neon-cyan);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: var(--space-1);
+        }
+
+        /* 投掷信息 */
+        .roll-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+            padding: var(--space-4);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .roll-info-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .roll-info-value {
+            font-weight: 700;
+            color: var(--neon-cyan);
+            font-size: var(--text-lg);
+        }
+
+        .roll-info-separator {
+            width: 1px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 结果展示 */
+        .result-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: var(--space-4);
+        }
+
+        .result-total {
+            font-size: clamp(4rem, 12vw, 6rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: var(--space-4);
+            text-shadow: 0 0 60px rgba(0, 217, 255, 0.3);
+        }
+
+        .result-breakdown {
+            font-size: var(--text-lg);
+            color: var(--text-secondary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .result-detail {
+            margin-top: var(--space-4);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--border-color);
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+        }
+
+        /* 历史记录 */
+        .history-panel {
+            margin-top: var(--space-8);
+            display: none;
+        }
+
+        .history-panel.show {
+            display: block;
         }
 
         .history-list {
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
         }
 
         .history-item {
-            padding: 0.3rem 0;
-            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-4);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
         }
 
-        .history-item:last-child {
-            border-bottom: none;
+        .history-item:hover {
+            border-color: var(--neon-cyan);
+            background: var(--bg-hover);
         }
 
-        .footer {
-            background: var(--secondary-color);
-            color: white;
+        .history-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .history-time {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+            font-family: 'Courier New', monospace;
+        }
+
+        .history-roll {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .history-result {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--neon-cyan);
+        }
+
+        /* 保存的掷骰 */
+        .saved-rolls-section {
+            margin-top: var(--space-10);
+            padding-top: var(--space-8);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .saved-rolls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--space-4);
+            margin-top: var(--space-5);
+        }
+
+        .saved-roll-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
             text-align: center;
-            padding: 1rem;
-            margin-top: auto;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
         }
 
-        /* 喝酒摇骰子按钮 */
+        .saved-roll-card:hover {
+            border-color: var(--neon-purple);
+            box-shadow: 0 4px 15px rgba(176, 38, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .saved-roll-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .saved-roll-config {
+            font-size: var(--text-sm);
+            color: var(--neon-purple);
+            font-family: 'Courier New', monospace;
+        }
+
+        .saved-roll-delete {
+            position: absolute;
+            top: var(--space-2);
+            right: var(--space-2);
+            width: 24px;
+            height: 24px;
+            background: var(--error);
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            font-size: var(--text-sm);
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .saved-roll-card:hover .saved-roll-delete {
+            opacity: 1;
+        }
+
+        /* 保存表单 */
+        .save-form {
+            display: flex;
+            gap: var(--space-3);
+            margin-top: var(--space-5);
+        }
+
+        .save-input {
+            flex: 1;
+            max-width: 300px;
+        }
+
+        /* 自定义骰子 */
+        .custom-dice-section {
+            margin-top: var(--space-10);
+            padding-top: var(--space-8);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .custom-dice-form {
+            display: flex;
+            gap: var(--space-4);
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .custom-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .custom-input {
+            width: 120px;
+        }
+
+        /* 骰子动画 */
+        .dice-rolling {
+            animation: diceRoll 0.5s ease-in-out;
+        }
+
+        @keyframes diceRoll {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-15deg) scale(1.1); }
+            50% { transform: rotate(15deg) scale(0.95); }
+            75% { transform: rotate(-10deg) scale(1.05); }
+        }
+
+        /* ==================== 喝酒摇骰子样式 - 置顶显示 ==================== */
+        
+        /* 喝酒摇骰子入口区域 - 置顶固定 */
+        .party-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: linear-gradient(180deg, 
+                rgba(10, 10, 20, 0.98) 0%, 
+                rgba(20, 10, 30, 0.95) 50%,
+                rgba(10, 10, 20, 0.9) 100%);
+            border-bottom: 2px solid transparent;
+            border-image: linear-gradient(90deg, #ff006e, #8338ec, #ff006e) 1;
+            padding: var(--space-4) var(--space-6);
+            text-align: center;
+            box-shadow: 
+                0 4px 30px rgba(255, 0, 110, 0.3),
+                0 0 60px rgba(131, 56, 236, 0.2);
+            animation: partyBarGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes partyBarGlow {
+            0% { 
+                box-shadow: 0 4px 30px rgba(255, 0, 110, 0.3), 0 0 60px rgba(131, 56, 236, 0.2);
+                border-image: linear-gradient(90deg, #ff006e, #8338ec, #ff006e) 1;
+            }
+            100% { 
+                box-shadow: 0 4px 40px rgba(255, 0, 110, 0.5), 0 0 80px rgba(131, 56, 236, 0.3);
+                border-image: linear-gradient(90deg, #ff3385, #9d5bf0, #ff3385) 1;
+            }
+        }
+
+        /* 置顶栏内容布局 */
+        .party-bar-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-6);
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .party-bar-title {
+            font-size: var(--text-xl);
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff006e, #8338ec);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            text-shadow: 0 0 30px rgba(255, 0, 110, 0.5);
+        }
+
+        .party-bar-title::before {
+            content: '🍻';
+            font-size: 1.5rem;
+            -webkit-text-fill-color: initial;
+            animation: partyIconBounce 1s ease-in-out infinite;
+        }
+
+        @keyframes partyIconBounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-3px) rotate(-10deg); }
+            75% { transform: translateY(-3px) rotate(10deg); }
+        }
+
+        .party-bar-desc {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .party-bar-desc::before {
+            content: '•';
+            color: #ff006e;
+            font-size: 1.5rem;
+            line-height: 0;
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-4);
+            font-size: var(--text-sm);
+        }
+
+        /* 喝酒摇骰子按钮 - 置顶版 */
         .btn-party {
             background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
             color: white;
-            font-weight: bold;
-            animation: pulse 2s infinite;
+            font-weight: 700;
+            padding: var(--space-3) var(--space-6);
+            font-size: var(--text-base);
+            animation: partyPulse 1.5s infinite;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 0, 110, 0.7); }
-            50% { box-shadow: 0 0 0 10px rgba(255, 0, 110, 0); }
+        .btn-party::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-party:hover::before {
+            left: 100%;
+        }
+
+        @keyframes partyPulse {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 rgba(255, 0, 110, 0.7), 0 4px 15px rgba(255, 0, 110, 0.3);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 0 8px rgba(255, 0, 110, 0), 0 6px 20px rgba(255, 0, 110, 0.4);
+                transform: scale(1.02);
+            }
         }
 
         .btn-party:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 0, 110, 0.5);
+        }
+
+        /* 页面内容需要给置顶栏留出空间 */
+        .dice-simulator-page {
+            padding-top: 100px;
+        }
+
+        @media (max-width: 768px) {
+            .party-section {
+                padding: var(--space-3) var(--space-4);
+            }
+            
+            .party-bar-content {
+                gap: var(--space-3);
+            }
+            
+            .party-bar-title {
+                font-size: var(--text-lg);
+            }
+            
+            .party-bar-desc {
+                display: none;
+            }
+            
+            .btn-party {
+                padding: var(--space-2) var(--space-4);
+                font-size: var(--text-sm);
+            }
+            
+            .dice-simulator-page {
+                padding-top: 80px;
+            }
         }
 
         /* 喝酒摇骰子模式 - 赛博夜店风 */
@@ -397,6 +1079,30 @@
             box-shadow: 0 0 20px rgba(255, 0, 110, 0.8);
         }
 
+        /* 皮肤切换 */
+        .party-skin-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .skin-btn {
+            padding: 0.5rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .skin-btn.active,
+        .skin-btn:hover {
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            border-color: #ff006e;
+        }
+
         .party-dice-area {
             min-height: 200px;
             display: flex;
@@ -461,10 +1167,10 @@
         }
 
         .party-dice.rolling {
-            animation: diceRoll 0.5s ease-in-out;
+            animation: partyDiceRoll 0.5s ease-in-out;
         }
 
-        @keyframes diceRoll {
+        @keyframes partyDiceRoll {
             0% { transform: rotate(0deg) scale(1); }
             25% { transform: rotate(90deg) scale(1.2); }
             50% { transform: rotate(180deg) scale(0.8); }
@@ -472,7 +1178,7 @@
             100% { transform: rotate(360deg) scale(1); }
         }
 
-        /* 点数皮肤样式 - 用点代替数字 */
+        /* 点数皮肤样式 */
         .party-dice.dots-skin {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             border: 2px solid #00d4ff;
@@ -488,44 +1194,34 @@
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
         }
 
-        /* 标准骰子点位置定义 (3x3网格布局) */
-        /* 第一行 */
-        .party-dice.dots-skin .dice-dot:nth-child(1) { top: 12px; left: 12px; } /* 左上 */
-        .party-dice.dots-skin .dice-dot:nth-child(2) { top: 12px; left: 50%; transform: translateX(-50%); } /* 中上 */
-        .party-dice.dots-skin .dice-dot:nth-child(3) { top: 12px; right: 12px; } /* 右上 */
-        /* 第二行 */
-        .party-dice.dots-skin .dice-dot:nth-child(4) { top: 50%; left: 12px; transform: translateY(-50%); } /* 左中 */
-        .party-dice.dots-skin .dice-dot:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); } /* 中心 */
-        .party-dice.dots-skin .dice-dot:nth-child(6) { top: 50%; right: 12px; transform: translateY(-50%); } /* 右中 */
-        /* 第三行 */
-        .party-dice.dots-skin .dice-dot:nth-child(7) { bottom: 12px; left: 12px; } /* 左下 */
-        .party-dice.dots-skin .dice-dot:nth-child(8) { bottom: 12px; left: 50%; transform: translateX(-50%); } /* 中下 */
-        .party-dice.dots-skin .dice-dot:nth-child(9) { bottom: 12px; right: 12px; } /* 右下 */
+        .party-dice.dots-skin .dice-dot:nth-child(1) { top: 12px; left: 12px; }
+        .party-dice.dots-skin .dice-dot:nth-child(2) { top: 12px; left: 50%; transform: translateX(-50%); }
+        .party-dice.dots-skin .dice-dot:nth-child(3) { top: 12px; right: 12px; }
+        .party-dice.dots-skin .dice-dot:nth-child(4) { top: 50%; left: 12px; transform: translateY(-50%); }
+        .party-dice.dots-skin .dice-dot:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .party-dice.dots-skin .dice-dot:nth-child(6) { top: 50%; right: 12px; transform: translateY(-50%); }
+        .party-dice.dots-skin .dice-dot:nth-child(7) { bottom: 12px; left: 12px; }
+        .party-dice.dots-skin .dice-dot:nth-child(8) { bottom: 12px; left: 50%; transform: translateX(-50%); }
+        .party-dice.dots-skin .dice-dot:nth-child(9) { bottom: 12px; right: 12px; }
 
-        /* 点数皮肤 - 不同点数的布局 (标准骰子排列) */
-        /* 1点: 中心 */
         .party-dice.dots-skin[data-value="1"] .dice-dot { display: none; }
         .party-dice.dots-skin[data-value="1"] .dice-dot:nth-child(5) { display: block; }
 
-        /* 2点: 左上-右下对角 */
         .party-dice.dots-skin[data-value="2"] .dice-dot { display: none; }
         .party-dice.dots-skin[data-value="2"] .dice-dot:nth-child(1),
         .party-dice.dots-skin[data-value="2"] .dice-dot:nth-child(9) { display: block; }
 
-        /* 3点: 左上-中心-右下对角 */
         .party-dice.dots-skin[data-value="3"] .dice-dot { display: none; }
         .party-dice.dots-skin[data-value="3"] .dice-dot:nth-child(1),
         .party-dice.dots-skin[data-value="3"] .dice-dot:nth-child(5),
         .party-dice.dots-skin[data-value="3"] .dice-dot:nth-child(9) { display: block; }
 
-        /* 4点: 四角 */
         .party-dice.dots-skin[data-value="4"] .dice-dot { display: none; }
         .party-dice.dots-skin[data-value="4"] .dice-dot:nth-child(1),
         .party-dice.dots-skin[data-value="4"] .dice-dot:nth-child(3),
         .party-dice.dots-skin[data-value="4"] .dice-dot:nth-child(7),
         .party-dice.dots-skin[data-value="4"] .dice-dot:nth-child(9) { display: block; }
 
-        /* 5点: 四角+中心 */
         .party-dice.dots-skin[data-value="5"] .dice-dot { display: none; }
         .party-dice.dots-skin[data-value="5"] .dice-dot:nth-child(1),
         .party-dice.dots-skin[data-value="5"] .dice-dot:nth-child(3),
@@ -533,7 +1229,6 @@
         .party-dice.dots-skin[data-value="5"] .dice-dot:nth-child(7),
         .party-dice.dots-skin[data-value="5"] .dice-dot:nth-child(9) { display: block; }
 
-        /* 6点: 左右各三个点 (竖排) */
         .party-dice.dots-skin[data-value="6"] .dice-dot { display: none; }
         .party-dice.dots-skin[data-value="6"] .dice-dot:nth-child(1),
         .party-dice.dots-skin[data-value="6"] .dice-dot:nth-child(4),
@@ -542,112 +1237,77 @@
         .party-dice.dots-skin[data-value="6"] .dice-dot:nth-child(6),
         .party-dice.dots-skin[data-value="6"] .dice-dot:nth-child(9) { display: block; }
 
-        /* 皮肤切换按钮 */
-        .party-skin-toggle {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: center;
-            margin-bottom: 1rem;
-        }
-
-        .skin-btn {
-            padding: 0.5rem 1rem;
-            background: rgba(255, 0, 110, 0.2);
-            border: 2px solid #ff006e;
-            color: #ff006e;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
-
-        .skin-btn:hover {
-            background: rgba(255, 0, 110, 0.4);
-            transform: scale(1.05);
-        }
-
-        .skin-btn.active {
-            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
-            color: white;
-            border-color: transparent;
-        }
-
+        /* 控制按钮 */
         .party-controls {
             display: flex;
-            gap: 1rem;
             justify-content: center;
+            gap: 1rem;
             margin-bottom: 1.5rem;
         }
 
         .party-roll-btn, .party-next-btn {
-            padding: 1rem 3rem;
-            font-size: 1.5rem;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
             font-weight: bold;
             border: none;
-            border-radius: 50px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
         .party-roll-btn {
             background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
             color: white;
-            box-shadow: 0 0 30px rgba(255, 0, 110, 0.5);
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
         }
 
         .party-roll-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 50px rgba(255, 0, 110, 0.8);
+            box-shadow: 0 0 30px rgba(255, 0, 110, 0.8);
         }
 
         .party-next-btn {
-            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            background: linear-gradient(135deg, #00d4ff 0%, #8338ec 100%);
             color: white;
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
         }
 
         .party-next-btn:hover:not(:disabled) {
             transform: scale(1.05);
-            box-shadow: 0 0 50px rgba(0, 212, 255, 0.8);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.8);
         }
 
         .party-next-btn:disabled {
-            background: linear-gradient(135deg, #666 0%, #444 100%);
+            opacity: 0.5;
             cursor: not-allowed;
-            opacity: 0.7;
         }
 
         .party-status {
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #00d4ff;
             margin-bottom: 1.5rem;
+            min-height: 1.5rem;
             text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-            min-height: 30px;
         }
 
         .party-pro-btn {
             display: block;
-            width: 100%;
-            padding: 1rem;
-            margin-top: 1.5rem;
+            margin: 0 auto;
+            padding: 0.8rem 2rem;
             background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
-            border: none;
-            border-radius: 10px;
-            color: #1a0a2e;
-            font-size: 1.2rem;
+            color: #1a1a2e;
             font-weight: bold;
+            border: none;
+            border-radius: 25px;
             cursor: pointer;
             transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
 
         .party-pro-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.6);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
         }
 
         .party-pro-btn:disabled {
@@ -655,9 +1315,9 @@
             cursor: not-allowed;
         }
 
-        /* 技能骰样式 */
+        /* 技能骰区域 */
         .party-skills {
-            margin-top: 1.5rem;
+            margin-top: 2rem;
             padding: 1.5rem;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
@@ -672,19 +1332,21 @@
         }
 
         .party-skills-title {
+            font-size: 1.2rem;
             color: #ffd700;
-            font-size: 1.3rem;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            margin: 0;
+            cursor: pointer;
+            user-select: none;
         }
 
         .party-close-pro {
-            background: rgba(255, 0, 110, 0.3);
+            padding: 0.4rem 1rem;
+            background: rgba(255, 0, 110, 0.2);
             border: 1px solid #ff006e;
             color: #ff006e;
-            padding: 0.3rem 0.8rem;
-            border-radius: 6px;
+            border-radius: 15px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             transition: all 0.3s;
         }
 
@@ -693,172 +1355,198 @@
             color: white;
         }
 
-        /* 德州骰选择对话框 */
-        .texas-dialog {
+        .party-skill-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .party-skill-item {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .party-skill-item:hover:not(.disabled) {
+            background: rgba(255, 0, 110, 0.2);
+            border-color: #ff006e;
+            transform: translateY(-2px);
+        }
+
+        .party-skill-item.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .party-skill-item.used {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+        }
+
+        .party-skill-name {
+            font-weight: bold;
+            color: #ff006e;
+            margin-bottom: 0.3rem;
+        }
+
+        .party-skill-count {
+            font-size: 0.85rem;
+            color: #00d4ff;
+            margin-bottom: 0.3rem;
+        }
+
+        .party-skill-desc {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* 模态框样式 */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.8);
-            z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
         }
 
-        .texas-dialog-content {
-            background: linear-gradient(135deg, rgba(20, 20, 40, 0.98) 0%, rgba(30, 10, 50, 0.98) 100%);
-            border-radius: 20px;
-            border: 2px solid #ffd700;
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #ff006e;
+            border-radius: 15px;
             padding: 2rem;
-            max-width: 600px;
-            width: 90%;
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        .texas-dialog-content h3 {
-            color: #ffd700;
-            text-align: center;
+        .modal-title {
+            font-size: 1.3rem;
+            color: #ff006e;
             margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
-
-        .texas-dialog-content p {
-            color: #aaa;
             text-align: center;
-            margin-bottom: 1.5rem;
         }
 
-        .texas-dice-options {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
+        .modal-text {
+            color: rgba(255, 255, 255, 0.8);
             margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        /* 德州骰选择 */
+        .texas-dice-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            margin: 1.5rem 0;
         }
 
         .texas-dice-option {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #333 0%, #555 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 3px solid transparent;
-        }
-
-        .texas-dice-option:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-
-        .texas-dice-option.selected {
-            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
-            border-color: #fff;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
-        }
-
-        .texas-selected {
-            text-align: center;
-            color: #00d4ff;
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .texas-dialog-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-
-        /* 重掷骰选择对话框样式 */
-        .reroll-groups {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .reroll-group {
-            background: linear-gradient(135deg, rgba(255, 0, 110, 0.2) 0%, rgba(131, 56, 236, 0.2) 100%);
-            border: 2px solid rgba(255, 0, 110, 0.5);
-            border-radius: 15px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            min-width: 150px;
-        }
-
-        .reroll-group:hover {
-            border-color: #ff006e;
-            background: linear-gradient(135deg, rgba(255, 0, 110, 0.3) 0%, rgba(131, 56, 236, 0.3) 100%);
-            transform: translateY(-3px);
-        }
-
-        .reroll-group.selected {
-            border-color: #ffd700;
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 140, 0, 0.3) 100%);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-        }
-
-        .reroll-group-title {
-            color: #ff006e;
-            font-weight: bold;
-            font-size: 1.1rem;
-            text-align: center;
-            margin-bottom: 0.8rem;
-        }
-
-        .reroll-group.selected .reroll-group-title {
-            color: #ffd700;
-        }
-
-        .reroll-group-dice {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .reroll-dice {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .texas-dice-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 0, 110, 0.5);
+        }
+
+        .texas-dice-option.selected {
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+            background: linear-gradient(135deg, #00d4ff 0%, #8338ec 100%);
+        }
+
+        /* 重掷骰选择 */
+        .reroll-groups {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .reroll-group {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .reroll-group:hover {
+            background: rgba(255, 0, 110, 0.1);
+        }
+
+        .reroll-group.selected {
+            border-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .reroll-group h4 {
+            color: #00d4ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .reroll-dice-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .reroll-dice {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
             color: white;
         }
 
-        /* 自选骰子彩蛋样式 */
-        .custom-dice-container {
-            margin-bottom: 1.5rem;
-        }
-
+        /* 自选骰子彩蛋 */
         .custom-dice-row {
             display: flex;
-            gap: 1rem;
             justify-content: center;
-            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
         }
 
         .custom-dice-slot {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, #333 0%, #555 100%);
-            border: 3px solid transparent;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -870,366 +1558,129 @@
         }
 
         .custom-dice-slot:hover {
-            border-color: #ff006e;
-            box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
+            background: rgba(255, 0, 110, 0.2);
         }
 
         .custom-dice-slot.selected {
             border-color: #ffd700;
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 140, 0, 0.3) 100%);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
         }
 
         .custom-dice-slot.filled {
-            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+            color: #1a1a2e;
         }
 
         .custom-dice-numbers {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
             margin-bottom: 1.5rem;
         }
 
-        .custom-dice-numbers p {
-            color: #aaa;
-            margin-bottom: 0.8rem;
-        }
-
-        .number-grid {
-            display: flex;
-            gap: 0.8rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .number-btn {
-            width: 55px;
-            height: 55px;
-            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
-            border: none;
-            border-radius: 10px;
-            font-size: 1.4rem;
-            font-weight: bold;
+        .custom-dice-num {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
             color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .number-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
-        }
-
-        .party-skill-list {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-
-        .party-skill-item {
-            background: linear-gradient(135deg, rgba(255, 0, 110, 0.2) 0%, rgba(131, 56, 236, 0.2) 100%);
-            border: 2px solid rgba(255, 0, 110, 0.5);
-            border-radius: 10px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .party-skill-item:hover:not(.disabled) {
-            background: linear-gradient(135deg, rgba(255, 0, 110, 0.4) 0%, rgba(131, 56, 236, 0.4) 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(255, 0, 110, 0.4);
-        }
-
-        .party-skill-item.disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .party-skill-item.used {
-            opacity: 0.5;
-            border-color: #666;
-        }
-
-        .party-skill-name {
-            color: #ff006e;
+            font-size: 1.2rem;
             font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 0.3rem;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .party-skill-count {
-            color: #00d4ff;
-            font-size: 0.9rem;
+        .custom-dice-num:hover {
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            border-color: #ff006e;
         }
 
-        .party-skill-desc {
-            color: #aaa;
-            font-size: 0.8rem;
-            margin-top: 0.5rem;
-        }
-
+        /* 喝酒摇骰子手机优化 */
         @media (max-width: 768px) {
-            .header {
+            .party-container {
+                width: 95%;
+                margin: 1rem auto;
+                padding: 1.5rem;
+            }
+
+            .party-header {
                 flex-direction: column;
-                gap: 0.5rem;
+                gap: 1rem;
                 text-align: center;
-                padding: 0.8rem 1rem;
             }
 
-            .header h1 {
-                font-size: 1.4rem;
-            }
-
-            .header-actions {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 0.4rem;
-            }
-
-            .btn {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.8rem;
-            }
-
-            .dice-types {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 0.5rem;
-            }
-
-            .dice-type-btn {
-                padding: 0.8rem 0.3rem;
-                font-size: 0.85rem;
-            }
-
-            .main-content {
-                padding: 0.8rem;
-            }
-
-            .dice-container {
-                padding: 1rem;
-            }
-
-            .dice-title {
-                font-size: 1.2rem;
-                margin-bottom: 1rem;
-            }
-
-            .dice-display {
-                min-height: 120px;
-                padding: 1rem;
-            }
-
-            .dice-result {
-                width: 50px;
-                height: 50px;
+            .party-title {
                 font-size: 1.5rem;
             }
 
-            .roll-btn {
-                padding: 0.8rem 2rem;
-                font-size: 1.1rem;
-            }
-            
-            /* 喝酒摇骰子手机优化 */
-            .party-overlay {
-                align-items: flex-start;
-                padding: 0.5rem 0;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            .party-container {
-                width: 98%;
-                max-width: 100%;
-                padding: 0.8rem;
-                margin: 0.5rem auto;
-                border-radius: 15px;
-            }
-            
-            .party-header {
-                flex-wrap: wrap;
-                gap: 0.5rem;
-                margin-bottom: 1rem;
-                padding-bottom: 0.5rem;
-            }
-            
-            .party-title {
-                font-size: 1.2rem;
-                flex: 1;
-            }
-            
             .party-round {
-                font-size: 1rem;
-            }
-            
-            .party-close {
-                width: 32px;
-                height: 32px;
-                font-size: 1rem;
-            }
-            
-            .party-dice-area {
-                min-height: auto;
-                margin-bottom: 1rem;
-            }
-            
-            .party-dice-container {
-                gap: 0.6rem;
-            }
-            
-            .party-dice {
-                width: 55px;
-                height: 55px;
-                font-size: 1.4rem;
-                border-radius: 12px;
-            }
-            
-            .party-controls {
-                flex-direction: column;
-                gap: 0.6rem;
-                margin-bottom: 1rem;
-            }
-            
-            .party-roll-btn, .party-next-btn {
-                padding: 0.8rem 2rem;
-                font-size: 1.1rem;
-                width: 100%;
-            }
-            
-            .party-status {
-                font-size: 0.95rem;
-                margin-bottom: 1rem;
-            }
-            
-            .party-skills {
-                padding: 0.8rem;
-                margin-top: 1rem;
-            }
-            
-            .party-skills-header {
-                flex-direction: row;
-                align-items: center;
-                gap: 0.5rem;
-            }
-            
-            .party-skills-title {
-                font-size: 1rem;
-            }
-            
-            .party-close-pro {
-                padding: 0.2rem 0.5rem;
-                font-size: 0.7rem;
-            }
-            
-            .party-skill-list {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.5rem;
-            }
-            
-            .party-skill-item {
-                padding: 0.5rem;
-                min-height: auto;
-            }
-
-            .party-skill-name {
-                font-size: 0.8rem;
-                margin-bottom: 0.2rem;
-            }
-
-            .party-skill-count {
-                font-size: 0.7rem;
-            }
-
-            .party-skill-desc {
-                font-size: 0.65rem;
-                margin-top: 0.3rem;
-                line-height: 1.2;
-            }
-            
-            .party-pro-btn {
-                padding: 0.8rem;
-                font-size: 1rem;
-                margin-top: 1rem;
-            }
-
-            /* 德州骰选择对话框手机优化 */
-            .texas-dialog-content {
-                width: 95%;
-                padding: 1rem;
-                margin: 1rem;
-            }
-
-            .texas-dialog-content h3 {
                 font-size: 1.2rem;
             }
 
-            .texas-dice-options {
-                gap: 0.5rem;
+            .party-close {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
             }
 
-            .texas-dice-option {
-                width: 50px;
-                height: 50px;
-                font-size: 1.3rem;
-                border-radius: 8px;
+            .party-dice-area {
+                min-height: 150px;
             }
 
-            .texas-selected {
-                font-size: 1rem;
-            }
-
-            .texas-dialog-buttons {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .texas-dialog-buttons button {
-                width: 100%;
-            }
-
-            /* 皮肤切换按钮手机优化 */
-            .party-skin-toggle {
-                margin-bottom: 0.8rem;
-            }
-
-            .skin-btn {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.8rem;
-            }
-
-            /* 点数皮肤手机优化 */
-            .party-dice.dots-skin .dice-dot {
-                width: 10px;
-                height: 10px;
-            }
-
-            .party-dice.dots-skin[data-value="1"]::after {
-                width: 12px;
-                height: 12px;
-            }
-
-            /* 重掷骰选择对话框手机优化 */
-            .reroll-groups {
-                flex-direction: column;
+            .party-dice-container {
                 gap: 1rem;
             }
 
-            .reroll-group {
-                min-width: auto;
-                padding: 0.8rem;
+            .party-dice {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
             }
 
-            .reroll-group-title {
+            .party-controls {
+                flex-direction: column;
+            }
+
+            .party-roll-btn, .party-next-btn {
+                width: 100%;
+            }
+
+            .party-status {
                 font-size: 1rem;
             }
 
-            .reroll-dice {
-                width: 40px;
-                height: 40px;
-                font-size: 1.1rem;
+            .party-skills {
+                padding: 1rem;
             }
 
-            /* 自选骰子彩蛋手机优化 */
+            .party-skills-header {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .party-skill-list {
+                grid-template-columns: 1fr;
+            }
+
+            .party-close-pro {
+                width: 100%;
+            }
+
+            .texas-dice-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .texas-dice-option {
+                width: 100%;
+                height: 50px;
+            }
+
+            .reroll-groups {
+                grid-template-columns: 1fr;
+            }
+
             .custom-dice-row {
                 gap: 0.5rem;
             }
@@ -1237,201 +1688,231 @@
             .custom-dice-slot {
                 width: 50px;
                 height: 50px;
-                font-size: 1.3rem;
-            }
-
-            .number-grid {
-                gap: 0.5rem;
-            }
-
-            .number-btn {
-                width: 45px;
-                height: 45px;
                 font-size: 1.2rem;
+            }
+
+            .custom-dice-numbers {
+                flex-wrap: wrap;
+            }
+
+            .custom-dice-num {
+                width: 40px;
+                height: 40px;
             }
         }
 
-        /* 超小屏幕优化 */
-        @media (max-width: 380px) {
-            .header h1 {
-                font-size: 1.2rem;
+        /* 响应式适配 */
+        @media (max-width: 768px) {
+            .page-header {
+                padding: calc(var(--space-6) + 50px) 0 var(--space-6) 0;
             }
 
-            .party-title {
-                font-size: 1rem;
+            .page-title {
+                font-size: var(--text-3xl);
             }
 
-            .party-dice {
-                width: 48px;
-                height: 48px;
-                font-size: 1.2rem;
+            .back-link {
+                position: fixed;
+                left: var(--space-4);
+                top: 18px;
+                padding: var(--space-1) var(--space-3);
+                font-size: var(--text-xs);
             }
 
-            .party-dice-container {
-                gap: 0.4rem;
+            .panel-card {
+                padding: var(--space-5);
             }
 
-            .dice-types {
-                grid-template-columns: repeat(2, 1fr);
+            .dice-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .count-option {
+                width: 50px;
+                height: 50px;
+            }
+
+            .roll-button {
+                padding: var(--space-4) var(--space-8);
+                font-size: var(--text-lg);
             }
         }
     </style>
 </head>
-<body>
-    <header class="header">
-        <h1>🎲 骰子模拟器</h1>
-        <div class="header-actions">
-            <button class="btn btn-party" onclick="enterPartyMode()">🍻 喝酒摇骰子</button>
-            <a href="../index.html" class="btn btn-secondary">🏠 返回首页</a>
-            <a href="../dnd-character-creator/index.html" class="btn btn-secondary">🧙‍♂️ 角色卡生成器</a>
-        </div>
+<body class="dice-simulator-page">
+    <!-- 页面头部 -->
+    <header class="page-header">
+        <a href="/AZ-s-Cyber-Toolbox/index.html" class="back-link">返回首页</a>
+        <h1 class="page-title">🎲 骰子模拟器</h1>
+        <p class="page-subtitle">选择骰子类型和数量，开始你的命运投掷</p>
     </header>
 
-    <main class="main-content">
-        <div class="dice-container">
-            <h2 class="dice-title">选择骰子类型和数量</h2>
+    <!-- 主控制面板 -->
+    <main class="control-panel" style="padding-top: 100px;">
+        <div class="panel-card">
+            <!-- 骰子类型选择 -->
+            <div class="dice-section">
+                <div class="section-header">
+                    <div class="section-icon">🎲</div>
+                    <h2 class="section-title">选择骰子类型</h2>
+                </div>
+                <div class="dice-grid" id="diceGrid">
+                    <div class="dice-option" data-sides="4">
+                        <span class="dice-icon">🔺</span>
+                        <span class="dice-label">D4</span>
+                        <span class="dice-sides">4面</span>
+                    </div>
+                    <div class="dice-option" data-sides="6">
+                        <span class="dice-icon">🎲</span>
+                        <span class="dice-label">D6</span>
+                        <span class="dice-sides">6面</span>
+                    </div>
+                    <div class="dice-option" data-sides="8">
+                        <span class="dice-icon">💎</span>
+                        <span class="dice-label">D8</span>
+                        <span class="dice-sides">8面</span>
+                    </div>
+                    <div class="dice-option" data-sides="10">
+                        <span class="dice-icon">🔟</span>
+                        <span class="dice-label">D10</span>
+                        <span class="dice-sides">10面</span>
+                    </div>
+                    <div class="dice-option" data-sides="12">
+                        <span class="dice-icon">⬡</span>
+                        <span class="dice-label">D12</span>
+                        <span class="dice-sides">12面</span>
+                    </div>
+                    <div class="dice-option" data-sides="20">
+                        <span class="dice-icon">⬠</span>
+                        <span class="dice-label">D20</span>
+                        <span class="dice-sides">20面</span>
+                    </div>
+                    <div class="dice-option" data-sides="100">
+                        <span class="dice-icon">💯</span>
+                        <span class="dice-label">D100</span>
+                        <span class="dice-sides">100面</span>
+                    </div>
+                </div>
+            </div>
 
-            <div class="dice-types">
-                <div class="dice-type" data-dice="4" onclick="selectDiceType(4)">
-                    <div class="dice-icon">🎲</div>
-                    <div class="dice-name">D4</div>
+            <!-- 数量选择 -->
+            <div class="dice-section">
+                <div class="section-header">
+                    <div class="section-icon">🔢</div>
+                    <h2 class="section-title">选择骰子数量</h2>
                 </div>
-                <div class="dice-type" data-dice="6" onclick="selectDiceType(6)">
-                    <div class="dice-icon">🎲</div>
-                    <div class="dice-name">D6</div>
-                </div>
-                <div class="dice-type selected" data-dice="8" onclick="selectDiceType(8)">
-                    <div class="dice-icon">🎲</div>
-                    <div class="dice-name">D8</div>
-                </div>
-                <div class="dice-type" data-dice="10" onclick="selectDiceType(10)">
-                    <div class="dice-icon">🎲</div>
-                    <div class="dice-name">D10</div>
-                </div>
-                <div class="dice-type" data-dice="12" onclick="selectDiceType(12)">
-                    <div class="dice-icon">🎲</div>
-                    <div class="dice-name">D12</div>
-                </div>
-                <div class="dice-type" data-dice="20" onclick="selectDiceType(20)">
-                    <div class="dice-icon">🎲</div>
-                    <div class="dice-name">D20</div>
-                </div>
-                <div class="dice-type" data-dice="100" onclick="selectDiceType(100)">
-                    <div class="dice-icon">🎲</div>
-                    <div class="dice-name">D100</div>
+                <div class="count-grid" id="countGrid">
+                    <button class="count-option" data-count="1">1</button>
+                    <button class="count-option" data-count="2">2</button>
+                    <button class="count-option" data-count="3">3</button>
+                    <button class="count-option" data-count="4">4</button>
+                    <button class="count-option" data-count="5">5</button>
+                    <button class="count-option" data-count="6">6</button>
+                    <button class="count-option" data-count="7">7</button>
+                    <button class="count-option" data-count="8">8</button>
                 </div>
             </div>
 
-            <div class="dice-count-section">
-                <span class="section-label">选择骰子数量</span>
-                <div class="count-buttons">
-                    <button class="count-btn" onclick="selectDiceCount(1)">1</button>
-                    <button class="count-btn selected" onclick="selectDiceCount(2)">2</button>
-                    <button class="count-btn" onclick="selectDiceCount(3)">3</button>
-                    <button class="count-btn" onclick="selectDiceCount(4)">4</button>
-                    <button class="count-btn" onclick="selectDiceCount(5)">5</button>
-                    <button class="count-btn" onclick="selectDiceCount(6)">6</button>
-                    <button class="count-btn" onclick="selectDiceCount(7)">7</button>
-                    <button class="count-btn" onclick="selectDiceCount(8)">8</button>
+            <!-- 投掷按钮 -->
+            <div class="roll-section">
+                <button class="roll-button" id="rollButton" onclick="rollDice()">
+                    🎲 开始投掷
+                </button>
+            </div>
+
+            <!-- 结果展示 -->
+            <div class="result-panel" id="resultPanel">
+                <!-- 投掷信息 -->
+                <div class="roll-info">
+                    <div class="roll-info-item">
+                        <span>🎲</span>
+                        <span>类型: <span class="roll-info-value" id="rollType">-</span></span>
+                    </div>
+                    <div class="roll-info-separator"></div>
+                    <div class="roll-info-item">
+                        <span>📊</span>
+                        <span>数量: <span class="roll-info-value" id="rollCount">-</span></span>
+                    </div>
+                </div>
+
+                <!-- 骰子容器 -->
+                <div class="dice-container" id="diceContainer">
+                    <!-- 动态生成骰子 -->
+                </div>
+
+                <!-- 总计区域 -->
+                <div class="total-section">
+                    <div class="total-label">总点数</div>
+                    <div class="total-value" id="resultTotal">0</div>
+                </div>
+
+                <!-- 统计信息 -->
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="statAvg">-</span>
+                        <span class="stat-label">平均值</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="statMax">-</span>
+                        <span class="stat-label">最高</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="statMin">-</span>
+                        <span class="stat-label">最低</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="statPercent">-</span>
+                        <span class="stat-label">完成度</span>
+                    </div>
                 </div>
             </div>
 
-            <button class="roll-button" onclick="rollDice()">🎲 掷骰子</button>
-
-            <div class="results-section">
-                <div class="results-title">掷骰结果</div>
-                <div id="diceResults" class="dice-results">
-                    <p style="color: var(--text-light); text-align: center; width: 100%;">点击上方按钮开始掷骰</p>
+            <!-- 历史记录 -->
+            <div class="history-panel" id="historyPanel">
+                <div class="section-header">
+                    <div class="section-icon">📜</div>
+                    <h2 class="section-title">投掷历史</h2>
                 </div>
-                <div id="totalResult" class="total-result" style="display: none;"></div>
+                <div class="history-list" id="historyList"></div>
             </div>
 
-            <div class="history-section">
-                <div class="history-title">📜 历史记录</div>
-                <div id="historyList" class="history-list">
-                    <p style="color: var(--text-light);">暂无记录</p>
+            <!-- 保存的掷骰 -->
+            <div class="saved-rolls-section">
+                <div class="section-header">
+                    <div class="section-icon">⭐</div>
+                    <h2 class="section-title">常用掷骰</h2>
+                </div>
+                <div class="save-form">
+                    <input type="text" class="form-input save-input" id="saveRollName" placeholder="输入名称（如：攻击检定）">
+                    <button class="btn btn-secondary" onclick="saveCurrentRoll()">💾 保存配置</button>
+                </div>
+                <div class="saved-rolls-grid" id="savedRollsGrid"></div>
+            </div>
+
+            <!-- 自定义骰子 -->
+            <div class="custom-dice-section">
+                <div class="section-header">
+                    <div class="section-icon">⚙️</div>
+                    <h2 class="section-title">自定义骰子</h2>
+                </div>
+                <div class="custom-dice-form">
+                    <div class="custom-input-group">
+                        <label class="form-label">面数 (2-1000)</label>
+                        <input type="number" class="form-input custom-input" id="customDiceSides" min="2" max="1000" value="2">
+                    </div>
+                    <button class="btn btn-primary" onclick="addCustomDice()">➕ 添加</button>
                 </div>
             </div>
+
         </div>
     </main>
 
-    <footer class="footer">
-        <p>🐉 阿正的赛博工具箱 - 让跑团更便捷</p>
-    </footer>
-
-    <!-- 德州骰选择对话框 -->
-    <div id="texasSelectDialog" class="texas-dialog" style="display: none;">
-        <div class="texas-dialog-content">
-            <h3>🤠 德州骰 - 选择5个骰子</h3>
-            <p>点击选择5个骰子：</p>
-            <div id="texasDiceOptions" class="texas-dice-options"></div>
-            <div class="texas-selected">已选择: <span id="texasSelectedCount">0</span>/5</div>
-            <div class="texas-dialog-buttons">
-                <button class="party-roll-btn" onclick="confirmTexasSelect()" id="texasConfirmBtn" disabled>确认选择</button>
-                <button class="party-next-btn" onclick="cancelTexasSelect()">取消</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 关闭Pro模式确认对话框 -->
-    <div id="closeProConfirmDialog" class="texas-dialog" style="display: none;">
-        <div class="texas-dialog-content">
-            <h3>⚠️ 确认关闭Pro模式</h3>
-            <p>关闭Pro模式将重置当前局数和所有技能骰，是否继续？</p>
-            <div class="texas-dialog-buttons">
-                <button class="party-roll-btn" onclick="confirmCloseProMode()">确认关闭</button>
-                <button class="party-next-btn" onclick="cancelCloseProMode()">取消</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 重掷骰选择对话框 -->
-    <div id="rerollSelectDialog" class="texas-dialog" style="display: none;">
-        <div class="texas-dialog-content">
-            <h3>🔄 重掷骰 - 选择一组</h3>
-            <p>点击选择你想要的一组骰子：</p>
-            <div class="reroll-groups">
-                <div class="reroll-group" id="rerollGroup1" onclick="selectRerollGroup(1)">
-                    <div class="reroll-group-title">第一组</div>
-                    <div class="reroll-group-dice" id="rerollGroup1Dice"></div>
-                </div>
-                <div class="reroll-group" id="rerollGroup2" onclick="selectRerollGroup(2)">
-                    <div class="reroll-group-title">第二组</div>
-                    <div class="reroll-group-dice" id="rerollGroup2Dice"></div>
-                </div>
-            </div>
-            <div class="texas-dialog-buttons">
-                <button class="party-roll-btn" onclick="confirmRerollSelect()" id="rerollConfirmBtn" disabled>确认选择</button>
-                <button class="party-next-btn" onclick="cancelRerollSelect()">取消</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 自选骰子彩蛋对话框 -->
-    <div id="customDiceDialog" class="texas-dialog" style="display: none;">
-        <div class="texas-dialog-content">
-            <h3>🎁 彩蛋解锁！自选5个D6</h3>
-            <p>点击数字选择你想要的骰子结果（1-6）：</p>
-            <div class="custom-dice-container">
-                <div class="custom-dice-row" id="customDiceRow">
-                    <!-- 5个自选骰子位置 -->
-                </div>
-            </div>
-            <div class="custom-dice-numbers">
-                <p>点击数字设置骰子：</p>
-                <div class="number-grid">
-                    <button class="number-btn" onclick="setCustomDiceValue(1)">1</button>
-                    <button class="number-btn" onclick="setCustomDiceValue(2)">2</button>
-                    <button class="number-btn" onclick="setCustomDiceValue(3)">3</button>
-                    <button class="number-btn" onclick="setCustomDiceValue(4)">4</button>
-                    <button class="number-btn" onclick="setCustomDiceValue(5)">5</button>
-                    <button class="number-btn" onclick="setCustomDiceValue(6)">6</button>
-                </div>
-            </div>
-            <div class="texas-dialog-buttons">
-                <button class="party-roll-btn" onclick="confirmCustomDice()" id="customDiceConfirmBtn" disabled>确认设置</button>
-                <button class="party-next-btn" onclick="cancelCustomDice()">取消</button>
-            </div>
+    <!-- 喝酒摇骰子 - 置顶固定栏 -->
+    <div class="party-section">
+        <div class="party-bar-content">
+            <div class="party-bar-title">喝酒摇骰子</div>
+            <div class="party-bar-desc">5个d6骰子，适合聚会喝酒游戏</div>
+            <button class="btn btn-party" onclick="enterPartyMode()">🎲 开始游戏</button>
         </div>
     </div>
 
@@ -1481,10 +1962,471 @@
         </div>
     </div>
 
+    <!-- 关闭Pro模式确认对话框 -->
+    <div id="closeProConfirmDialog" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3 class="modal-title">⚠️ 确认关闭Pro模式</h3>
+            <p class="modal-text">关闭Pro模式将重置当前游戏进度，是否继续？</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="cancelCloseProMode()">取消</button>
+                <button class="btn btn-danger" onclick="confirmCloseProMode()">确认关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 德州骰选择对话框 -->
+    <div id="texasSelectDialog" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3 class="modal-title">🤠 德州骰 - 选择5个骰子</h3>
+            <p class="modal-text">从7个骰子中选择5个（已选择: <span id="texasSelectedCount">0</span>/5）</p>
+            <div id="texasDiceOptions" class="texas-dice-grid"></div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="cancelTexasSelect()">取消</button>
+                <button class="btn btn-primary" id="texasConfirmBtn" onclick="confirmTexasSelect()" disabled>确认选择</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 重掷骰选择对话框 -->
+    <div id="rerollSelectDialog" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3 class="modal-title">🔄 重掷骰 - 选择一组</h3>
+            <p class="modal-text">点击选择其中一组骰子</p>
+            <div class="reroll-groups">
+                <div class="reroll-group" id="rerollGroup1" onclick="selectRerollGroup(1)">
+                    <h4>第一组</h4>
+                    <div id="rerollGroup1Dice" class="reroll-dice-row"></div>
+                </div>
+                <div class="reroll-group" id="rerollGroup2" onclick="selectRerollGroup(2)">
+                    <h4>第二组</h4>
+                    <div id="rerollGroup2Dice" class="reroll-dice-row"></div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="cancelRerollSelect()">取消</button>
+                <button class="btn btn-primary" id="rerollConfirmBtn" onclick="confirmRerollSelect()" disabled>确认选择</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自选骰子彩蛋对话框 -->
+    <div id="customDiceDialog" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3 class="modal-title">🎁 彩蛋解锁 - 自选骰子</h3>
+            <p class="modal-text">点击槽位选择，然后点击下方数字设置骰子值</p>
+            <div id="customDiceRow" class="custom-dice-row"></div>
+            <div class="custom-dice-numbers">
+                <button class="custom-dice-num" onclick="setCustomDiceValue(1)">1</button>
+                <button class="custom-dice-num" onclick="setCustomDiceValue(2)">2</button>
+                <button class="custom-dice-num" onclick="setCustomDiceValue(3)">3</button>
+                <button class="custom-dice-num" onclick="setCustomDiceValue(4)">4</button>
+                <button class="custom-dice-num" onclick="setCustomDiceValue(5)">5</button>
+                <button class="custom-dice-num" onclick="setCustomDiceValue(6)">6</button>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="cancelCustomDice()">取消</button>
+                <button class="btn btn-primary" id="customDiceConfirmBtn" onclick="confirmCustomDice()" disabled>确认</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        let selectedDiceType = 6;
-        let selectedDiceCount = 2;
+        // 初始化
+        let selectedDice = null;
+        let selectedCount = null;
         let rollHistory = [];
+
+        // DOM加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            initDiceSelection();
+            initCountSelection();
+            loadSavedRolls();
+        });
+
+        // 骰子类型选择
+        function initDiceSelection() {
+            document.querySelectorAll('.dice-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.dice-option').forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+                    selectedDice = parseInt(option.dataset.sides);
+                });
+            });
+        }
+
+        // 数量选择
+        function initCountSelection() {
+            document.querySelectorAll('.count-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.count-option').forEach(o => o.classList.remove('selected'));
+                    option.classList.add('selected');
+                    selectedCount = parseInt(option.dataset.count);
+                });
+            });
+        }
+
+        // 投掷骰子
+        // 创建骰子HTML
+        function createDiceHTML(index, sides) {
+            return `
+                <div class="dice-3d rolling" id="dice-${index}" data-index="${index}">
+                    <span class="dice-index">${index + 1}</span>
+                    <div class="dice-face" id="dice-face-${index}">?</div>
+                </div>
+            `;
+        }
+
+        // 更新骰子显示
+        function updateDiceDisplay(index, value, isMax, isMin) {
+            const diceFace = document.getElementById(`dice-face-${index}`);
+            const dice = document.getElementById(`dice-${index}`);
+            
+            if (diceFace && dice) {
+                diceFace.textContent = value;
+                diceFace.classList.remove('max-value', 'min-value');
+                
+                if (isMax) diceFace.classList.add('max-value');
+                if (isMin) diceFace.classList.add('min-value');
+                
+                // 移除滚动动画，添加落地弹跳
+                dice.classList.remove('rolling');
+                dice.classList.add('landed');
+                
+                setTimeout(() => {
+                    dice.classList.remove('landed');
+                }, 400);
+            }
+        }
+
+        // 滚动动画效果
+        function animateDiceRoll(index, sides, finalValue, delay) {
+            const diceFace = document.getElementById(`dice-face-${index}`);
+            if (!diceFace) return;
+            
+            // 快速滚动显示随机数字
+            let rolls = 0;
+            const maxRolls = 12;
+            const interval = setInterval(() => {
+                diceFace.textContent = Math.floor(Math.random() * sides) + 1;
+                rolls++;
+                
+                if (rolls >= maxRolls) {
+                    clearInterval(interval);
+                    // 显示最终结果
+                    const isMax = finalValue === sides;
+                    const isMin = finalValue === 1;
+                    updateDiceDisplay(index, finalValue, isMax, isMin);
+                }
+            }, 80 + (delay * 20)); // 递增延迟，创造错落感
+        }
+
+        function rollDice() {
+            if (!selectedDice || !selectedCount) {
+                showNotification('请先选择骰子类型和数量！', 'warning');
+                return;
+            }
+
+            const button = document.getElementById('rollButton');
+            button.disabled = true;
+            button.textContent = '🎲 投掷中...';
+
+            // 准备结果面板
+            const resultPanel = document.getElementById('resultPanel');
+            resultPanel.classList.remove('show');
+            
+            // 清空骰子容器
+            const diceContainer = document.getElementById('diceContainer');
+            diceContainer.innerHTML = '';
+            
+            // 重置统计显示
+            document.getElementById('resultTotal').textContent = '0';
+            document.getElementById('statAvg').textContent = '-';
+            document.getElementById('statMax').textContent = '-';
+            document.getElementById('statMin').textContent = '-';
+            document.getElementById('statPercent').textContent = '-';
+
+            setTimeout(() => {
+                // 生成所有骰子HTML
+                let diceHTML = '';
+                for (let i = 0; i < selectedCount; i++) {
+                    diceHTML += createDiceHTML(i, selectedDice);
+                }
+                diceContainer.innerHTML = diceHTML;
+                
+                // 显示面板
+                resultPanel.classList.add('show');
+                
+                // 更新投掷信息
+                document.getElementById('rollType').textContent = `D${selectedDice}`;
+                document.getElementById('rollCount').textContent = selectedCount;
+                
+                // 生成结果
+                const results = [];
+                let total = 0;
+                
+                for (let i = 0; i < selectedCount; i++) {
+                    const roll = Math.floor(Math.random() * selectedDice) + 1;
+                    results.push(roll);
+                    total += roll;
+                }
+                
+                // 找出最大最小值
+                const maxResult = Math.max(...results);
+                const minResult = Math.min(...results);
+                
+                // 为每个骰子启动动画
+                results.forEach((result, index) => {
+                    const isMax = result === maxResult && result === selectedDice;
+                    const isMin = result === minResult && result === 1;
+                    animateDiceRoll(index, selectedDice, result, index);
+                });
+                
+                // 动画结束后更新总计和统计
+                const animationDuration = 1200 + (selectedCount * 100);
+                
+                setTimeout(() => {
+                    // 动画显示总计数字
+                    animateNumber(document.getElementById('resultTotal'), 0, total, 800);
+                    
+                    // 更新统计
+                    const avg = (total / selectedCount).toFixed(1);
+                    const maxPossible = selectedDice * selectedCount;
+                    const percentage = ((total / maxPossible) * 100).toFixed(0);
+                    
+                    document.getElementById('statAvg').textContent = avg;
+                    document.getElementById('statMax').textContent = maxResult;
+                    document.getElementById('statMin').textContent = minResult;
+                    document.getElementById('statPercent').textContent = percentage + '%';
+                    
+                    // 添加到历史
+                    addToHistory(selectedDice, selectedCount, results, total);
+                    
+                    // 恢复按钮
+                    button.disabled = false;
+                    button.textContent = '🎲 再次投掷';
+                    
+                    showNotification(`投掷完成！总点数: ${total}`, 'success');
+                }, animationDuration);
+                
+            }, 300);
+        }
+
+        // 数字动画
+        function animateNumber(element, start, end, duration) {
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // 使用缓动函数
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const current = Math.floor(start + (end - start) * easeOutQuart);
+                
+                element.textContent = current;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = end;
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
+        // 添加到历史
+        function addToHistory(sides, count, results, total) {
+            const historyItem = {
+                sides,
+                count,
+                results,
+                total,
+                time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            };
+
+            rollHistory.unshift(historyItem);
+            if (rollHistory.length > 10) rollHistory.pop();
+
+            updateHistoryDisplay();
+        }
+
+        // 更新历史显示
+        function updateHistoryDisplay() {
+            const historyPanel = document.getElementById('historyPanel');
+            const historyList = document.getElementById('historyList');
+
+            if (rollHistory.length > 0) {
+                historyPanel.classList.add('show');
+                historyList.innerHTML = rollHistory.map(item => `
+                    <div class="history-item">
+                        <div class="history-info">
+                            <span class="history-time">${item.time}</span>
+                            <span class="history-roll">${item.count}D${item.sides}</span>
+                        </div>
+                        <span class="history-result">${item.total}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // 保存当前配置
+        function saveCurrentRoll() {
+            if (!selectedDice || !selectedCount) {
+                showNotification('请先选择骰子类型和数量！', 'warning');
+                return;
+            }
+
+            const name = document.getElementById('saveRollName').value.trim();
+            if (!name) {
+                showNotification('请输入配置名称！', 'warning');
+                return;
+            }
+
+            const savedRolls = JSON.parse(localStorage.getItem('diceSavedRolls') || '[]');
+            
+            const existingIndex = savedRolls.findIndex(r => r.name === name);
+            if (existingIndex >= 0) {
+                if (!confirm('已存在同名配置，是否覆盖？')) return;
+                savedRolls[existingIndex] = { name, sides: selectedDice, count: selectedCount };
+            } else {
+                savedRolls.push({ name, sides: selectedDice, count: selectedCount });
+            }
+
+            localStorage.setItem('diceSavedRolls', JSON.stringify(savedRolls));
+            document.getElementById('saveRollName').value = '';
+            loadSavedRolls();
+            showNotification('配置已保存！', 'success');
+        }
+
+        // 加载保存的配置
+        function loadSavedRolls() {
+            const savedRolls = JSON.parse(localStorage.getItem('diceSavedRolls') || '[]');
+            const grid = document.getElementById('savedRollsGrid');
+
+            if (savedRolls.length === 0) {
+                grid.innerHTML = '<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1; padding: var(--space-4);">暂无保存的配置</p>';
+                return;
+            }
+
+            grid.innerHTML = savedRolls.map((roll, index) => `
+                <div class="saved-roll-card" onclick="applySavedRoll(${index})">
+                    <div class="saved-roll-name">${roll.name}</div>
+                    <div class="saved-roll-config">${roll.count}D${roll.sides}</div>
+                    <button class="saved-roll-delete" onclick="event.stopPropagation(); deleteSavedRoll(${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        // 应用保存的配置
+        function applySavedRoll(index) {
+            const savedRolls = JSON.parse(localStorage.getItem('diceSavedRolls') || '[]');
+            const roll = savedRolls[index];
+            if (!roll) return;
+
+            // 选择骰子
+            document.querySelectorAll('.dice-option').forEach(o => {
+                o.classList.remove('selected');
+                if (parseInt(o.dataset.sides) === roll.sides) o.classList.add('selected');
+            });
+            selectedDice = roll.sides;
+
+            // 选择数量
+            document.querySelectorAll('.count-option').forEach(o => {
+                o.classList.remove('selected');
+                if (parseInt(o.dataset.count) === roll.count) o.classList.add('selected');
+            });
+            selectedCount = roll.count;
+
+            showNotification(`已加载: ${roll.name}`, 'info');
+        }
+
+        // 删除保存的配置
+        function deleteSavedRoll(index) {
+            const savedRolls = JSON.parse(localStorage.getItem('diceSavedRolls') || '[]');
+            savedRolls.splice(index, 1);
+            localStorage.setItem('diceSavedRolls', JSON.stringify(savedRolls));
+            loadSavedRolls();
+            showNotification('配置已删除', 'success');
+        }
+
+        // 添加自定义骰子
+        function addCustomDice() {
+            const sides = parseInt(document.getElementById('customDiceSides').value);
+            
+            if (isNaN(sides) || sides < 2 || sides > 1000) {
+                showNotification('请输入2-1000之间的数字！', 'warning');
+                return;
+            }
+
+            // 检查是否已存在
+            if (document.querySelector(`[data-sides="${sides}"]`)) {
+                showNotification('该骰子类型已存在！', 'warning');
+                return;
+            }
+
+            const diceGrid = document.getElementById('diceGrid');
+            const newDice = document.createElement('div');
+            newDice.className = 'dice-option';
+            newDice.dataset.sides = sides;
+            newDice.innerHTML = `
+                <span class="dice-icon">🎲</span>
+                <span class="dice-label">D${sides}</span>
+                <span class="dice-sides">${sides}面</span>
+            `;
+            
+            newDice.addEventListener('click', () => {
+                document.querySelectorAll('.dice-option').forEach(o => o.classList.remove('selected'));
+                newDice.classList.add('selected');
+                selectedDice = sides;
+            });
+
+            diceGrid.appendChild(newDice);
+            showNotification(`已添加自定义骰子 D${sides}！`, 'success');
+        }
+
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 16px 24px;
+                background: ${type === 'success' ? 'var(--neon-green)' : type === 'warning' ? 'var(--warning)' : 'var(--neon-blue)'};
+                color: ${type === 'success' ? '#000' : '#fff'};
+                border-radius: 8px;
+                font-weight: 600;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ==================== 喝酒摇骰子功能 ====================
         
         // 喝酒摇骰子模式变量
         let partyMode = {
@@ -1492,14 +2434,43 @@
             proMode: false,
             round: 1,
             dice: [],
-            skin: 'number', // 'number' 或 'dots'
+            skin: 'number',
+            locked: false,
             skills: {
                 reroll: 0,
                 small: 0,
                 big: 0,
                 texas: 0
             },
-            skillHistory: []
+            skillHistory: [],
+            rerollCount: 0
+        };
+
+        // 德州骰选择相关变量
+        let texasSelection = {
+            results: [],
+            selected: [],
+            active: false
+        };
+
+        // 重掷骰选择相关变量
+        let rerollSelection = {
+            group1: [],
+            group2: [],
+            selectedGroup: null,
+            active: false
+        };
+
+        // 技能骰标题点击计数（彩蛋）
+        let skillsTitleClickCount = 0;
+        let skillsTitleClickTimer = null;
+        let customDiceBonusUsed = false;
+
+        // 自选骰子彩蛋相关变量
+        let customDiceSelection = {
+            values: [null, null, null, null, null],
+            selectedSlot: 0,
+            active: false
         };
 
         // 皮肤切换函数
@@ -1516,93 +2487,18 @@
 
         // 生成点数骰子的HTML
         function getDotsHTML(value) {
-            // 生成9个点 (3x3网格布局)
             return '<span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span><span class="dice-dot"></span>';
         }
 
-        function selectDiceType(type) {
-            selectedDiceType = type;
-            document.querySelectorAll('.dice-type').forEach(el => {
-                el.classList.remove('selected');
-            });
-            document.querySelector(`[data-dice="${type}"]`).classList.add('selected');
-        }
-
-        function selectDiceCount(count) {
-            selectedDiceCount = count;
-            document.querySelectorAll('.count-btn').forEach(el => {
-                el.classList.remove('selected');
-            });
-            event.target.classList.add('selected');
-        }
-
-        function rollDice() {
-            const results = [];
-            let total = 0;
-
-            for (let i = 0; i < selectedDiceCount; i++) {
-                const result = Math.floor(Math.random() * selectedDiceType) + 1;
-                results.push(result);
-                total += result;
-            }
-
-            displayResults(results, total);
-            addToHistory(results, total);
-        }
-
-        function displayResults(results, total) {
-            const resultsContainer = document.getElementById('diceResults');
-            const totalContainer = document.getElementById('totalResult');
-
-            resultsContainer.innerHTML = results.map((result, index) => 
-                `<div class="dice-result" style="animation-delay: ${index * 0.1}s">${result}</div>`
-            ).join('');
-
-            totalContainer.innerHTML = `总计: ${total}`;
-            totalContainer.style.display = 'block';
-        }
-
-        function addToHistory(results, total) {
-            const historyList = document.getElementById('historyList');
-            const timestamp = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            
-            rollHistory.unshift({
-                time: timestamp,
-                dice: `${selectedDiceCount}D${selectedDiceType}`,
-                results: results,
-                total: total
-            });
-
-            if (rollHistory.length > 10) {
-                rollHistory.pop();
-            }
-
-            updateHistoryDisplay();
-        }
-
-        function updateHistoryDisplay() {
-            const historyList = document.getElementById('historyList');
-            
-            if (rollHistory.length === 0) {
-                historyList.innerHTML = '<p style="color: var(--text-light);">暂无记录</p>';
-                return;
-            }
-
-            historyList.innerHTML = rollHistory.map(roll => 
-                `<div class="history-item">
-                    <strong>[${roll.time}]</strong> ${roll.dice}: [${roll.results.join(', ')}] = <strong>${roll.total}</strong>
-                </div>`
-            ).join('');
-        }
-
-        // ==================== 喝酒摇骰子模式 ====================
-        
+        // 进入喝酒摇骰子模式
         function enterPartyMode() {
             partyMode.active = true;
             partyMode.proMode = false;
             partyMode.round = 1;
             partyMode.dice = [];
             partyMode.skillHistory = [];
+            partyMode.rerollCount = 0;
+            customDiceBonusUsed = false;
             
             // 初始化5个d6骰子
             for (let i = 0; i < 5; i++) {
@@ -1624,11 +2520,13 @@
             document.getElementById('partyNextBtn').style.display = 'none';
         }
         
+        // 退出喝酒摇骰子模式
         function exitPartyMode() {
             partyMode.active = false;
             document.getElementById('partyModeOverlay').style.display = 'none';
         }
         
+        // 进入Pro模式
         function enterPartyProMode() {
             partyMode.proMode = true;
             partyMode.skills = {
@@ -1645,19 +2543,23 @@
             updatePartyStatus('Pro模式已开启！每3局获得一个随机技能骰');
         }
 
+        // 显示关闭Pro模式确认对话框
         function showCloseProConfirm() {
             document.getElementById('closeProConfirmDialog').style.display = 'flex';
         }
 
+        // 确认关闭Pro模式
         function confirmCloseProMode() {
             document.getElementById('closeProConfirmDialog').style.display = 'none';
             exitPartyProMode();
         }
 
+        // 取消关闭Pro模式
         function cancelCloseProMode() {
             document.getElementById('closeProConfirmDialog').style.display = 'none';
         }
 
+        // 退出Pro模式
         function exitPartyProMode() {
             partyMode.proMode = false;
             partyMode.skills = {
@@ -1691,13 +2593,7 @@
             updatePartyStatus('Pro模式已关闭，游戏已重置！点击"掷骰子"开始新的一局');
         }
 
-        // 德州骰选择相关变量
-        let texasSelection = {
-            results: [],
-            selected: [],
-            active: false
-        };
-
+        // 显示德州骰选择对话框
         function showTexasDialog() {
             // 生成7个d6骰子
             texasSelection.results = [];
@@ -1719,6 +2615,7 @@
             document.getElementById('texasSelectDialog').style.display = 'flex';
         }
 
+        // 切换德州骰选择
         function toggleTexasDie(index) {
             if (!texasSelection.active) return;
 
@@ -1741,6 +2638,7 @@
             document.getElementById('texasConfirmBtn').disabled = texasSelection.selected.length !== 5;
         }
 
+        // 确认德州骰选择
         function confirmTexasSelect() {
             if (texasSelection.selected.length !== 5) return;
 
@@ -1760,6 +2658,7 @@
             updatePartyStatus(`使用德州骰！结果: [${values.join(', ')}]`);
         }
 
+        // 取消德州骰选择
         function cancelTexasSelect() {
             document.getElementById('texasSelectDialog').style.display = 'none';
             texasSelection.active = false;
@@ -1769,19 +2668,7 @@
             updatePartyStatus('取消使用德州骰');
         }
 
-        // 重掷骰选择相关变量
-        let rerollSelection = {
-            group1: [],
-            group2: [],
-            selectedGroup: null,
-            active: false
-        };
-
-        // 技能骰标题点击计数（彩蛋）
-        let skillsTitleClickCount = 0;
-        let skillsTitleClickTimer = null;
-        let customDiceBonusUsed = false;
-
+        // 显示重掷骰选择对话框
         function showRerollDialog() {
             // 生成两组5个d6骰子
             rerollSelection.group1 = [];
@@ -1814,6 +2701,7 @@
             document.getElementById('rerollSelectDialog').style.display = 'flex';
         }
 
+        // 选择重掷骰组
         function selectRerollGroup(groupNum) {
             if (!rerollSelection.active) return;
 
@@ -1825,6 +2713,7 @@
             document.getElementById('rerollConfirmBtn').disabled = false;
         }
 
+        // 确认重掷骰选择
         function confirmRerollSelect() {
             if (!rerollSelection.selectedGroup) return;
 
@@ -1847,6 +2736,7 @@
             updatePartyStatus(`使用重掷骰！选择了第${rerollSelection.selectedGroup}组: [${values.join(', ')}]`);
         }
 
+        // 取消重掷骰选择
         function cancelRerollSelect() {
             document.getElementById('rerollSelectDialog').style.display = 'none';
             rerollSelection.active = false;
@@ -1886,13 +2776,7 @@
             }
         }
 
-        // 自选骰子彩蛋相关变量
-        let customDiceSelection = {
-            values: [null, null, null, null, null],
-            selectedSlot: 0,
-            active: false
-        };
-
+        // 显示自选骰子彩蛋对话框
         function showCustomDiceDialog() {
             customDiceSelection.values = [null, null, null, null, null];
             customDiceSelection.selectedSlot = 0;
@@ -1912,6 +2796,7 @@
             updatePartyStatus('🎁 彩蛋解锁！请选择5个骰子的数值');
         }
 
+        // 选择自选骰子槽位
         function selectCustomDiceSlot(index) {
             if (!customDiceSelection.active) return;
 
@@ -1924,6 +2809,7 @@
             });
         }
 
+        // 设置自选骰子值
         function setCustomDiceValue(value) {
             if (!customDiceSelection.active) return;
 
@@ -1946,6 +2832,7 @@
             document.getElementById('customDiceConfirmBtn').disabled = !isComplete;
         }
 
+        // 确认自选骰子
         function confirmCustomDice() {
             if (!customDiceSelection.active) return;
 
@@ -1971,17 +2858,17 @@
             // 5秒倒计时
             let countdown = 5;
             nextBtn.textContent = `下一局 (${countdown}s)`;
-            const countdownInterval = setInterval(() => {
+            window.partyCountdownInterval = setInterval(() => {
                 countdown--;
                 if (countdown > 0) {
                     nextBtn.textContent = `下一局 (${countdown}s)`;
                 } else {
-                    clearInterval(countdownInterval);
+                    clearInterval(window.partyCountdownInterval);
+                    window.partyCountdownInterval = null;
                     nextBtn.disabled = false;
                     nextBtn.textContent = '下一局 ➜';
                 }
             }, 1000);
-            nextBtn.dataset.countdownInterval = countdownInterval;
 
             renderPartyDice();
 
@@ -1989,12 +2876,14 @@
             updatePartyStatus(`🎁 彩蛋使用成功！自选骰子: [${values.join(', ')}]`);
         }
 
+        // 取消自选骰子
         function cancelCustomDice() {
             document.getElementById('customDiceDialog').style.display = 'none';
             customDiceSelection.active = false;
             updatePartyStatus('取消使用彩蛋');
         }
 
+        // 渲染喝酒摇骰子
         function renderPartyDice() {
             const container = document.getElementById('partyDiceContainer');
             
@@ -2013,6 +2902,7 @@
             }).join('');
         }
         
+        // 渲染技能骰
         function renderPartySkills() {
             const container = document.getElementById('partySkillList');
             
@@ -2035,16 +2925,17 @@
             }).join('');
         }
         
+        // 掷骰子
         function partyRoll() {
             // 掷骰子
             partyMode.dice.forEach((die, index) => {
                 const dieEl = document.getElementById(`partyDie${index}`);
                 dieEl.classList.add('rolling');
-                
+
                 setTimeout(() => {
                     die.value = Math.floor(Math.random() * 6) + 1;
                     dieEl.classList.remove('rolling');
-                    
+
                     // 根据皮肤更新显示
                     if (partyMode.skin === 'dots') {
                         dieEl.setAttribute('data-value', die.value);
@@ -2055,16 +2946,25 @@
                     }
                 }, 500);
             });
-            
+
             setTimeout(() => {
-                // 检查是否五个骰子都不一样
+                // 检查是否五个骰子都不一样（最多重掷3次避免极端情况）
                 const values = partyMode.dice.map(d => d.value).filter(v => v !== null);
                 const uniqueValues = [...new Set(values)];
-                
+
                 if (values.length === 5 && uniqueValues.length === 5) {
-                    updatePartyStatus('五个骰子都不一样！自动重新掷骰子...');
-                    setTimeout(() => partyRoll(), 1000);
-                    return;
+                    partyMode.rerollCount = (partyMode.rerollCount || 0) + 1;
+                    if (partyMode.rerollCount <= 3) {
+                        updatePartyStatus(`五个骰子都不一样！自动重新掷骰子... (${partyMode.rerollCount}/3)`);
+                        setTimeout(() => partyRoll(), 1000);
+                        return;
+                    } else {
+                        // 超过3次，接受结果
+                        partyMode.rerollCount = 0;
+                        updatePartyStatus('五个骰子都不一样！已达到最大重掷次数，接受结果。');
+                    }
+                } else {
+                    partyMode.rerollCount = 0;
                 }
                 
                 renderPartyDice();
@@ -2079,19 +2979,17 @@
                 let countdown = 5;
                 nextBtn.textContent = `下一局 (${countdown}s)`;
 
-                const countdownInterval = setInterval(() => {
+                window.partyCountdownInterval = setInterval(() => {
                     countdown--;
                     if (countdown > 0) {
                         nextBtn.textContent = `下一局 (${countdown}s)`;
                     } else {
-                        clearInterval(countdownInterval);
+                        clearInterval(window.partyCountdownInterval);
+                        window.partyCountdownInterval = null;
                         nextBtn.disabled = false;
                         nextBtn.textContent = '下一局 ➜';
                     }
                 }, 1000);
-
-                // 保存interval ID以便提前清除
-                nextBtn.dataset.countdownInterval = countdownInterval;
 
                 updatePartyStatus(`第${partyMode.round}局完成！五个骰子: [${values.join(', ')}]`);
                 
@@ -2102,6 +3000,7 @@
             }, 600);
         }
         
+        // 下一局
         function partyNextRound() {
             const nextBtn = document.getElementById('partyNextBtn');
 
@@ -2109,9 +3008,9 @@
             if (nextBtn.disabled) return;
 
             // 清除倒计时interval
-            if (nextBtn.dataset.countdownInterval) {
-                clearInterval(parseInt(nextBtn.dataset.countdownInterval));
-                delete nextBtn.dataset.countdownInterval;
+            if (window.partyCountdownInterval) {
+                clearInterval(window.partyCountdownInterval);
+                window.partyCountdownInterval = null;
             }
 
             partyMode.round++;
@@ -2125,6 +3024,7 @@
             updatePartyStatus(`第${partyMode.round}局开始！点击"掷骰子"`);
         }
         
+        // 使用技能骰
         function usePartySkill(skillKey) {
             if (partyMode.skills[skillKey] <= 0) return;
             
@@ -2134,7 +3034,7 @@
                 case 'reroll':
                     // 重掷骰：生成两组5个d6，让玩家选择
                     showRerollDialog();
-                    return; // 不执行后续的render和update
+                    return;
                     
                 case 'small':
                     // 小小骰：重掷5个d4
@@ -2146,14 +3046,14 @@
                 case 'big':
                     // 大大骰：重掷5个d6，结果只可能为4/5/6
                     partyMode.dice.forEach((die, index) => {
-                        die.value = Math.floor(Math.random() * 3) + 4; // 4, 5, 或 6
+                        die.value = Math.floor(Math.random() * 3) + 4;
                     });
                     break;
                     
                 case 'texas':
                     // 德州骰：显示选择对话框让玩家自选5个
                     showTexasDialog();
-                    return; // 不执行后续的render和update
+                    return;
             }
             
             renderPartyDice();
@@ -2163,6 +3063,7 @@
             updatePartyStatus(`使用技能骰！结果: [${values.join(', ')}]`);
         }
         
+        // 奖励随机技能骰
         function awardRandomSkill() {
             const skillKeys = ['reroll', 'small', 'big', 'texas'];
             const randomSkill = skillKeys[Math.floor(Math.random() * skillKeys.length)];
@@ -2180,6 +3081,7 @@
             updatePartyStatus(`🎉 第${partyMode.round}局奖励！获得1个${skillNames[randomSkill]}！`);
         }
         
+        // 更新状态
         function updatePartyStatus(message) {
             document.getElementById('partyStatus').textContent = message;
         }
